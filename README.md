@@ -15,10 +15,31 @@ You may find my notes on integrating Amplify with Android, along with a number o
 * [Subscriptions](https://github.com/SharinaS/java-fundamentals/wiki/Android-Subscriptions)
 * [S3 and File Uploads](https://github.com/SharinaS/java-fundamentals/wiki/Android-Amplify-S3-and-File-Uploads)
 
-## EC2
+# EC2
 * A virtual server or servers in the cloud.
 * Reduces the time needed to obtain and boot new server instances
   * Allows for quickly scaling capacity as computing requirements change
+
+### Pricing Models
+* On Demand
+* Reserved - 1 or 3 years term contracts
+* Spot - bid a price you want to pay
+* Dedicated hosts - physical server(s) for license terms/conditions
+
+## EBS
+* The virtual hard disks that EC2 uses. 
+  * Every server has a disk, and this is also the case for virtual servers. 
+  * The EC2 and the EBS has to be in the same Availability Zone.
+* There's SSD (2 types)
+  * GP2
+  * IO1
+* ... and there's Magnetic (2 types)
+  * ST1
+  * SC1
+* ... and the previous generation is called magnetic
+
+### Resources
+* A Cloud Guru's AWS Certified Cloud Practitioner Course
 
 # Elastic Beanstalk
 Here are my step-by-step instructions on [how to deploy to elastic beanstalk](https://github.com/SharinaS/java-fundamentals/wiki/Deploying-to-AWS-with-Elastic-Beanstalk) when dealing with a Java fullstack app (and postgresql db)
@@ -30,7 +51,5 @@ My Java 401 class notes on [IAM in my wiki](https://github.com/SharinaS/java-fun
 * IAM = Identify And Access Management
 * Security controls regarding access to AWS resources.
 
-
-
 ### Resources
-[1Strategy March blog post on IAM](https://www.1strategy.com/blog/2020/03/10/ten-tips-for-improved-iam-security/)
+* [1Strategy March blog post on IAM](https://www.1strategy.com/blog/2020/03/10/ten-tips-for-improved-iam-security/)
