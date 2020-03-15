@@ -45,6 +45,8 @@ In case of failure, for production website, have at least two EC2 instances runn
 * ... and the previous generation is called magnetic
 
 ## Provision an EC2 Instance Using EC2's Amazon Linux 2 AMI
+![image of ec2 instance](/assets/ec2Instance.png)
+
 0. Sign into your Amazon Console and go to EC2:
 1. `Launch instance`
 2. Click (to the left) `Free tier only`
@@ -54,9 +56,13 @@ In case of failure, for production website, have at least two EC2 instances runn
 6. In Step 4, "Add Storage", the volume type, "root," is our EBS instance, or the virtual hard-disk in the cloud. Every time you `Add New Volume`, you get more options to choose from under the column of "Volume Type." For a simple setup, choose "Volume Type" of `General Purpose SSD (pg2)` and then click `Next: Add Tags`. 
 7. In Step 5, "Add Tags," Add key-value pairs of information about the instance, by clicking on `Add Tag`, such as name (of the instance), department, employee-id (of person who spun up the instance), etc. Then click `Next: Configure Security Group`.
 8. In Step 6, " Configure Security Group," make sure "Create a new security group" is toggled, rename your "Security group name" to something and add a "Description," which could be the same thing you wrote in as the group name. Note that a security group is a virtual firewall in the cloud, so you can specify if it's open to the entire world, or only to `My IP` (only you can SSH into the webserver). For web traffic, though, you want to set it up so it can respond to web requests... so for this example, for type `SSH`, choose `Anywhere`. Then, `Add Rule`, and for port type `HTTP`, choose `Custom`, so it too opens up to the world. Hit `Review and Launch`. 
-9. In Step 7, hit `Launch`. In the box that appears, "Select an existing key pair or create a new key pair," change the dropdown to read `Create a new key pair` and give the private key pair a name. Then click `Download Key Pair` into your downloads directory, and `Launch Instance`. 
+9. In Step 7, hit `Launch`. In the box that appears, "Select an existing key pair or create a new key pair," change the dropdown to read `Create a new key pair` and give the private key pair a name. Then click `Download Key Pair` into your downloads directory, and `Launch Instance`.
+![image of key value pairs](/assets/ec2KeyValue.png)
+
 10. Click on `View Instances` in Launch Status page.
-11. When you select an instance, it will reveal deatils about that instance, including a "Description" tag. Hover over the "IPv4 Public IP (the IP address) and click on the `Copy to clipboard` icon that appears. 
+11. When you select an instance, it will reveal details about that instance, including a "Description" tag. Hover over the "IPv4 Public IP (the IP address) and click on the `Copy to clipboard` icon that appears. 
+![image of part of instance description](/assets/ec2InstanceInfo.png)
+
 12. For Mac users, open up the terminal and cd into Downloads - `cd Downloads`. 
 13. Change permissions using the terminal on the private key you downloaded a bit ago: `chmod 400 <name-of-key.pem>`
 14. Connect to the EC2 instance by typing into the terminal: `ssh ec2-user@<the IP address copied in step 11> -i <name-of-key.pem>` and hit `yes` when it asks if you're sure you want to connect. Don't worry about the first part in this simple example, when it says, "The authenticity of host.... can't be established." 
