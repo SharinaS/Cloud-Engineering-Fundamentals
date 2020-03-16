@@ -17,7 +17,7 @@ You may find my notes on integrating Amplify with Android, along with a number o
 
 
 # EC2
-Notes and instructions on using the Amazon console and the terminal are in the repository file titled EC2.md.
+Notes and instructions on using the Amazon console and the terminal are in my [repository file titled EC2.md](https://github.com/SharinaS/Cloud-Engineering-Fundamentals/blob/master/EC2.md).
 
 # Elastic Beanstalk
 Here are my step-by-step instructions on [how to deploy to elastic beanstalk](https://github.com/SharinaS/java-fundamentals/wiki/Deploying-to-AWS-with-Elastic-Beanstalk) when dealing with a Java fullstack app (and postgresql db)

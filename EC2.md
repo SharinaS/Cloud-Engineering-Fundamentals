@@ -67,7 +67,7 @@ Firewalls enable the computer to communicate via its different ports.
 ### First, Gain Access to Your EC2 Instance
 (1) Make sure there is a User added within IAM on the Amazon console with Administrator Access. 
 
-You should have an Access key ID and a Secret access key downloaded somewhere (regenerate these by going to `IAM` > `Users` > the user name > `Security Credentials` tab, and under the "Access keys" section click `Make inactive` or `Delete`... and then click `Create access key` to generate a new set of keys. Make sure to download .csv file!).
+You should have an Access key ID and a Secret access key downloaded somewhere (regenerate these by going to `IAM` > `Users` > the user name > `Security Credentials` tab, and under the "Access keys" section click `Make inactive` or `Delete`... and then click `Create access key` to generate a new set of keys. Make sure to download the **.csv file!**).
 
 (2) Head over to the terminal. 
 
@@ -81,27 +81,81 @@ Remember step 14 in my "Provision an EC2 Instance Using EC2's Amazon Linux 2 AMI
 ssh ec2-user@<IPv4 Public IP> -i <your Key pair name>.pem
 ```
 
---> Add screenshot of terminal here <-- 
+You'll see output like this appear:
+
+![screenshot of terminal after acessing key](/assets/linux2ascii.png) 
 
 Elevate your priviledges to root with:
 ```
 sudo su
 ```
-So, your terminal will have something like:
+So, your terminal will have something like as its path:
 ```
 [root@ip-111-11-11-11 ec2-user]#
 ```
 
-Now you can interact with services like S3.
+### Configure the EC2 Instance to Interact with S3
+Need to do this step otherwise the terminal will complain that it's unable to locate credentials when you do something like try to make an S3 bucket. 
 
-### Make a Bucket in S3
-The format is **AWS + the service + action**.
+Can either give it credentials of the administrator that was set up above, or you can do it by using roles. 
 
-Make the bucket: 
+To give credentials:
+(note that the path shown should look like what's immediately above, code-wise)
 ```
-[root@ip-111-11-11-11 ec2-user]# aws s3 mb
+aws configure
+```
+When it asks for the Access Key and the Secret Access Key, copy paste from the .csv file you downloaded (when setting up your terminal above) into the terminal when prompted. 
+
+It'll then ask for the region name. Type in the region you usually work in, such as:
+```
+us-west-2
+```
+Hit enter when it asks for output format to choose default. 
+
+Now you can make an S3 bucket or do whatever else you want.
+
+### Check Configuration and Credentials from the Terminal
+Make sure you have access to your EC2 instance via the terminal - you'll be in a directory that looks like:  
+
+```
+[root@ip-111-11-11-11 ec2-user]#
+```
+Go to the home directory:
+```
+cd ~
+```
+get into the hidden aws file, which will have config and credentials
+```
+cd .aws
+```
+Since credentials is a file, use nano (text editor for linux) to view it and the access keys within it:
+```
+nano credentials
+```
+*Note that using the command line as demoed in this section leaves port 22 completely open... so it could be hacked... so the access keys can be easily found and used to gain control of the AWS account.* **Use roles to increase security!**
+
+
+### Make a Bucket in S3 Using the Terminal
+The format is **aws console + the service + action + name of new thing**.
+
+*Note that the name of the bucket must be lowercase.*
+```
+aws s3 mb s3://supercooldemobucket
 ```
 
+To list all the buckets you have in S3:
+```
+aws s3 ls
+```
+
+To upload content into the bucket from the current location:
+(for example, you can make a demo txt file with some content in it using `echo "this is a demo file" > demoTxtFile.txt`... use `ls` to prove to yourself that the file now exists within the current directory)
+
+```
+aws s3 cp demoTxtFile.txt s3://supercooldemobucket
+```
+
+<!-- screenshot of console -->
 
 ### Resources
 * A Cloud Guru's [AWS Certified Cloud Practitioner](https://acloud.guru/learn/aws-certified-cloud-practitioner) Course
