@@ -85,7 +85,7 @@ You'll see output like this appear:
 
 ![screenshot of terminal after acessing key](/assets/linux2ascii.png) 
 
-Elevate your priviledges to root with:
+(3) Elevate your priviledges to root with:
 ```
 sudo su
 ```
@@ -94,13 +94,21 @@ So, your terminal will have something like as its path:
 [root@ip-111-11-11-11 ec2-user]#
 ```
 
-### Configure the EC2 Instance to Interact with S3
-Need to do this step otherwise the terminal will complain that it's unable to locate credentials when you do something like try to make an S3 bucket. 
+## Configure the EC2 Instance to Interact with S3 (or other AWS Services)
+Need to configure the EC2 instance otherwise the terminal will complain that it's unable to locate credentials when you do something like try to make an S3 bucket. 
 
-Can either give it credentials of the administrator that was set up above, or you can do it by using roles. 
+Can either give it **credentials** of the administrator that was set up above, or you can do it by using **roles**. 
 
-To give credentials:
-(note that the path shown should look like what's immediately above, code-wise)
+### To Use Credentials:
+*Note that using the command line as demoed in this section leaves port 22 completely open... so it could be hacked... so the access keys can be easily found and used to gain control of the AWS account. Other option - use roles to increase security! (see below).*
+
+
+Note that the directory you're in should look like (see above for steps into this thing):
+
+```
+[root@ip-111-11-11-11 ec2-user]#
+```
+Tell AWS you want to dos some configuring:
 ```
 aws configure
 ```
@@ -114,16 +122,38 @@ Hit enter when it asks for output format to choose default.
 
 Now you can make an S3 bucket or do whatever else you want.
 
-### Check Configuration and Credentials from the Terminal
-Make sure you have access to your EC2 instance via the terminal - you'll be in a directory that looks like:  
+### To Make and Use a Role:
+This is more secure than using credentials. No .aws file is generated, and so no access is available to snatch up public or private keys. 
+
+See [my notes in IAM.md on making a role]().
+
+## Check Configuration and Credentials from the Terminal
+Make sure you have access to your EC2 instance via the terminal 
+
+### Grab the instance's Public IP and Key pair name
+In the Amazon console, go to EC2 > Running Instances. Click the box next to the instance name, and click on Description tab. Copy to clipboard the "IPv4 Public IP." Also make note of the "Key pair name" in this section.
+
+### SSH Into the EC2 Instance
+Navigate to the folder you downloaded (or moved) the **.pem** file into and type into the terminal:
+
+```
+ssh ec2-user@<IPv4 Public IP> -i <your Key pair name>.pem
+```
+```
+sudo su
+```
+
+You'll be in a directory that looks like:  
 
 ```
 [root@ip-111-11-11-11 ec2-user]#
 ```
+
 Go to the home directory:
 ```
 cd ~
 ```
+### If you set up *Credentials*, there *will* be a **.aws** file 
 get into the hidden aws file, which will have config and credentials
 ```
 cd .aws
@@ -132,30 +162,15 @@ Since credentials is a file, use nano (text editor for linux) to view it and the
 ```
 nano credentials
 ```
-*Note that using the command line as demoed in this section leaves port 22 completely open... so it could be hacked... so the access keys can be easily found and used to gain control of the AWS account.* **Use roles to increase security!**
-
-
-### Make a Bucket in S3 Using the Terminal
-The format is **aws console + the service + action + name of new thing**.
-
-*Note that the name of the bucket must be lowercase.*
+### If you set up a *Role* via IAM, you *don't want* a **.aws** file
+Remove the .aws file
 ```
-aws s3 mb s3://supercooldemobucket
+rm -rf .aws
 ```
-
-To list all the buckets you have in S3:
+Ask it to try and connect to S3 - to list the buckets that exist - using the role you set up ([see notes here]() on doing this), now that .aws is gone:
 ```
 aws s3 ls
 ```
 
-To upload content into the bucket from the current location:
-(for example, you can make a demo txt file with some content in it using `echo "this is a demo file" > demoTxtFile.txt`... use `ls` to prove to yourself that the file now exists within the current directory)
-
-```
-aws s3 cp demoTxtFile.txt s3://supercooldemobucket
-```
-
-<!-- screenshot of console -->
-
-### Resources
+# Resources
 * A Cloud Guru's [AWS Certified Cloud Practitioner](https://acloud.guru/learn/aws-certified-cloud-practitioner) Course
