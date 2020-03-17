@@ -24,7 +24,10 @@ You may find my notes on integrating Amplify with Android, along with a number o
 [Taskmaster is an Android app](https://github.com/SharinaS/taskmaster) I built as a learning project during my time at Code Fellows. It has a range of AWS services, integrated in with Amplify. FYI, it uses version 1.0 of Amplify, which is now out of date. 
 
 # EC2
-Notes and instructions on using the Amazon console and the terminal are in my [repository file titled EC2.md](https://github.com/SharinaS/Cloud-Engineering-Fundamentals/blob/master/EC2.md).
+## Notes 
+[Use the Amazon console and your local terminal](https://github.com/SharinaS/Cloud-Engineering-Fundamentals/blob/master/EC2.md), from my repository file titled EC2.md.
+
+[Build a simple web server](https://github.com/SharinaS/Cloud-Engineering-Fundamentals/blob/master/EC2.md) in my EC2 file. 
 
 # Elastic Beanstalk
 ## Notes
@@ -43,6 +46,12 @@ My Java 401 class notes on [IAM in my wiki](https://github.com/SharinaS/java-fun
 
 ### Resources
 * [1Strategy March blog post on IAM](https://www.1strategy.com/blog/2020/03/10/ten-tips-for-improved-iam-security/)
+
+# SageMaker
+Provides ability to build, train and deploy machine learning models. A fully managed services to remove the grunt work of machine learning. Provides all the components used for machine larning in one toolset. 
+
+### Resources
+[AWS](https://aws.amazon.com/sagemaker/)
 
 # S3
 ## Notes

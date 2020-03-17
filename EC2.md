@@ -27,10 +27,10 @@ In case of failure, for production website, have at least two EC2 instances runn
   * SC1
 * ... and the previous generation is called magnetic
 
-## Provision an EC2 Instance Using EC2's Amazon Linux 2 AMI 
+# Provision an EC2 Instance Using EC2's Amazon Linux 2 AMI 
 ![image of ec2 instance](/assets/ec2Instance.png)
 
-### Using the Amazon Console:
+## Using the Amazon Console:
 1. Sign into your Amazon Console and go to EC2, and click `Launch instance`.
 2. Click (to the left) `Free tier only`
 3. Select the `Amazon Linux 2 AMI (HVM), SSD Volume Type` instance
@@ -63,7 +63,7 @@ In case of failure, for production website, have at least two EC2 instances runn
 ### Firewalls
 Firewalls enable the computer to communicate via its different ports. 
 
-## Use the Terminal (Mac) To interact with AWS
+# Use the Terminal (Mac) To interact with AWS
 ### First, Gain Access to Your EC2 Instance
 (1) Make sure there is a User added within IAM on the Amazon console with Administrator Access. 
 
@@ -94,8 +94,8 @@ So, your terminal will have something like as its path:
 [root@ip-111-11-11-11 ec2-user]#
 ```
 
-## Configure the EC2 Instance to Interact with S3 (or other AWS Services)
-Need to configure the EC2 instance otherwise the terminal will complain that it's unable to locate credentials when you do something like try to make an S3 bucket. 
+# Configure the EC2 Instance to Interact with S3 (or other AWS Services)
+We need to configure the EC2 instance otherwise the terminal will complain that it's unable to locate credentials when you do something like try to make an S3 bucket. 
 
 Can either give it **credentials** of the administrator that was set up above, or you can do it by using **roles**. 
 
@@ -122,18 +122,18 @@ Hit enter when it asks for output format to choose default.
 
 Now you can make an S3 bucket or do whatever else you want.
 
-### To Make and Use a Role:
+## To Make and Use a Role:
 This is more secure than using credentials. No .aws file is generated, and so no access is available to snatch up public or private keys. 
 
 See [my notes in IAM.md on making a role]().
 
-## Check Configuration and Credentials from the Terminal
+# Check Configuration and Credentials from the Terminal
 Make sure you have access to your EC2 instance via the terminal 
 
-### Grab the instance's Public IP and Key pair name
+## Grab the instance's Public IP and Key pair name
 In the Amazon console, go to EC2 > Running Instances. Click the box next to the instance name, and click on Description tab. Copy to clipboard the "IPv4 Public IP." Also make note of the "Key pair name" in this section.
 
-### SSH Into the EC2 Instance
+## SSH Into the EC2 Instance
 Navigate to the folder you downloaded (or moved) the **.pem** file into and type into the terminal:
 
 ```
@@ -171,6 +171,69 @@ Ask it to try and connect to S3 - to list the buckets that exist - using the rol
 ```
 aws s3 ls
 ```
+
+# Building a Simple Web Server
+This uses the EC2 instance created above, and uses Apache.
+
+### Apache
+* Apache = Apache HTTP Server. 
+* As a webserver, it serves websites on the internet.
+* It's cross-platform web server software
+* Open-source
+* First version released in 1995 - one of the oldest web servers.
+
+## Do the Things
+### Get info from AWS
+Go to the AWS console and get the IP address for the instance you want to use. The IP address is the "IPv4 Public IP" visible when the instance radio button is clicked. Make note of the "Key pair name" a little below the IP address.
+
+### Connect from the terminal
+Navigate to the folder you downloaded (or moved) your **.pem** file into (which has your private key for the EC2 instance) and type into the terminal:
+
+```
+ssh ec2-user@<IPv4 Public IP> -i <Key pair name>.pem
+```
+```
+sudo su
+```
+Check for updates:
+```
+yum update -y
+```
+
+### Install Apache
+To make the EC2 instance a web server, we install Apache via the terminal:
+```
+yum install httpd -y
+```
+
+### Start Apache Service
+```
+service httpd start
+```
+
+### Check the Website Root Directory
+Go to the html directory:
+```
+cd /var/www.html
+```
+This is our root directory to our website. So, any files put into the directory will be visible just by going to the public IP address of the server. 
+
+Check for content:
+```
+ls
+```
+
+### Make Some Content
+At this point, just after adding Apache, there shouldn't be any files. 
+
+Make the content by using `nano index.html` to open up a super simple text editor and make a super simple demo page (use control-x to exit, hit yes to save, then hit enter to write). 
+
+Or, go about the usual steps, like using `touch` to make a file. You can't open up VS Code while in this directory though....
+
+### View the Content on the Browser
+Paste in the Public IP Address.
+
+<!-- screenshot of hello world -->
 
 # Resources
 * A Cloud Guru's [AWS Certified Cloud Practitioner](https://acloud.guru/learn/aws-certified-cloud-practitioner) Course
