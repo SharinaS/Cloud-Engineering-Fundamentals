@@ -64,12 +64,13 @@ In case of failure, for production website, have at least two EC2 instances runn
 Firewalls enable the computer to communicate via its different ports. 
 
 # Use the Terminal (Mac) To interact with AWS
-### First, Gain Access to Your EC2 Instance
-(1) Make sure there is a User added within IAM on the Amazon console with Administrator Access. 
+### Gain Access to Your EC2 Instance
+Make sure there is a User added within IAM on the Amazon console with Administrator Access. 
 
-You should have an Access key ID and a Secret access key downloaded somewhere (regenerate these by going to `IAM` > `Users` > the user name > `Security Credentials` tab, and under the "Access keys" section click `Make inactive` or `Delete`... and then click `Create access key` to generate a new set of keys. Make sure to download the **.csv file!**).
+If you're using credentials (don't; a role is much more secure):
+* You should have an Access key ID and a Secret access key downloaded somewhere (regenerate these by going to `IAM` > `Users` > the user name > `Security Credentials` tab, and under the "Access keys" section click `Make inactive` or `Delete`... and then click `Create access key` to generate a new set of keys. Make sure to download the **.csv file!**).
 
-(2) Head over to the terminal. 
+### Head over to the terminal. 
 
 Remember step 14 in my "Provision an EC2 Instance Using EC2's Amazon Linux 2 AMI" section?
 
@@ -172,68 +173,8 @@ Ask it to try and connect to S3 - to list the buckets that exist - using the rol
 aws s3 ls
 ```
 
-# Building a Simple Web Server
-This uses the EC2 instance created above, and uses Apache.
-
-### Apache
-* Apache = Apache HTTP Server. 
-* As a webserver, it serves websites on the internet.
-* It's cross-platform web server software
-* Open-source
-* First version released in 1995 - one of the oldest web servers.
-
-## Do the Things
-### Get info from AWS
-Go to the AWS console and get the IP address for the instance you want to use. The IP address is the "IPv4 Public IP" visible when the instance radio button is clicked. Make note of the "Key pair name" a little below the IP address.
-
-### Connect from the terminal
-Navigate to the folder you downloaded (or moved) your **.pem** file into (which has your private key for the EC2 instance) and type into the terminal:
-
-```
-ssh ec2-user@<IPv4 Public IP> -i <Key pair name>.pem
-```
-```
-sudo su
-```
-Check for updates:
-```
-yum update -y
-```
-
-### Install Apache
-To make the EC2 instance a web server, we install Apache via the terminal:
-```
-yum install httpd -y
-```
-
-### Start Apache Service
-```
-service httpd start
-```
-
-### Check the Website Root Directory
-Go to the html directory:
-```
-cd /var/www.html
-```
-This is our root directory to our website. So, any files put into the directory will be visible just by going to the public IP address of the server. 
-
-Check for content:
-```
-ls
-```
-
-### Make Some Content
-At this point, just after adding Apache, there shouldn't be any files. 
-
-Make the content by using `nano index.html` to open up a super simple text editor and make a super simple demo page (use control-x to exit, hit yes to save, then hit enter to write). 
-
-Or, go about the usual steps, like using `touch` to make a file. You can't open up VS Code while in this directory though....
-
-### View the Content on the Browser
-Paste in the Public IP Address.
-
-<!-- screenshot of hello world -->
+# Build a Simple Web Server
+[Go to my file on building web servers in this here repo](https://github.com/SharinaS/Cloud-Engineering-Fundamentals/blob/master/BUILD_WEB_SERVER.md)
 
 # Resources
 * A Cloud Guru's [AWS Certified Cloud Practitioner](https://acloud.guru/learn/aws-certified-cloud-practitioner) Course
