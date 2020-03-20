@@ -174,7 +174,8 @@ aws s3 ls
 ```
 
 # Build a Simple Web Server
-[Go to my file on building web servers in this here repo](https://github.com/SharinaS/Cloud-Engineering-Fundamentals/blob/master/BUILD_WEB_SERVER.md)
+[Go to my file on building a simple web server](https://github.com/SharinaS/Cloud-Engineering-Fundamentals/blob/master/BUILD_WEB_SERVER.md), using Apache and an EC2 Instance. 
+
 
 # Resources
 * A Cloud Guru's [AWS Certified Cloud Practitioner](https://acloud.guru/learn/aws-certified-cloud-practitioner) Course
