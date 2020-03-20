@@ -47,6 +47,13 @@ My Java 401 class notes on [IAM in my wiki](https://github.com/SharinaS/java-fun
 ### Resources
 * [1Strategy March blog post on IAM](https://www.1strategy.com/blog/2020/03/10/ten-tips-for-improved-iam-security/)
 
+# Load Balancer
+## My Notes
+[Info on load balancers](https://github.com/SharinaS/Cloud-Engineering-Fundamentals/blob/master/LOADBALANCER.md)
+
+## My Projects
+[Music Central - a fullstack Java app](https://github.com/SharinaS/music-central) - has a load balancer setup.
+
 # SageMaker
 Provides ability to build, train and deploy machine learning models. A fully managed services to remove the grunt work of machine learning. Provides all the components used for machine larning in one toolset. 
 

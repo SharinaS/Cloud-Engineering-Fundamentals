@@ -59,11 +59,10 @@ Make the content by using `nano index.html` to open up a super simple text edito
 Or, go about the usual steps, like using `touch` to make a file. You can't open up VS Code while in this directory though....
 
 ### View the Content on the Browser
-Paste in the Public IP Address.
+Paste the Public IP Address into your browser to see the demo web page.
 
-<!-- screenshot of hello world -->
+![screenshot of html via EC2 instance](/assets/webpage-on-instance.png)
 
-# Build A Fancier One
 
 # Resources
 * A Cloud Guru's [AWS Certified Cloud Practitioner](https://acloud.guru/learn/aws-certified-cloud-practitioner) Course
