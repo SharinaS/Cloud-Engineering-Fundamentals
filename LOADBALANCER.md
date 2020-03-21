@@ -9,8 +9,8 @@ Click button that says `Create Load Balancer`.
 ### Select load balancer type
 **3 Types of Load Balancers**
 * Application Load Balancer
-  * Evaluates the code, so it can make intelligent routing decisions - "Layer 7" - 
-  * Could have a group servers that are just for the payment gateway. Traffic would be sent to this gruop when there is a payment being made, otherwise traffic could be routed to another group of EC2 instances if a person was just browsing. 
+  * Evaluates the code, so it can make intelligent routing decisions - "Layer 7" 
+  * Could have a group servers that are just for the payment gateway. Traffic would be sent to this group when there is a payment being made, otherwise traffic could be routed to another group of EC2 instances if a person was just browsing. 
   * Good for applications (duh)
 * Network Load Balancer
   * For ultra high performance and for cases of using static IP addresses.
@@ -74,10 +74,28 @@ Take the EC2 instance and add it behind the load balancer.
 
 Can Add another instance by clicking on `Edit`, just above "Registered targets."
 
-# If LoadBalancer is Setup After Route 53...
+# If Load Balancer is Setup After Route 53...
 From [AWS route 53 faqs](https://aws.amazon.com/route53/faqs/):
 "Amazon Route 53 offers a special type of record called an 'Alias' record that lets you map your zone apex (example.com) DNS name to the DNS name for your ELB load balancer (such as my-loadbalancer-1234567890.us-west-2.elb.amazonaws.com). IP addresses associated with load balancers can change at any time due to scaling up, scaling down, or software updates. Route 53 responds to each request for an Alias record with one or more IP addresses for the load balancer."
 
+## Go to Load Balancer on Your Console
+Copy to clipboard the IPv4 address of the load balancer you want Route 53 to point to.
+
+## Go to Route 53
+Click the radio button for the domain name you're working with, and click the button just above that says `Go to Record Sets.` 
+
+Choose the radio button for the domain name, Type A, with a value of the old ALIAS you'd like to replace.  
+
+### Under "Edit Record Set" 
+Copy the IPv4 address you copied into the box directly to the right of "Alias Target".
+
+![screenshot of changing where route 53 points](/assets/route53-change.png)
+
+Click `Save record set`
+
+### Check domain name
+Type in your usual URL into a browswer window and make sure all is well. 
 
 # Resources
 * A Cloud Guru's [AWS Certified Cloud Practitioner](https://acloud.guru/learn/aws-certified-cloud-practitioner) Course
+* 
