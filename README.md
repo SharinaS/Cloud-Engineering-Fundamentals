@@ -3,6 +3,20 @@ A repository dedicated to the learning of cloud engineering, specifically AWS Se
 
 Do note that a number of these technologies, such as Amplify, have changed versions since I did projects using them, so, check the docs carefully when applicable, and switch to the most up to date version. The amplify docs are a great example - some of my notes may still reference amplify 1.0; at the time of writing this, you actually want to make sure you link over to amplify 2.0 version of the docs, otherwise I can just about guarantee your project won't run properly (yes, that's experience talking, unfortunately). 
 
+## Certifications
+Launched initially in 2013. There are now 10 certifications available. 
+
+# Overview
+
+### Availability Zone
+Essentially an availability zone is a data center. A data center is filled with "computer stuff" - inside are servers, switches, firewalls, load balancers, storage, etc. If many data centers are close together, they are counted as one availability zone. 
+
+### Region
+Composed of two or more availability zones. A region is a geographical area. 
+
+### Edge Locations
+Endpoints for AWS which are used for caching content. There are always more edge locations than regions. Edge locations typically consist of CloudFront (Amazon's Content Delivery Network / CDN).
+
 # Amplify 
 ### Notes
 You may find my notes on integrating Amplify with Android, along with a number of AWS services, Amplify and Android in my [Java Fundamentals wiki](https://github.com/SharinaS/java-fundamentals/wiki). Specific topics associated with Amplify and Android - with links to this wiki - are found below:
@@ -70,3 +84,4 @@ See my notes when I set up Route 53 for my app, Music Central - scroll down in [
 
 ### Projects
 My [full-stack Java app - Music Central](https://github.com/SharinaS/music-central) - makes use of several AWS services. The readme has notes from my experience of integrating these services into the app.
+
