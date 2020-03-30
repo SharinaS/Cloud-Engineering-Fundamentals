@@ -57,6 +57,8 @@ My [full-stack Java app - Music Central](https://github.com/SharinaS/music-centr
 ### Notes 
 My Java 401 class notes on [IAM in my wiki](https://github.com/SharinaS/java-fundamentals/wiki/IAM---AWS-Identify-and-Access-Management) from my time at Code Fellows in Seattle. 
 
+[My evolving notes on roles, policies and other IAM topics](https://github.com/SharinaS/Cloud-Engineering-Fundamentals/blob/master/IAM.md)
+
 ### Resources
 * [1Strategy March blog post on IAM](https://www.1strategy.com/blog/2020/03/10/ten-tips-for-improved-iam-security/)
 
