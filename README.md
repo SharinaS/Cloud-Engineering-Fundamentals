@@ -37,6 +37,9 @@ You may find my notes on integrating Amplify with Android, along with a number o
 
 [Taskmaster is an Android app](https://github.com/SharinaS/taskmaster) I built as a learning project during my time at Code Fellows. It has a range of AWS services, integrated in with Amplify. FYI, it uses version 1.0 of Amplify, which is now out of date. 
 
+# CloudWatch
+To get automatic notifications if account bill gets too high, you go into CloudWatch to create a billing alarm. The billing alarm uses an SNS topic (a way of emailing you whenever the threshold is reached).
+
 # EC2
 ### Notes 
 [Use the Amazon console and your local terminal](https://github.com/SharinaS/Cloud-Engineering-Fundamentals/blob/master/EC2.md), from my repository file titled EC2.md.
@@ -69,12 +72,6 @@ My Java 401 class notes on [IAM in my wiki](https://github.com/SharinaS/java-fun
 ### My Projects
 [Music Central - a fullstack Java app](https://github.com/SharinaS/music-central) - has a load balancer.
 
-# SageMaker
-Provides ability to build, train and deploy machine learning models. A fully managed services to remove the grunt work of machine learning. Provides all the components used for machine larning in one toolset. 
-
-### Resources
-[AWS](https://aws.amazon.com/sagemaker/)
-
 # Route 53
 Change where the domain name points, such as when adding a load balancer to an instance that already has Route 53 setup - [see my notes on this in this repo](https://github.com/SharinaS/Cloud-Engineering-Fundamentals/blob/master/LOADBALANCER.md).
 
@@ -83,6 +80,12 @@ See my notes when I set up Route 53 for my app, Music Central - scroll down in [
 # S3
 ### Notes
 [This repo's S3.md file](https://github.com/SharinaS/Cloud-Engineering-Fundamentals/blob/master/S3.md) has notes about using the terminal to interact with S3 via the terminal.
+
+# SageMaker
+Provides ability to build, train and deploy machine learning models. A fully managed services to remove the grunt work of machine learning. Provides all the components used for machine larning in one toolset. 
+
+### Resources
+[AWS](https://aws.amazon.com/sagemaker/)
 
 ### Projects
 My [full-stack Java app - Music Central](https://github.com/SharinaS/music-central) - makes use of several AWS services. The readme has notes from my experience of integrating these services into the app.
