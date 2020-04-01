@@ -79,7 +79,7 @@ See my notes when I set up Route 53 for my app, Music Central - scroll down in [
 
 # S3
 ### Notes
-[My S3 Notes and How To's](https://github.com/SharinaS/Cloud-Engineering-Fundamentals/blob/master/S3.md) has notes about using the terminal to interact with S3 via the terminal.
+[My S3 Notes and How To's](https://github.com/SharinaS/Cloud-Engineering-Fundamentals/blob/master/S3.md) is written primarily from the perspective of preparing for the AWS Certified Solutions Architect Associate exam. 
 
 ### Projects
 My [full-stack Java app - Music Central](https://github.com/SharinaS/music-central) - makes use of S3. The readme has notes from my experience of integrating S3 into the app.
