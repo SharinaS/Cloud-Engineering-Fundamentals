@@ -1,13 +1,13 @@
 # Cloud Engineering Fundamentals - AWS
 A repository dedicated to the learning of cloud engineering, specifically AWS Services. This project started after earning my certificate in "Advanced Software Development in Java" at Code Fellows in Seattle, and as such also includes links to notes I took during that academic time period. 
 
+***A Note on Deprecation***
 Do note that a number of these technologies, such as Amplify, have changed versions since I did projects using them, so, check the docs carefully when applicable, and switch to the most up to date version. The amplify docs are a great example - some of my notes may still reference amplify 1.0; at the time of writing this, you actually want to make sure you link over to amplify 2.0 version of the docs, otherwise I can just about guarantee your project won't run properly (yes, that's experience talking, unfortunately). 
 
 ## Certifications
-Launched initially in 2013. There are now 10 certifications available. 
+Certifications were launched initially in 2013. There are now 10 certifications available. 
 
-# Overview
-
+## Availability Zones, Regions and Edge Locations
 ### Availability Zone
 Essentially an availability zone is a data center. A data center is filled with "computer stuff" - inside are servers, switches, firewalls, load balancers, storage, etc. If many data centers are close together, they are counted as one availability zone. 
 
@@ -16,6 +16,25 @@ Composed of two or more availability zones. A region is a geographical area.
 
 ### Edge Locations
 Endpoints for AWS which are used for caching content. There are always more edge locations than regions. Edge locations typically consist of CloudFront (Amazon's Content Delivery Network / CDN).
+
+## Infrastructure as Code
+Serves as a way to manage configurations, provisioning and deployments.
+
+May include tools such as version control, testing and CI / CD (continuous integration / continuous deployment).
+
+## Organizations
+Allows you to have multiple AWS accounts and centrally manage them. 
+
+Allows for consolidated billing, which is beneficial in that the more you use, the less you pay for a service. 
+* One bill per AWS account
+
+Best practices:
+* MFA should be set up on root account
+* Use strong password on root account
+* Paying account should be used for billing only - don't deploy resources into the paying account (root account) 
+* Use Service Control Policies (SCP) to enable/disable AWS services either on an organizational unit or individual accounts. 
+
+--------
 
 # Amplify 
 ### Notes
@@ -36,6 +55,9 @@ You may find my notes on integrating Amplify with Android, along with a number o
 [JavaTag, aka ZombieTag, is an Android App](https://github.com/SharinaS/JavaTag) built during a sprint cycle with a team of five other developers. It uses Amplify and various AWS services.
 
 [Taskmaster is an Android app](https://github.com/SharinaS/taskmaster) I built as a learning project during my time at Code Fellows. It has a range of AWS services, integrated in with Amplify. FYI, it uses version 1.0 of Amplify, which is now out of date. 
+
+# CloudFormation
+Access [my notes on CloudFormation within this Repo](https://github.com/SharinaS/Cloud-Engineering-Fundamentals/blob/master/CLOUDFORMATION.md).
 
 # CloudWatch
 To get automatic notifications if account bill gets too high, you go into CloudWatch to create a billing alarm. The billing alarm uses an SNS topic (a way of emailing you whenever the threshold is reached).
@@ -91,3 +113,11 @@ Provides ability to build, train and deploy machine learning models. A fully man
 [AWS SageMaker](https://aws.amazon.com/sagemaker/)
 
 
+-------------
+Packer is an automated way of building machine images. 
+
+-------------
+Ansible vs Chef
+* Chef is written by Ruby developers and expects full developer skills.
+* Ansible allows for some kowledge of python and yaml and json
+* Puppet is somewhere inbetween.
