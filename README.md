@@ -113,6 +113,10 @@ Provides ability to build, train and deploy machine learning models. A fully man
 [AWS SageMaker](https://aws.amazon.com/sagemaker/)
 
 
+# VPC 
+[My notes on VPCs and building them are in this repo, here.](https://github.com/SharinaS/Cloud-Engineering-Fundamentals/blob/master/VPC.md)
+
+
 -------------
 Packer is an automated way of building machine images. 
 

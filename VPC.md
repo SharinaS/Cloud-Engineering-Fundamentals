@@ -235,11 +235,9 @@ When the box pops up that says "Select an existing key pair or create a new key 
 
 
 What we've got so far:
-![Screenshot of a cloud guru lesson showing VPC with Public and Private Subnets](vpc-with-two-subnets.png)
+![Screenshot of a cloud guru lesson showing VPC with Public and Private Subnets](/assets/vpc-with-two-subnets.png)
 
-## Test the Things 
-
-### Connect to the Public EC2 Instance
+## Test the Public EC2 Instance (the Web Server)
 
 Via the terminal, navigate to where you stored your KeyPair. 
 
@@ -262,17 +260,216 @@ Elevate priviledges to root:
 sudo su
 ```
 
-### Check the Private One:
+*Now, need to examine the private instance.*
+
+## Access the Private Instance (the Database Server):
 *The private one does not have an IP address to connect to, since it's private*
 
-Note that the two instances have two separate security groups, and by default, the two security groups do not allow access to each other. 
+Note that the two instances have two separate security groups, and so, by default, the security groups do not allow access to each other. So, if you try to SSH into the instance that is private (the DBServer), via the instance that is public (the WebServer), it's not going to work. 
 
-### Solution: Create another Security Group
-*Helpful, since this instance is for a database, to have its own security group :)*
+### Solution: Create another Security Group within the Default VPC for the database server
+* *It's also helpful to have a security group for the private instance, anyway, since it is going to be a database server :)*
 
 Go to EC2. 
 
-Scroll down on the left hand side to "Security Groups"
+Scroll down on the left hand side to "Network and Security," and click on "Security Groups."
+
+Click "Create security group" near the top of the page where security groups are listed.
+
+Name it with something descriptive (mine is, Sharina-Database-Security-Group-us-west-2).
+
+Give it a description and associate it with the VPC you made way, way back when for this project, such as: "Security Group for the database server built within sharinaVPC"
+
+Click "Add rule" within the "Inbound rules section."
+* This is where we get to communicate certain things to EC2 instances from within this security group.
+* We want to ping EC2 instances inside this security group from within our WebServer's security group, so for Type, choose, "All ICMP - IPv4." So the source will be our web security group, or the IP range.
+  * For Source type, leave it as Custom
+  * For Source, this is where we allow the web server's security group to ping, so you can type in "sg" or start searching for the security group you want to have as the source (the other security group we created a while back). Or, can just type in what the IPv4 CIDR is, which is the IP address range. (Go to Subnets (within VPC service) to check what the IPv4 CIDR is. This will be for the subnet that is associated with this particular instance. In this project's case, this is for my private subnet, which I named, "sharina-10.0.1.0-private-us-west-2a."). 
+* We want to talk to our database servers using HTTP, such as when we install managment software to manage mySQL, so add another rule.
+  * For Type, choose "HTTP." For Source, type in the IP address range. In my case, it's "10.0.1.0/24" 
+* We want HTTPS, so choose this in Type, and add in the IP address range in Source.
+* We also want SSH, so choose this in Type, and add in the IP address range in Source.
+* We need MySQL/Aurora, which allows us to communicate to DB server using MySQL. Do the same for Source. 
+
+Leave the outbound rules the way they are - it should have Type "All traffic," and have destination "0.0.0.0/0", "::/0"
+
+Click "Create Security Group"
+
+![screenshot of inbound rules for this security group](/assets/dbserversecuritygroup.png)
+
+**Now, we need to move the database server we created into this new security group:**
+
+So, we created the new security group which is within the default VPC.
+
+We now need to move the database server. 
+
+Go to EC2. Click on the radio button for the database server you created a while back.
+
+Up above, click the pulldown menu called "Actions," and choose "Change Security Groups."
+
+A new window will pop up, called "Change Security Groups." You'll see that the default security group is currently chosen. Unclick it, and click your newly created security group (in my case, the super long title of "Sharina-Database-Security-Group-us-west-2." Seriously, who's idea was that?). Hit the button to confirm all that.
+
+Back in the list of EC2 instances, with your radio button still checked, go down to the tab called "Description," and copy to clipboard the private IP address, titled "Private IPs."
+
+**We now get to SSH back into our public web server!**
+Via the terminal, navigate to where you stored your KeyPair. 
+
+```
+ssh ec2-user@the-ip-address -i SharinaKeyPair.pem
+```
+
+Do an update if it tell you to.
+```
+sudo yum update
+```
+
+Elevate priviledges to root:
+
+```
+sudo su
+```
+
+```
+ping private-ip-address-of-database-server 
+```
+
+# NAT Instances and Gateways
+nat = network address translation
+
+In a private subnet, How to install updates? Install updates? Download software? Must use NAT Instances & Nat Gateways, since there is not route set up to the Internet! These things make it possible to communicate with our Internet Gateway, without making our private subnet public. 
+
+Nat Gateways are used 99% of the time; Nat Instances are *individual EC2 instances* that do this. Gateways are *highly available, spread across multiple AZ's*. Instances are on their way out... but they're still on the exam.
+
+Problems with NAT Instance architecture:
+* It is a single virtual machine
+  * Can create high availability using Autoscaling groups, multiple subnets in different AZs, and a script to automate failover... but ouch. 
+* It's a small virtual machine, so it can easily get overwhelmed - it's a massive bottleneck.
+  * Increase the instance size to deal with bottle-necking.
+* It's got a single point of failure. 
+
+## How to Create a NAT *Instance*:
+[See Amazon docs about NAT Instances](https://docs.aws.amazon.com/vpc/latest/userguide/VPC_NAT_Instance.html). Essentially, the instance will act like a bridge to our private subnet, through our public subnet, to our internet gateway. 
+
+Things to Note:
+* When you create a NAT instance, you have to disable source/destination check on the instance.
+* NAT instances must be a in a public subnet.
+* There must be a route out of the private subnet *to* the NAT instance 
+* A NAT instance is always *behind* a security gruop.
+
+### Set up the NAT instance
+In EC2, launch an instance.
+
+On the left of the list of AMIs, under "Quick Start," choose "Communicty AMIs." In the search bar, type in "nat" and hit return/enter. This gives us our nat instances. 
+
+This is the one I chose, which is an Amazon Community AMI:
+```
+amzn-ami-vpc-nat-hvm-2018.03.0.20181116-x86_64-ebs - ami-0b840e8a1ce4cdf15
+Amazon Linux AMI 2018.03.0.20181116 x86_64 VPC HVM ebs
+```
+
+It's set as a t2.micro, which is great. 
+
+In the configure instance details page:
+* Changed the vpc to my custom vpc.
+* Change the subnet to the public subnet (want to launch into the public one), which will give us a public ip address, regarding the "Auto-assign Public IP" - it will say "Enable"
+* Leave everything else the way it is. 
+
+Click the button that says "Add Storage," where you do nothing, just click the button to "Add tags."
+
+Add a few descriptive tags, definitely at least a name. 
+
+Click "Configure security group."
+
+Choose the "Select an existing security group" radio button so we can put this instance inside our web server security group (ie, not the database security group created a while back). 
+
+Click "Review and launch."
+
+A window will pop up that asks where to boot from, re SSD. Choose the radio button that says, "Make General Purpose (SSD) the boot volume for this instance." If you don't get this window, it's probably b/c of the AMI you're using. 
+
+Review the instance, and click "Launch"
+
+A window will pop up asking about key pairs - choose the key pair you've used above. ... and click "Launch instances"
+
+### Make it a "Gateway" of sorts by Disabling Source/Destination checks
+
+Click on the NAT instance radio button. Go to the Actions tab, and choose "Networking > Enable Source/Destination Check." Go ahead and disable it. 
+
+### Make the Database Server "talk" to the NAT Instance
+To do this, we need to create a route out to the internet. The route needs to be created in the default route table, which is the main route table. 
+
+Go to VPC (within network and content delivery), and Go to "Route Tables," on the left, within the Virtual Private Cloud section. 
+
+click the radio button of the route table that is associated with your VPC, and says "Yes," in the "Main" column. This is the main route table associated with your VPC. 
+
+In the tabs below, click "Routes." 
+
+Click "Edit routes," and then "Add route." 
+
+If we want to go out to the internet, we add "0.0.0.0/0," as our Destination. We then add our NAT instance as the Target, by clicking "Instance" on the pulldown menu and then choosing the NAT instance we created above.
+
+Click "Save routes."
+
+Now we have a route within our main route table, which says, go over this elastic network interface (eni-).
+
+### Terminate the Instance, since, seriously, so many issues with this architecture!
+Click the radio button for the nat instance. Click the Actions pulldown menu above. Choose "Instance State > Terminate"
+
+Remember to remove the route associated with this instance, too. Go to VPC > Route Tables.
+
+Click on your main route table, click the tab below that says "Routes." You'll see one that says, blackhole! This is because the instance no longer exists. 
+
+Go to "Edit routes," and click on the "x" to the right of the route, then click "Save routes."
+
+## Create a NAT Gateway - scaleable and highly available
+Things to Note:
+* They are redundant inside the availability zone.
+* You can only have one NAT gateway in an AZ.
+  * To create AZ-independant architecture, you must create a NAT gateway in *each* availability zone, and configure your routing to ensure that resources use the NAT gateway in the same AZ that they're in. 
+* Preferred by the enterprise
+* It scales automatically
+* No need to patch the OS 
+* Not associated with any security groups!
+* Automatically assigned a public ip address
+* No need to disable source/destination checks
+
+### Make a Gateway
+Go to VPC > Vitual Private Cloud > NAT Gateways.
+
+Click the button, "Create NAT Gateway."
+
+You'll want to choose your *public* subnet that you created way in the beginning. 
+
+Click the button that says "Allocate Elastic IP Address," which will create an IP address and attach it to the new Gateway. 
+
+Create the Gateway.
+
+### Edit route tables
+A window will pop up saying you'll need to edit your route tables. Click on the "Edit route tables" button.
+
+You'll find yourself at the list of Route Tables.
+
+Click the radio button for your *main* route table inside your VPC. Click the tab called "Routes" and then the button "Edit routes."
+
+We need to give the main route table a route out into the internet. Click "Add route," and put the destination as 0.0.0.0/0, and change the Target to NAT_gateway, and choose the one you created. 
+
+Click the "save" and "close" button.
+
+
+
+# Learning Moments
+Hardest part to this project, when doing this for the first time, is making sure that one is working within or with the correct subnet, given the goals for that subnet. So, labeling each subnet descriptively is really important. 
+
+So, at this time, I cannot ping the private IP address of the database server. I can only ping the public address of my web server. I'm guessing it has to do with my subnets, but the specific correction has yet to be identified. Maybe all secondary to a little user confusion.... 
+
+
+
+-----------------
 
 # Resources
 [Practical VPC Design on Medium](https://medium.com/aws-activate-startup-blog/practical-vpc-design-8412e1a18dcc)
+
+[A Cloud Guru's AWS Certified Solutions Architect Associate course](https://acloud.guru/)
+
+[1Strategy AWS VPC starter CloudFormation template](https://github.com/1Strategy/vpc-starter-template)
+
+[AWS NAT Instances docs](https://docs.aws.amazon.com/vpc/latest/userguide/VPC_NAT_Instance.html)
