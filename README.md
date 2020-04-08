@@ -62,6 +62,9 @@ Access [my notes on CloudFormation within this Repo](https://github.com/SharinaS
 # CloudWatch
 To get automatic notifications if account bill gets too high, you go into CloudWatch to create a billing alarm. The billing alarm uses an SNS topic (a way of emailing you whenever the threshold is reached).
 
+# Command Line
+My cheatsheet is available [here in this repo](https://github.com/SharinaS/Cloud-Engineering-Fundamentals/blob/master/AWS_CLI_COMMANDS.md)
+
 # EC2
 ### Notes 
 [Use the Amazon console and your local terminal](https://github.com/SharinaS/Cloud-Engineering-Fundamentals/blob/master/EC2.md), from my repository file titled EC2.md.
@@ -115,13 +118,3 @@ Provides ability to build, train and deploy machine learning models. A fully man
 
 # VPC 
 [My notes on VPCs and building them are in this repo, here.](https://github.com/SharinaS/Cloud-Engineering-Fundamentals/blob/master/VPC.md)
-
-
--------------
-Packer is an automated way of building machine images. 
-
--------------
-Ansible vs Chef
-* Chef is written by Ruby developers and expects full developer skills.
-* Ansible allows for some kowledge of python and yaml and json
-* Puppet is somewhere inbetween.

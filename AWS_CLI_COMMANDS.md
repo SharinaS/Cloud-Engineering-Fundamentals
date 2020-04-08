@@ -23,3 +23,66 @@ sudo su
 
 ## Install MySQL
 yum install mysql -y
+
+## Apache
+Once you've accessed the EC2 instance (a public one)...
+
+### Check for existance of Apache
+
+```
+service httpd status
+```
+
+# Apache 
+### Install Apache
+```
+yum install httpd -y
+```
+then,
+
+```
+chkconfig httpd on
+```
+then,
+
+```
+service httpd start
+```
+
+Go to html directory
+
+```
+cd /var/www/html
+```
+
+there may not be anything in there... `ls`
+
+Use nano to make a little index page if you want, with `<html><h1>hello</h1></html>`. 
+
+```
+nano index.html
+```
+
+You can check the code in the terminal with
+
+```
+cat index.html
+```
+
+Once Apache is setup, you can copy the public IP address of an instance, and paste it into a web browswer window, and hit enter :)
+
+
+
+# Access Information about a Service
+## Access information about a stack in CloudFormation:
+```
+aws cloudformation describe-stacks --stack-name sharina-s3bucket
+```
+
+## EC2
+### Specific Instance
+```
+aws ec2 describe-instances --instance-ids i-12345678901234567
+
+```
+

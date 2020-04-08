@@ -332,11 +332,13 @@ sudo su
 ```
 ping private-ip-address-of-database-server 
 ```
-
+-------------
 # NAT Instances and Gateways
 nat = network address translation
 
-In a private subnet, How to install updates? Install updates? Download software? Must use NAT Instances & Nat Gateways, since there is not route set up to the Internet! These things make it possible to communicate with our Internet Gateway, without making our private subnet public. 
+In a private subnet, How to install updates? Install updates? Download software? Must use NAT Instances & Nat Gateways, since there is not route set up to the Internet! These things make it possible to communicate with our Internet Gateway, without making our private subnet public.
+
+In other words, when our instances in our private subnets need to access the internet, they do so via either a NAT Instance or a NAT gateway. 
 
 Nat Gateways are used 99% of the time; Nat Instances are *individual EC2 instances* that do this. Gateways are *highly available, spread across multiple AZ's*. Instances are on their way out... but they're still on the exam.
 
@@ -428,7 +430,7 @@ Things to Note:
 * Preferred by the enterprise
 * It scales automatically
 * No need to patch the OS 
-* Not associated with any security groups!
+* Not associated with any security groups! (Doesn't need to be behind one)
 * Automatically assigned a public ip address
 * No need to disable source/destination checks
 
@@ -454,12 +456,171 @@ We need to give the main route table a route out into the internet. Click "Add r
 
 Click the "save" and "close" button.
 
+From A Cloud Guru... An example of how to diagram what we might have so far. Note that what *I* created is a bit different.
+![screenshot of what we've got so far](/assets/vpcwithnatgateway.png)
 
+---------------
+# Network Access Control Lists (NACL)
+"A network ACL is an optional layer of security that acts as a firewall for controlling traffic in and out of a subnet," says AWS.
 
+Often a good thing to make sure there are not too many of, if not none, paraphrased from an individual at 1Strategy. 
+
+Go to VPC > Security (to the left) > Network ACLs.
+
+You'll see a list of Access Control Lists. Two were created at some point along the journey - one with 2 subnets (sits inside our custom VPC), and one with 3 subnets (sits within the default VPC). 
+
+In other words, when we created the custom VPC, a network ACL was created by default. By default, it allows all outbound and inbound traffic. 
+
+Everytime we add a subnet to our VPC, it will be associated with our default Network ACL. In fact, it *must* be associated with a network ACL - if you don't explicitly associate a subnet with a netowrk ACL, the subnet will be automatically associated with the default network ACL. 
+
+Note, we can associate a subnet with a new NACL, but *a subnet itself can only be associated with one network ACL at a given time*. Network ACLs can have multiple subnets on them, however. 
+
+The Default NACL has Inbound Rules. Each rule is incremented by 100. (see more below).
+
+You can create custom network ACLs. By default each custom network ACL *denies* all inbound and outbound traffic until you add rules. 
+
+*if you're using network ACLs, they will always be evaluated before security groups.* So if you **deny** a specific port on your ACL, it will never reach your security group. So, NACls will always act first before security groups. 
+
+... So, you can use a network ACL to block specific IP Addresses.
+* You can't block specific IP addresses using security groups.
+
+*Network ACLs are stateless*. So responses to allowed inbound traffic are subject to the rules for outbound traffic (and vice versa). 
+
+## Create a Network ACL 
+Click the Create button up top. 
+
+Create a descriptive name.
+
+Select the VPC it should go inside. 
+
+*Once a new NACL is created, note that all inbound and outbound rules are automatically set to deny everything*.
+
+### Change Subnet Associations
+Click on the new NACL's radio tab, and click on the tab below, calld "Subnet associations."
+
+Click "Edit subnet associations"
+
+Choose the subnet you want - I chose my public one. 
+
+The subnet is now associated with this new NACL, and the other subnet is left behind in the other one. 
+
+Now that the NACL has the public subnet it in, any access via HTTP is no longer available (ie, Apache setup would have shown ability to see a little website via IP address in browser - see AWS_CLI_COMMANDS.md). 
+
+### Set up Rules for new NACL
+Click tab, "Inbound rules," then "Edit inbound rules"
+* Can create rules to connect on port 80, 443, and 22, for example, inbound.
+
+Edit Outbound rules
+* connect on port 80, 443, 1024-65535 (ephemoral ports for NAT Gateway)
+  * short lived transport protrocol port is an ephemeral port. They may be used on the server side of communication. Port only available during the communication, then times out. NAT gateway uses the emphemoral port of the type noted above. 
+
+The rules are evaluated in order - 100 (HTTP), 200 (HTTPS), 300 (SSH) for inbound rules. So, if there's a deny rule setup as rule 400, the deny won't activate till everything else is done. If you set up a deny rule for a specific IP address, the deny rule needs to be numbered 99, in this case, so it's before the allow rules. 
+
+----------------
+# Custom VPCs and Elastic Load Balancers
+When you provision a load balancer, you'll need *at least two* public subnets. Otherwise, it won't let you create a load balancer. 
+
+-----------------
+# VPC Flow Logs
+A feature that lets you capture information about IP traffic going to/from network interfaces in a VPC. 
+
+Flow log data is stored, reviewed and retrieved using CloudWatch Logs. 
+* Alternatively you can send logs to an S3 Bucket. 
+
+Can do logs at the VPC level, Subnet level or Network Interface level. 
+
+You essentially go to VPC, go to the tab actions, and click "Flow Log." You also need to go over to CloudWatch and set up a new log group ("Create log group" button). This is necessary before choosing Destination log group when creating a new flow log. You'll also have to "set up permissions" (a link available when setting up a new flow log), which makes you set up a new IAM role (easy though, since it sets everything up for you). 
+
+When you go to CloudWatch, click on "Logs" on the left hand side, and you'll see lots of data.
+
+Note:
+* You cannot enable flow logs for VPCs that are peered with your VPC unless the peer VPC is in your account. As in, you can't do this across accounts.
+* You can tag flow logs
+* Once you create a flow log, you cannot change its configuration. As in, you can't associate a different IAM role with the flow log. 
+* Not all IP traffic is monitored. 
+  * traffic generated by instances when te ycontact the Amazon DNS server is not monitored, however if you use your own DNS server, all traffic to that DNS server is logged.
+  * Traffic to/from 169.254.169.254 for instance metadata not monitored
+  * DHCP traffic not monitored
+  * traffic to the reserved IP address for the default VPC router also not monitored.
+
+-----------------
+# Bastion Host
+A special purpose computer set up to resist attacks. It's usually on the outside of a firewall or public subnets. Usually involves access from untrusted networks or computers. It is used to securely administer EC2 instances (usign SSH or RDP).
+
+Note that a NAT Gateway or NAT Instance is used to provide internet traffic to EC2 instances in a private subnet. 
+
+If we have a public subnet, the bastion host would go inside the public subnet. SSH or RDP through the Internet Gateway, through our Route Tables, through the Network ACLs, Through Security Groups, onto the Bastion server. The Bastion server would then forward the connection through SSH or through RDP to our private instances. So, we just harden the Bastion host (since this is what will be hacked). That way we don't need to harden our private instances. 
+
+Note that you can't use a NAT Gateway as a Bastion host; you have to go ahead an configure a bastion host. 
+
+-----------------
+# Direct Connect
+A direct connection into AWS, using dedicated lines. It is an AWS service. 
+
+Allows for private connectivity between AWS and a datacenter, office, etc. 
+
+Direct connect locations are spread all over the world. 
+
+Within direct connect, is a "AWS cage", which has routers. Customers routers then connect to the routers within the AWS cage. None of this traverses the internet. There is use of the AWS backbone network. 
+
+Useful for high throughput workloads (ie lots of network traffic). 
+
+Useful for when you need a stable and reliable and secure connection. For example, if you have situation where you're trying to use a VPN connection but it keeps dropping out b/c of the amount of throughput, you can use a direct connect to solve those issues. 
+
+## Steps for Setup
+Note that if one does not have a direct connect connection at your location, one can't do these steps. 
+
+1. Create a virtual interface in the Direct Connect console - this is a Public Virtual Interface.
+2. Go to the VPC console > VPN connections. Create a Customer Gateway.
+3. Create a Virtual Private Gateway
+4. Attach the Virtual Private Gateway to the desired VPC.
+5. Select VPN Connections and create new VPN Connection
+6. Select the Virtual Private Gateway and the Customer Gateway
+7. Once the VPN is available, set up the VPN on the customer gateway or firewall.
+
+^-- memorize these steps for the exam and watch this video on YouTube, called [How do I configure a VPN over AWS Direct Connect?](https://www.youtube.com/watch?v=dhpTTT6V1So). 
+
+-----------------
+# Global Accelerator
+A service in which you create acclerators to improve availability and performance of your app for local and global users. Global Accelerator directs traffic to optimal endpoints over the AWS global network. Much more efficient. 
+
+GA gives you *two static IP addresses* that you associate with your accelerator. You can also bring your own IP addresses. 
+
+User --> Edge location --> AWS Global Accelerator --> Endpoint group --> Endpoints
+
+You can control traffic using traffic dials, so it's very highly configurable.
+
+### Components to a Global Accelerator
+* Static IP addresses
+* Accelerator
+* DNS name (supplied with set up of accelerator)
+  * will point to the static IP addresses that GA assigns to you. 
+  * can use your accelerator's static IP addresses or DNS name to route traffic to your accelerator, or route traffic using your own custom domain name. 
+* Network Zone
+  * An isolated unit with its own set of physical infrastructure... but think of it as an AWS Availability Zone. 
+  * When an accelerator is configured, two IPv4 addresses will be allocated so there's always a healthy static IP address in an isolated network zone to try by a client application.
+* Listener (one or more)
+  * Processes inbound connections from clients to GA, based on the port and protocol (TCP or UDP protocols) you configure. 
+  * Each listener has an endpoint group (or more) associated with it; traffic is forwarded to endpoints in one of the groups. 
+* Endpoint Group
+  * Endpoint groups are associated with listeners by specifiying the Regions you want to distribute traffic to. 
+  * Each endpoint group is associaed with a specific AWS Region
+  * A "traffic dial" can increase or decrease the percentage of traffic that would be otherwise be directed to an endpoint group. 
+* Endpoint
+  * These are Network Load Balancers, Application Load Balancers, EC2 instances, Elastic IP addresses.
+  * An Application Load Balancer endpoint can be an internet-facing or internal.
+  * For each endpoint, you can configure weights (weights are numbers that you use to indicate the proportion of traffic to route to each one) so you can do things like performance testing within a region. 
+
+### How to Build One
+See A Cloud Guru's AWS Certified Solutions Architect, Chapter 7.11 for a demo
+
+-----------------
+# VPC Endpoint
+Allows traffic between your VPC and the other service to not leave the Amazon network. It's a private connection between your VPC to supported AWS services a
+
+-----------------
 # Learning Moments
-Hardest part to this project, when doing this for the first time, is making sure that one is working within or with the correct subnet, given the goals for that subnet. So, labeling each subnet descriptively is really important. 
-
-So, at this time, I cannot ping the private IP address of the database server. I can only ping the public address of my web server. I'm guessing it has to do with my subnets, but the specific correction has yet to be identified. Maybe all secondary to a little user confusion.... 
+Hardest part to building a VPC, when doing this for the first time, is making sure that one is working within or with the correct subnet, given the goals for that subnet. So, labeling each subnet descriptively is really important. Actually, label *everything* descriptively. I didn't at first, and that got me in a bit of confused trouble at times. 
 
 
 
