@@ -83,8 +83,49 @@ aws cloudformation describe-stacks --stack-name sharina-s3bucket
 ### Specific Instance
 ```
 aws ec2 describe-instances --instance-ids i-12345678901234567
+```
+
+# Setting up AWS CLI Credentials / Profile and Checking Them via the CLI
+Get into aws
+```
+cd .aws
+```
+
+Check what's inside - you should see at minimum, `cli config credentials`. 
+```
+cd .aws
+```
+Open config and credentials using vs code
 
 ```
+code credentials config
+```
+Modify the files as needed
+
+Check the default profile (or whatever profile is setup)
+
+```
+sharstubbs~/.aws$ aws sts get-caller-identity --profile default 
+```
+
+Check the training profile
+
+```
+sharstubbs~/.aws$ aws sts get-caller-identity --profile training 
+```
+
+You can also check the account aliases
+
+```
+sharstubbs~/.aws$ aws iam list-account-aliases 
+```
+
+... and then go deeper in, by looking at a particular profile via IAM
+
+```
+sharstubbs~/.aws$ aws iam list-account-aliases --profile training 
+```
+
 
 --------------
 # Resources

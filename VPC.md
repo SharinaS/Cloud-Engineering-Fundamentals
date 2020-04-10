@@ -1,4 +1,6 @@
-Big Hint: You should be able to build a VPC from memory to pass the AWS Certified Solutions Architect Exam.
+The following are notes taken while studying for the AWS Certified Solutions Architect Exam. My main resource was A Cloud Guru, so please only use these notes for increasing your personal knowledge *nothing more*. 
+
+Big Study Hint: You should be able to build a VPC from memory to pass the AWS Certified Solutions Architect Exam.
 
 # What is a VPC
 VPC = "Virtual Private Cloud"
@@ -274,38 +276,16 @@ When the box pops up that says "Select an existing key pair or create a new key 
 What we've got so far:
 ![Screenshot of a cloud guru lesson showing VPC with Public and Private Subnets](/assets/vpc-with-two-subnets.png)
 
-## Test the Public EC2 Instance (the Web Server)
-
-Via the terminal, navigate to where you stored your KeyPair. 
-
-If it's a new key pair, you'll have to establish the appropriate permissions with a chmod command:
-
-```
-chmod 400 SharinaKeyPair.pem 
-```
-
-Grab the IPv4 Public IP value (the IP address) of the public instance you made. 
-
-To SSH into the instance, type into the terminal the following, plus the IP address, plus the file name for the pem file. 
-
-```
-ssh ec2-user@the-ip-address -i SharinaKeyPair.pem
-```
-Elevate priviledges to root:
-
-```
-sudo su
-```
 
 *Now, need to examine the private instance.*
 
 ## Accessing the Private Instance 
 *The private one does not have an IP address to connect to, since it's private*
 
-Note that *the two instances have two separate security groups, and so, by default, the security groups do not allow access to each other.* So, if you try to SSH into the instance that is private (the DBServer), via the instance that is public (the WebServer), it's not going to work. 
+Note that *the two instances have two separate security groups, and so, by default, the security groups do not allow access to each other.* So, if you try to SSH into the instance that is private, via the instance that is public, it's not going to work. 
 
 Solution: Create another Security Group for the private instance that will allow for communication from the public subnet.
-* *It's helpful to have a security group for the private instance, anyway, since it is going to be something like a database server :)*
+* *It's helpful to have a security group for the private instance, anyway, since that way it is going to be something cool like a database server :)*
 
 Go to EC2. 
 
@@ -318,7 +298,7 @@ Give it a good name and a description.
 Choose the VPC you created.  
 
 Click "Add rule" within the "Inbound rules section." - This is where we get to communicate certain things to EC2 instances inside this security group.
-* If we want to ping EC2 instances inside this security group from our security group in our public subnet, so for Type, choose, "All ICMP - IPv4." So the source will be our web security group, or the IP range.
+* If we want to ping EC2 instances inside this security group from our security group in our public subnet, for Type, choose, "All ICMP - IPv4." So the source will be our web security group, or the IP range.
   * For Source type, leave it as Custom
   * For Source, this is where we allow the public subnet's security group (the security group you created in the public subnet) to ping this one, so you can type in "sg" or start searching for the security group associated with the public subnet. 
   * Or, you can just type in what the IPv4 CIDR is, which is the IP address range. (Go to Subnets (within VPC service) to check the IPv4 CIDR, but it might be 10.0.1.0/24, for example. 
@@ -343,14 +323,37 @@ Up above, click the pulldown menu called "Actions," and choose "Networking > Cha
 
 A new window will pop up, called "Change Security Groups." You'll see that the default security group is currently chosen. Unclick it, and instead click your newly created security group. Hit the button to confirm all that.
 
-### Test the things
-**We now get to SSH back into our public web server!**
+## Test The Things
+### Test the Public EC2 Instance
+
+Via the terminal, navigate to where you stored your KeyPair. 
+
+If it's *a new key pair, you'll have to establish the appropriate permissions with a chmod command:
+
+```
+chmod 400 SharinaKeyPair.pem 
+```
+
+Grab the IPv4 Public IP value (the IP address) of the public instance you made. 
+
+To SSH into the instance, type into the terminal the following, plus the IP address, plus the file name for the pem file. 
+
+```
+ssh ec2-user@the-ip-address -i file-name-for-your-key-pair.pem
+```
+Elevate priviledges to root:
+
+```
+sudo su
+```
+
+### Test the Private Instance
 Back in the list of EC2 instances, with your radio button still checked, go down to the tab called "Description," and copy to clipboard the private IP address, titled "Private IPs."
 
 Via the terminal, navigate to where you stored your KeyPair. 
 
 ```
-ssh ec2-user@the-ip-address -i SharinaKeyPair.pem
+ssh ec2-user@the-ip-address -i SharqinaKeyPair.pem
 ```
 
 Do an update if it tell you to.
@@ -500,6 +503,7 @@ From A Cloud Guru... An example of how to diagram what we might have so far. Not
 ![screenshot of what we've got so far](/assets/vpcwithnatgateway.png)
 
 ---------------
+
 # Network Access Control Lists (Network ACL)
 "A network ACL is an optional layer of security that acts as a firewall for controlling traffic in and out of a subnet," says AWS.
 
@@ -558,6 +562,8 @@ The rules are evaluated in order - 100 (HTTP), 200 (HTTPS), 300 (SSH) for inboun
 ----------------
 # Custom VPCs and Elastic Load Balancers
 When you provision a load balancer, you'll need *at least two* public subnets. Otherwise, it won't let you create a load balancer. 
+
+That is all for now, regarding this topic.
 
 -----------------
 # VPC Flow Logs
@@ -697,4 +703,6 @@ Hardest part to building a VPC, when doing this for the first time, is making su
 [AWS NAT Instances docs](https://docs.aws.amazon.com/vpc/latest/userguide/VPC_NAT_Instance.html)
 
 [AWS' "What Is AMazon VPC" doc](https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html)
+
+[Reference for Bastion Architecture/Configuration ](https://docs.aws.amazon.com/quickstart/latest/linux-bastion/architecture.html)
 
