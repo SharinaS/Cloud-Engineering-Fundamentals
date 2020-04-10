@@ -86,3 +86,6 @@ aws ec2 describe-instances --instance-ids i-12345678901234567
 
 ```
 
+--------------
+# Resources
+[AWS CLI Command Reference guide](https://docs.aws.amazon.com/cli/latest/reference/)

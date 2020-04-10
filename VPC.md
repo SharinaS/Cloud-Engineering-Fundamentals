@@ -78,6 +78,8 @@ You can add deny and allow rules. When you open a port on inbound, it doesn't me
 ### Availability Zones... when it comes to this stuff:
 An availability zone in my AWS account can be a totally different availability zone from the one found in another AWS account, even though they may be called the same (ie, US-East-1A). This is because they are randomized when you choose them in the following steps. 
 
+---------------
+
 # Create a Custom VPC - VPC with Public & Private Subnets
 "Create VPC"
 
@@ -96,7 +98,7 @@ Hit "Create"
 
 ***When we create a custom VPC, it creates 3 things:***  
 * A default Route Table
-* A Network Access Control List (NACL)
+* A Network Access Control List (Network ACL)
 * A default Security Group is created (can identify it with the VPC ID)
 
 ***2 Things are NOT created***
@@ -128,7 +130,7 @@ Create another Subnet, in a different availability zone.
 ### Note that...
 Note that *one subnet gets one availability zone*; no spanning across availability zones. 
 
-Scroll to the right in list of Subnets. The Auto-assign public IP Address has been turned *off*. We'll need to turn this on, since I want one of subnets we just created to be private and the other public. 
+Scroll to the right in list of Subnets. *The Auto-assign public IP Address is off*. We'll need to turn this on, since I want one of subnets we just created to be private and the other public. 
 
 Also note that we only have 251 available IP addresses. We should be getting 256 (per the CIDR.xyz website), with a usable amount of 254.
 * [See VPC and Subnet Sizing](https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Subnets.html#VPC_Sizing)
@@ -138,13 +140,13 @@ Also note that we only have 251 available IP addresses. We should be getting 256
 From A Cloud Guru: 
 *"By default, any user-created VPC subnet WILL NOT automatically assign Public IPv4 Addresses to instances – the only subnet that does this is the “Default” VPC subnets automatically created by AWS in your account." The simplest way to make the instance reachable from the outside world is therefore to **create an elastic IP address and associate it with your instance.***
 
-For a subnet to be publically accessible, we'll need *EC2 instances* to launch in it with public IP addresses. 
+For a subnet to be publicly accessible, we'll need *EC2 instances* to launch in it with public IP addresses. 
 
 Select the subnet you want to make public - the radio button. 
 
 Go to the tab that says "Actions," which produces a dropdown menu when you click on it. Click the "Modify auto-assign IP settings" option.
 
-On the page that opens (which also says: "Enable the auto-assign IP address setting to automatically request a public IPv4 or IPv6 address for an instance launched in this subnet. You can override the auto-assign IP settings for an instance at launch time.")... 
+On the page that opens (which says: "Enable the auto-assign IP address setting to automatically request a public IPv4 or IPv6 address for an instance launched in this subnet. You can override the auto-assign IP settings for an instance at launch time.")... 
 
 ... click the box that says "Enable auto-assign public IPv4 address."*
 
@@ -178,31 +180,35 @@ aws ec2 attach-internet-gateway --vpc-id "vpc-092524f82494c9b63" --internet-gate
 Now, we need to configure our Routes Table so we have a route out into the internets.
 
 ## Configure Routes Table
+*"A route table specifies how packets are forwarded between the subnets within your VPC, the internet, and your VPN connection." - AWS* 
+
 Make a route out into the Internet.
 
 Go to Routes Table. 
 
-Click on the radio button that corresponds to the route that belongs to the VPC you created. Check the column "VPC ID" if you're not sure (there will be a default route in there too)
+Click on the radio button that corresponds to the route that belongs to the VPC you created. Check the column "VPC ID" if you're not sure which route is which).
 
-Down below, click the tab "Routes." You'll see two routes. These two routes are letting the two subnets I created "talk to each other."
+Down below, click the tab "Routes." You'll see two routes. *These two routes are letting the two subnets I created "talk to each other."*
 
 Click the tab "Subnet Associations." You'll see a note that says "You do not have any subnet associations." So, if we put a route out into the internet via our main route table, any subnet we create will be public by default. We always want our main route *private.* We want a *separate route table for our public subnets.*
 
-Go back to the tab "Routes." Click "Create Route Table." A new page will open up. Name it and choose the VPC you want to associate it with. 
+Up above, click the button, "Create Route Table." A new page will open up. Name it and choose the VPC you want to associate it with. 
 * I'm calling this one "Sharina-PublicRoute."
-  * Any subnet associated with this route table will be able to talk to the internet.
+  * Any subnet that will be associated with this route table will be able to talk to the internet.
 
 Back in the list of routes, I now have two routes - the original one that got created with the VPC creation, and this new one. Note that the automatically made one is the main route. 
 
 ### Make routes for IPv4 and IPv6 to the Internet Gateway:
-With the radio button clicked for the PublicRoute you created, next, to create a route out to the internet, Click the tab, "Routes", and then the button, "Edit routes." In the new screen, click " Add route. A new row is created. Add in `0.0.0.0/0`. For Target, choose "Internet Gateway," and choose the gateway you created. 
+With the radio button clicked for the Public Route you created, next, (to create a route out to the internet,) Click the tab, "Routes", and then click the button, "Edit routes." 
 
-We can now add our route, by adding another row to the "Edit routes" table.  We can add the IPv6 by typing in `::/0` to give us a route out. In Target, choose "Internet Gateway" again, and choose the gateway created prior.
+In the new window, click "Add route." A new row is created. Type in `0.0.0.0/0`. For Target, choose "Internet Gateway," and choose the gateway you created. 
+
+We can now add a route out, by adding another row to the "Edit routes" table.  We can add the IPv6 by typing in `::/0` to give us a route out. In Target, choose "Internet Gateway" again, and choose the gateway you created prior.
 
 Now, any subnet associated with the Route Table will automatically become public (based on the above settings) for IPv4 and IPv6. 
 
 ### Associate the Subnets
-Given that my radio button is still clicked for "Sharina-PublicRoute," I'm going to click the tab "Subnet Associations." Then, click the button, "Edit subnet associations.
+Given that my radio button is still clicked for my public route," I'm going to click the tab "Subnet Associations." Then, click the button, "Edit subnet associations."
 
 Out of the two subnets that appear, click the radio button of the one you'd like to associate with your route table. 
 
@@ -217,44 +223,53 @@ Next, we need to *provision EC2 instances* - one in the public subnet and one in
 ## Provision EC2 Instances
 Go to EC2 service. Launch an instance, and choose the "Amazon Linux 2 AMI." Make sure the t2.micro is chosen, and hit "Next: configure Instance Details."
 
-In the page that opens, chose the VPC you created way back when. Choose the subnet you decided the public one. 
+In the page that opens, for Network, choose the VPC you created. 
 
-Make sure the "Auto-assign Public IP" drop down says "Use subnet setting (Enable). If it doesn't, you chose the wrong Subnet in the dropdown just above. 
+Choose the subnet you decided would be the public one. Be careful to be accurate with this step!
+
+Make sure the "Auto-assign Public IP" drop down says "Use subnet setting (Enable). If it doesn't, you chose the wrong Subnet in the dropdown just above, if you're trying to put the instance in a public subnet.
 
 ### Click "Next: Add Storage." Nothing to do here, so Click "Next: Add Tags" 
 
-Add a tag to help identify the instance. 
+Add a tag to help identify the instance. Add a key of "Name" and then write a descriptive name value.
 
 ### Click "Next: Configure Security Group"
-Note that security groups do not span VPCs.
+AWS says, "... if you want to set up a web server and allow Internet traffic to reach your instance, add rules that allow unrestricted access to the HTTP and HTTPS ports."
 
-Note that when you create a new security group, all outbound traffic is allowed by default. 
+Note that...
+* a security group is "a set of firewall rules that control the traffic for your instance," says AWS.
+* security groups do not span VPCs.
+* when you create a new security group, all outbound traffic is allowed by default. 
 
-In the "Assign a security group" options, choose the radio button that says, "Create a new security group." Give it a name and Description. 
+Within the "Assign a security group" row, choose the radio button that says, "Create a new security group." Give it a good name and description. 
 
-Click "Add Rule" and because we want to give it HTTP access, choose the Type to be HTTP for the new rule. Meanwhile, keep the SSH type the way it is (just above the new Rule you just created).
+Click "Add Rule" and because we want to give the public instance HTTP access, choose the Type to be HTTP for the new rule. Meanwhile, keep the SSH type the way it is (just above the new rule you just created).
 
-Click "Review Instance and Launch" button.
-
-This will create an HTTP instance that will allow SSH and HTTP to be open to the world. 
+Click "Review Instance and Launch" button - this will create an HTTP instance that will allow SSH and HTTP to be open to the world. 
 
 Then, click "Launch" button.
 
-A window will pop up that tells you to choose or create a key pair. If you make a new key pair, remember to download the key pair. 
+### Select or Create a New Key Pair
+A key pair lets you securely connect to your instance. A key pair consists of:
+* a public key (AWS stores this one)
+* a private key (you store this one)
+
+A window will pop up that tells you to choose or create a key pair. If you make a new key pair, remember to download the key pair and keep it somewhere you'll find again. 
 
 Click "Launch Instance"
 
 ### Now, go back to instances, and launch a second instance. 
-For this instance, follow the same steps as above, except when you get to Configure Instance Details, we want to choose the subnet that produces an "Auto-assign Public IP" statement that says *"Use subnet setting (Disable)"*. This is because for this one, we are *not* wanting a public IP address for this EC2 instance. 
+For this instance, follow the same steps as above, except when you get to Configure Instance Details, we want to choose the subnet that produces an "Auto-assign Public IP" statement that says *"Use subnet setting (Disable)"*. 
 
-This is because we are going to create a database server, which doesn't need to be public. 
+This is because for this instance, we are *not* wanting a public IP address for this EC2 instance. We are making an instance within our private subnet.
 
-So, for the "Add Tags" section, give it a key of Name and something descriptive. 
+This way, we can create a database server within our subnet, which doesn't need to be public. 
+
+For the "Add Tags" section, give it a key of Name and something descriptive. 
 
 For the "Configure Security Group Section," it's fine to "Select an existing security group." Choose the "default VPC security group."
 
 When the box pops up that says "Select an existing key pair or create a new key pair," choose the keypair you created prior (at least for the last instance). 
-
 
 What we've got so far:
 ![Screenshot of a cloud guru lesson showing VPC with Public and Private Subnets](/assets/vpc-with-two-subnets.png)
@@ -284,13 +299,13 @@ sudo su
 
 *Now, need to examine the private instance.*
 
-## Access the Private Instance (the Database Server):
+## Accessing the Private Instance 
 *The private one does not have an IP address to connect to, since it's private*
 
-Note that the two instances have two separate security groups, and so, by default, the security groups do not allow access to each other. So, if you try to SSH into the instance that is private (the DBServer), via the instance that is public (the WebServer), it's not going to work. 
+Note that *the two instances have two separate security groups, and so, by default, the security groups do not allow access to each other.* So, if you try to SSH into the instance that is private (the DBServer), via the instance that is public (the WebServer), it's not going to work. 
 
-### Solution: Create another Security Group within the Default VPC for the database server
-* *It's also helpful to have a security group for the private instance, anyway, since it is going to be a database server :)*
+Solution: Create another Security Group for the private instance that will allow for communication from the public subnet.
+* *It's helpful to have a security group for the private instance, anyway, since it is going to be something like a database server :)*
 
 Go to EC2. 
 
@@ -298,42 +313,40 @@ Scroll down on the left hand side to "Network and Security," and click on "Secur
 
 Click "Create security group" near the top of the page where security groups are listed.
 
-Name it with something descriptive (mine is, Sharina-Database-Security-Group-us-west-2).
+Give it a good name and a description.
 
-Give it a description and associate it with the VPC you made way, way back when for this project, such as: "Security Group for the database server built within sharinaVPC"
+Choose the VPC you created.  
 
-Click "Add rule" within the "Inbound rules section."
-* This is where we get to communicate certain things to EC2 instances from within this security group.
-* We want to ping EC2 instances inside this security group from within our WebServer's security group, so for Type, choose, "All ICMP - IPv4." So the source will be our web security group, or the IP range.
+Click "Add rule" within the "Inbound rules section." - This is where we get to communicate certain things to EC2 instances inside this security group.
+* If we want to ping EC2 instances inside this security group from our security group in our public subnet, so for Type, choose, "All ICMP - IPv4." So the source will be our web security group, or the IP range.
   * For Source type, leave it as Custom
-  * For Source, this is where we allow the web server's security group to ping, so you can type in "sg" or start searching for the security group you want to have as the source (the other security group we created a while back). Or, can just type in what the IPv4 CIDR is, which is the IP address range. (Go to Subnets (within VPC service) to check what the IPv4 CIDR is. This will be for the subnet that is associated with this particular instance. In this project's case, this is for my private subnet, which I named, "sharina-10.0.1.0-private-us-west-2a."). 
+  * For Source, this is where we allow the public subnet's security group (the security group you created in the public subnet) to ping this one, so you can type in "sg" or start searching for the security group associated with the public subnet. 
+  * Or, you can just type in what the IPv4 CIDR is, which is the IP address range. (Go to Subnets (within VPC service) to check the IPv4 CIDR, but it might be 10.0.1.0/24, for example. 
 * We want to talk to our database servers using HTTP, such as when we install managment software to manage mySQL, so add another rule.
-  * For Type, choose "HTTP." For Source, type in the IP address range. In my case, it's "10.0.1.0/24" 
+  * For Type, choose "HTTP." For Source, type in the IP address range, or search for the security group name. In my case, it's "10.0.1.0/24" 
 * We want HTTPS, so choose this in Type, and add in the IP address range in Source.
 * We also want SSH, so choose this in Type, and add in the IP address range in Source.
-* We need MySQL/Aurora, which allows us to communicate to DB server using MySQL. Do the same for Source. 
+* For a database, we need MySQL/Aurora, which allows us to communicate to DB server using MySQL. Do the same for Source. 
 
-Leave the outbound rules the way they are - it should have Type "All traffic," and have destination "0.0.0.0/0", "::/0"
+Leave the outbound rules the way they are - it should already have Type "All traffic," and have destination "0.0.0.0/0", "::/0"
 
 Click "Create Security Group"
 
 ![screenshot of inbound rules for this security group](/assets/dbserversecuritygroup.png)
 
-**Now, we need to move the database server we created into this new security group:**
+**Now, we need to move the instance in the private subnet we created into this new security group we just created for it**
 
-So, we created the new security group which is within the default VPC.
 
-We now need to move the database server. 
+Go to EC2. Click on the radio button for the instance in the private subnet you created a while back.
 
-Go to EC2. Click on the radio button for the database server you created a while back.
+Up above, click the pulldown menu called "Actions," and choose "Networking > Change Security Groups."
 
-Up above, click the pulldown menu called "Actions," and choose "Change Security Groups."
+A new window will pop up, called "Change Security Groups." You'll see that the default security group is currently chosen. Unclick it, and instead click your newly created security group. Hit the button to confirm all that.
 
-A new window will pop up, called "Change Security Groups." You'll see that the default security group is currently chosen. Unclick it, and click your newly created security group (in my case, the super long title of "Sharina-Database-Security-Group-us-west-2." Seriously, who's idea was that?). Hit the button to confirm all that.
-
+### Test the things
+**We now get to SSH back into our public web server!**
 Back in the list of EC2 instances, with your radio button still checked, go down to the tab called "Description," and copy to clipboard the private IP address, titled "Private IPs."
 
-**We now get to SSH back into our public web server!**
 Via the terminal, navigate to where you stored your KeyPair. 
 
 ```
@@ -352,9 +365,10 @@ sudo su
 ```
 
 ```
-ping private-ip-address-of-database-server 
+ping private-ip-address-of-private-instance
 ```
 -------------
+
 # NAT Instances and Gateways
 nat = network address translation
 
@@ -486,7 +500,7 @@ From A Cloud Guru... An example of how to diagram what we might have so far. Not
 ![screenshot of what we've got so far](/assets/vpcwithnatgateway.png)
 
 ---------------
-# Network Access Control Lists (NACL)
+# Network Access Control Lists (Network ACL)
 "A network ACL is an optional layer of security that acts as a firewall for controlling traffic in and out of a subnet," says AWS.
 
 Go to VPC > Security (to the left) > Network ACLs.
@@ -521,7 +535,7 @@ Select the VPC it should go inside.
 *Once a new NACL is created, note that all inbound and outbound rules are automatically set to deny everything*.
 
 ### Change Subnet Associations
-Click on the new NACL's radio tab, and click on the tab below, calld "Subnet associations."
+Click on the new NACL's radio tab, and click on the tab below, called "Subnet associations."
 
 Click "Edit subnet associations"
 
@@ -529,7 +543,7 @@ Choose the subnet you want - I chose my public one.
 
 The subnet is now associated with this new NACL, and the other subnet is left behind in the other one. 
 
-Now that the NACL has the public subnet it in, any access via HTTP is no longer available (ie, Apache setup would have shown ability to see a little website via IP address in browser - see AWS_CLI_COMMANDS.md). 
+Now that the NACL has the public subnet it in, any access via HTTP is no longer available (ie, Apache setup would have shown ability to see a little website via IP address in browser.
 
 ### Set up Rules for new Network ACL
 Click tab, "Inbound rules," then "Edit inbound rules"
@@ -681,3 +695,6 @@ Hardest part to building a VPC, when doing this for the first time, is making su
 [1Strategy AWS VPC starter CloudFormation template](https://github.com/1Strategy/vpc-starter-template)
 
 [AWS NAT Instances docs](https://docs.aws.amazon.com/vpc/latest/userguide/VPC_NAT_Instance.html)
+
+[AWS' "What Is AMazon VPC" doc](https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html)
+
