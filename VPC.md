@@ -163,10 +163,6 @@ The chosen subnet, within the list of subnets will show a "Yes" under the column
 
 Now, we have a public and private subnet.
 
-From A Cloud Guru... An example of how to diagram what we might have so far.
-
-![screenshot of current VPC architecture](/assets/subnetVPC.png)
-
 Next, we need an **Internet Gateway**, which gives us a way to get into the VPC. Then, we'll need to configure our route tables. 
 
 ## Add an Internet Gateway
@@ -278,13 +274,6 @@ For the "Add Tags" section, give it a key of Name and something descriptive.
 For the "Configure Security Group Section," it's fine to "Select an existing security group." Choose the "default VPC security group."
 
 When the box pops up that says "Select an existing key pair or create a new key pair," choose the keypair you created prior (at least for the last instance). 
-
-From A Cloud Guru... An example of how to diagram what we might have so far. 
-
-![Screenshot of a cloud guru lesson showing VPC with Public and Private Subnets](/assets/vpc-with-two-subnets.png)
-
-
-*Now, need to examine the private instance.*
 
 ## Accessing the Private Instance 
 *The private one does not have an IP address to connect to, since it's private*
@@ -505,10 +494,6 @@ Click the radio button for your *main* route table inside your VPC. Click the ta
 We need to give the main route table a route out into the internet. Click "Add route," put the destination perhaps as "0.0.0.0/0," change the "Target" to "NAT_gateway," and then choose the one you created. 
 
 Click the "save" and "close" button.
-
-From A Cloud Guru... An example of how to diagram what we might have so far. 
-
-![screenshot of what we've got so far](/assets/vpcwithnatgateway.png)
 
 ---------------
 
