@@ -1,4 +1,4 @@
-The following are notes taken while studying for the AWS Certified Solutions Architect Exam. My main resource was A Cloud Guru, so please only use these notes for increasing your personal knowledge *nothing more*. 
+The following are notes taken while studying for the AWS Certified Solutions Architect Exam, Chapter 7. My main resource was A Cloud Guru, so please only use these notes for increasing your personal knowledge and *nothing more*. 
 
 Big Study Hint: You should be able to build a VPC from memory to pass the AWS Certified Solutions Architect Exam.
 
@@ -83,14 +83,17 @@ An availability zone in my AWS account can be a totally different availability z
 ---------------
 
 # Create a Custom VPC - VPC with Public & Private Subnets
+This custom VPC is built step by step, using the AWS Console. 
+
 "Create VPC"
 
 Name it.
 
 IPv4 CIDR address block:
-For the biggest block possible: `10.0.0.0/16`
+* For the biggest block possible: `10.0.0.0/16`
 
-IPv6 CIDR block: Can use the `Amazon provided IPv6 CIDR block` - radio button.
+IPv6 CIDR block: 
+* Can use the `Amazon provided IPv6 CIDR block` - radio button.
 
 Tenancy: `default`
 * Less expensive - you're sharing your underlying hardware with other AWS customers.
@@ -273,7 +276,8 @@ For the "Configure Security Group Section," it's fine to "Select an existing sec
 
 When the box pops up that says "Select an existing key pair or create a new key pair," choose the keypair you created prior (at least for the last instance). 
 
-What we've got so far:
+From A Cloud Guru... An example of how to diagram what we might have so far. 
+
 ![Screenshot of a cloud guru lesson showing VPC with Public and Private Subnets](/assets/vpc-with-two-subnets.png)
 
 
@@ -324,7 +328,7 @@ Up above, click the pulldown menu called "Actions," and choose "Networking > Cha
 A new window will pop up, called "Change Security Groups." You'll see that the default security group is currently chosen. Unclick it, and instead click your newly created security group. Hit the button to confirm all that.
 
 ## Test The Things
-### Test the Public EC2 Instance
+### SSH into the public EC2 instance
 
 Via the terminal, navigate to where you stored your KeyPair. 
 
@@ -353,7 +357,7 @@ Back in the list of EC2 instances, with your radio button still checked, go down
 Via the terminal, navigate to where you stored your KeyPair. 
 
 ```
-ssh ec2-user@the-ip-address -i SharqinaKeyPair.pem
+ssh ec2-user@the-ip-address -i file-name-of-your-key-pair.pem
 ```
 
 Do an update if it tell you to.
@@ -373,9 +377,9 @@ ping private-ip-address-of-private-instance
 -------------
 
 # NAT Instances and Gateways
-nat = network address translation
+NAT = network address translation
 
-In a private subnet, How to install updates? Install updates? Download software? Must use NAT Instances & Nat Gateways, since there is not route set up to the Internet! These things make it possible to communicate with our Internet Gateway, without making our private subnet public.
+When you're in a private subnet, how do you install updates? Install updates? Download software? Must use NAT Instances or Nat Gateways, since there is no route set up to the Internet from the private subnet. These things make it possible to communicate with our Internet Gateway, without making our private subnet public.
 
 In other words, when our instances in our private subnets need to access the internet, they do so via either a NAT Instance or a NAT gateway. 
 
@@ -383,9 +387,9 @@ Nat Gateways are used 99% of the time; Nat Instances are *individual EC2 instanc
 
 Problems with NAT Instance architecture:
 * It is a single virtual machine
-  * Can create high availability using Autoscaling groups, multiple subnets in different AZs, and a script to automate failover... but ouch. 
+  * Can create high availability using Autoscaling groups, multiple subnets in different AZs, and a script to automate failover... but ouch, lots of work. 
 * It's a small virtual machine, so it can easily get overwhelmed - it's a massive bottleneck.
-  * Increase the instance size to deal with bottle-necking.
+  * Solution: increase the instance size to deal with bottle-necking.
 * It's got a single point of failure. 
 
 ## How to Create a NAT *Instance*:
@@ -411,7 +415,7 @@ Amazon Linux AMI 2018.03.0.20181116 x86_64 VPC HVM ebs
 It's set as a t2.micro, which is great. 
 
 In the configure instance details page:
-* Changed the vpc to my custom vpc.
+* Change the vpc to your custom vpc.
 * Change the subnet to the public subnet (want to launch into the public one), which will give us a public ip address, regarding the "Auto-assign Public IP" - it will say "Enable"
 * Leave everything else the way it is. 
 
@@ -421,11 +425,11 @@ Add a few descriptive tags, definitely at least a name.
 
 Click "Configure security group."
 
-Choose the "Select an existing security group" radio button so we can put this instance inside our web server security group (ie, not the database security group created a while back). 
+Choose the "Select an existing security group" radio button so we can put this instance inside the security group that also holds the *public* instance we created earlier.
 
 Click "Review and launch."
 
-A window will pop up that asks where to boot from, re SSD. Choose the radio button that says, "Make General Purpose (SSD) the boot volume for this instance." If you don't get this window, it's probably b/c of the AMI you're using. 
+A window might pop up that asks where to boot from, re SSD. Choose the radio button that says, "Make General Purpose (SSD) the boot volume for this instance." If you don't get this window, don't panic - it's probably b/c of the AMI you're using, and just move on. 
 
 Review the instance, and click "Launch"
 
@@ -438,15 +442,15 @@ Click on the NAT instance radio button. Go to the Actions tab, and choose "Netwo
 ### Make the Database Server "talk" to the NAT Instance
 To do this, we need to create a route out to the internet. The route needs to be created in the default route table, which is the main route table. 
 
-Go to VPC (within network and content delivery), and Go to "Route Tables," on the left, within the Virtual Private Cloud section. 
+Go to VPC (within network and content delivery), and go to "Route Tables," on the left, within the Virtual Private Cloud section. 
 
-click the radio button of the route table that is associated with your VPC, and says "Yes," in the "Main" column. This is the main route table associated with your VPC. 
+Click the radio button of the route table that is associated with your VPC, and says "Yes," in the "Main" column. This is the main route table associated with your VPC. 
 
 In the tabs below, click "Routes." 
 
 Click "Edit routes," and then "Add route." 
 
-If we want to go out to the internet, we add "0.0.0.0/0," as our Destination. We then add our NAT instance as the Target, by clicking "Instance" on the pulldown menu and then choosing the NAT instance we created above.
+If we want to go out to the internet, we can add something like, "0.0.0.0/0," as our Destination. We then add our NAT instance as the Target, by clicking "Instance" on the pulldown menu and then choosing the NAT instance we created above.
 * You should only allow 0.0.0.0/0 on port 80 or 443 to to connect to your public facing Web Servers, or preferably only to an ELB, says A Cloud Guru.
 
 Click "Save routes."
@@ -482,7 +486,7 @@ Go to VPC > Vitual Private Cloud > NAT Gateways.
 
 Click the button, "Create NAT Gateway."
 
-You'll want to choose your *public* subnet that you created way in the beginning. 
+You'll want to choose the *public* subnet you created way back when. 
 
 Click the button that says "Allocate Elastic IP Address," which will create an IP address and attach it to the new Gateway. 
 
@@ -495,11 +499,12 @@ You'll find yourself at the list of Route Tables.
 
 Click the radio button for your *main* route table inside your VPC. Click the tab called "Routes" and then the button "Edit routes."
 
-We need to give the main route table a route out into the internet. Click "Add route," and put the destination as 0.0.0.0/0, and change the Target to NAT_gateway, and choose the one you created. 
+We need to give the main route table a route out into the internet. Click "Add route," put the destination perhaps as "0.0.0.0/0," change the "Target" to "NAT_gateway," and then choose the one you created. 
 
 Click the "save" and "close" button.
 
-From A Cloud Guru... An example of how to diagram what we might have so far. Note that what *I* created is a bit different.
+From A Cloud Guru... An example of how to diagram what we might have so far. 
+
 ![screenshot of what we've got so far](/assets/vpcwithnatgateway.png)
 
 ---------------
@@ -536,7 +541,7 @@ Create a descriptive name.
 
 Select the VPC it should go inside. 
 
-*Once a new NACL is created, note that all inbound and outbound rules are automatically set to deny everything*.
+*Once a new Network ACL is created, note that all inbound and outbound rules are automatically set to deny everything*.
 
 ### Change Subnet Associations
 Click on the new NACL's radio tab, and click on the tab below, called "Subnet associations."
@@ -547,9 +552,9 @@ Choose the subnet you want - I chose my public one.
 
 The subnet is now associated with this new NACL, and the other subnet is left behind in the other one. 
 
-Now that the NACL has the public subnet it in, any access via HTTP is no longer available (ie, Apache setup would have shown ability to see a little website via IP address in browser.
+Now that the Network ACL has the public subnet it in, any access via HTTP is no longer available (ie, Apache setup would have shown ability to see a little website via IP address in browser.
 
-### Set up Rules for new Network ACL
+### Set up Rules for the New Network ACL
 Click tab, "Inbound rules," then "Edit inbound rules"
 * Can create rules to connect on port 80, 443, and 22, for example, inbound.
 
@@ -557,6 +562,7 @@ Edit Outbound rules
 * connect on port 80, 443, 1024-65535 (ephemoral ports for NAT Gateway)
   * short lived transport protrocol port is an ephemeral port. They may be used on the server side of communication. Port only available during the communication, then times out. NAT gateway uses the emphemoral port of the type noted above. 
 
+### About the Order of Rules:
 The rules are evaluated in order - 100 (HTTP), 200 (HTTPS), 300 (SSH) for inbound rules. So, if there's a deny rule setup as rule 400, the deny won't activate till everything else is done. If you set up a deny rule for a specific IP address, the deny rule needs to be numbered 99, in this case, so it's before the allow rules. 
 
 ----------------
@@ -583,8 +589,8 @@ Note:
 * You can tag flow logs
 * Once you create a flow log, you cannot change its configuration. As in, you can't associate a different IAM role with the flow log. 
 * Not all IP traffic is monitored. 
-  * traffic generated by instances when te ycontact the Amazon DNS server is not monitored, however if you use your own DNS server, all traffic to that DNS server is logged.
-  * Traffic to/from 169.254.169.254 for instance metadata not monitored
+  * traffic generated by instances that contact the Amazon DNS server is not monitored, however if you use your own DNS server, all traffic to that DNS server is logged.
+  * traffic to/from 169.254.169.254 for instance metadata not monitored
   * DHCP traffic not monitored
   * traffic to the reserved IP address for the default VPC router also not monitored.
 
@@ -594,14 +600,14 @@ Used to securely administer EC2 instances.
 
 **A Bastion Host allows you to SSH or RDP into an EC2 instance located in a private subnet.** 
 
-A special purpose computer set up to resist attacks. It's usually on the outside of a firewall or public subnets. Usually involves access from untrusted networks or computers. It is used to securely administer EC2 instances (using SSH or RDP).
+A special purpose computer set up to resist attacks. It's usually on the outside of a firewall or in a public subnet. Usually involves access from untrusted networks or computers. It is used to securely administer EC2 instances (using SSH or RDP).
 * So, if we want to SSH into our instances in our private subnet, we do that via a bastion host. 
 
 Note that a NAT Gateway or NAT Instance is used to provide internet traffic to EC2 instances in a private subnet. 
 
-If we have a public subnet, the bastion host would go inside the public subnet. SSH or RDP through the Internet Gateway, through our Route Tables, through the Network ACLs, Through Security Groups, onto the Bastion server. The Bastion server would then forward the connection through SSH or through RDP to our private instances. So, we just harden the Bastion host (since this is what will be hacked). That way we don't need to harden our private instances. 
+If we have a public subnet, the bastion host can go inside the public subnet. This means you can SSH or RDP through the Internet Gateway, through our Route Tables, through the Network ACLs, through Security Groups, onto the Bastion server. The Bastion server would then forward the connection through SSH or through RDP to our private instances. So, we just "harden" the Bastion host (since this is what will be hacked). That way we don't need to harden our private instances. 
 
-Note that you can't use a NAT Gateway as a Bastion host; you have to go ahead an configure a bastion host. 
+Note that you can't use a NAT Gateway as a Bastion host; you have to go ahead and configure a bastion host. 
 
 -----------------
 # Direct Connect
@@ -611,7 +617,7 @@ Allows for private connectivity between AWS and a datacenter, office, etc.
 
 Direct connect locations are spread all over the world. 
 
-Within direct connect, is a "AWS cage", which has routers. Customers routers then connect to the routers within the AWS cage. None of this traverses the internet. There is use of the AWS backbone network. 
+Within direct connect is a "AWS cage," which has routers. Customers routers then connect to the routers within the AWS cage. None of this traverses the internet. There is use of the AWS backbone network. 
 
 Useful for high throughput workloads (ie lots of network traffic). 
 
@@ -632,7 +638,7 @@ Note that if one does not have a direct connect connection at your location, one
 
 -----------------
 # Global Accelerator
-A service in which you create acclerators to improve availability and performance of your app for local and global users. Global Accelerator directs traffic to optimal endpoints over the AWS global (backbone) network. Much more efficient. 
+A service in which you create accelerators to improve availability and performance of your app for local and global users. Global Accelerator directs traffic to optimal endpoints over the AWS global (backbone) network. Much more efficient. 
 
 GA gives you *two static IP addresses* that you associate with your accelerator. You can also bring your own IP addresses. 
 
@@ -698,11 +704,9 @@ Hardest part to building a VPC, when doing this for the first time, is making su
 
 [A Cloud Guru's AWS Certified Solutions Architect Associate course](https://acloud.guru/)
 
-[1Strategy AWS VPC starter CloudFormation template](https://github.com/1Strategy/vpc-starter-template)
-
 [AWS NAT Instances docs](https://docs.aws.amazon.com/vpc/latest/userguide/VPC_NAT_Instance.html)
 
-[AWS' "What Is AMazon VPC" doc](https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html)
+[AWS' "What Is Amazon VPC" doc](https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html)
 
 [Reference for Bastion Architecture/Configuration ](https://docs.aws.amazon.com/quickstart/latest/linux-bastion/architecture.html)
 
