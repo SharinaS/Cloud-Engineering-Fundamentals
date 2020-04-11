@@ -10,7 +10,7 @@ A virtual data center in the cloud.
 A VPC is a *collection* of internet gateways, route tables, network access control lists (ACLs), security groups, EC2 instances, private and public subnets.
 
 A VPC consists of:
-* IGWs(Virtual Private Gateways)
+* IGWs (Virtual Private Gateways)
 * Route Tables
 * Network Access Control Lists (stateless)
 * Subnets (1 subnet = 1 availability zone)
