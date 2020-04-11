@@ -161,7 +161,10 @@ The chosen subnet, within the list of subnets will show a "Yes" under the column
 
 *This now lets us launch EC2 instances into this particular subnet, and that automatically allows for a public IP addresss :)*
 
-Now, we have a public and private subnet, 
+Now, we have a public and private subnet.
+
+From A Cloud Guru... An example of how to diagram what we might have so far.
+
 ![screenshot of current VPC architecture](/assets/subnetVPC.png)
 
 Next, we need an **Internet Gateway**, which gives us a way to get into the VPC. Then, we'll need to configure our route tables. 
