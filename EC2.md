@@ -1,3 +1,5 @@
+This document focuses on EC2 and the associated services and technologies that come with it.
+
 # EC2
 What EC2 is:
 * A virtual server or servers in the cloud.
@@ -13,12 +15,12 @@ Note that:
   * You can also use a third party tool (bit locker, etc) to encrypt the root volume, or this can be done when creating AMI's in the AWS console or using the API.
 * Added volumtes can be encrypted. 
 
-### Architecture Note
+### Architecture Note: 
 In case of failure, for production website, have at least two EC2 instances running in two separate availability zones. 
 
 By the way, a default Security Group is set up for you, so no matter what, you start with one.
 
-## Pricing Models
+# Pricing Models
 On Demand 
 * Fixed rate by the hour or second with no committment (great for testing)
 * Good for low cost and flexibility, short term or unpredictable workloads that can't be interrupted. 
@@ -44,7 +46,7 @@ Dedicated hosts
 * physical server(s) for license terms/conditions requirements - sometimes there are requirements that may not support multi-tenant virtualization. 
 * Can be purchased on-demand (hourly) and 70% off the on-demand price. 
 
-## Instance Types
+# Instance Types
 Not as important for the Solutions Architect Associate exam, but good to start learning.
 
 Think, FIGHT DR MCPXZ AU
@@ -77,6 +79,7 @@ A1 - Arm-based workloads (scale out workloads)
 
 U-6tb1 - Bare Metal
 
+----------------
 
 # Provision an EC2 Instance 
 ...Using EC2's Amazon Linux 2 AMI 
@@ -112,9 +115,9 @@ Next, we need to add key-value pairs of information about the instance by clicki
 Then click "Next: Configure Security Group."
 
 ## Security Group
-Note that a security group is a virtual firewall in the cloud, so you can specify if it's open to the entire world, or only to "My IP" (only you can SSH into the webserver). For web traffic, though, you want to set it up so it can respond to web requests.
+> Note that a security group is a virtual firewall (which enables the computer to communicate via its different ports) in the cloud, so you can specify if it's open to the entire world, or only to "My IP" (only you can SSH into the webserver). For web traffic, though, you want to set it up so it can respond to web requests.
 
-Note that:
+Remember:
 * Rule changes on a security group will take place immediately
 * Security Grups are stateful
   * When you create an inbound rule, an outbound rule is automatically created (when you come in, you're allowed out)
@@ -147,7 +150,7 @@ When you select an instance, it will reveal details about that instance, includi
 
 ![image of part of instance description](/assets/ec2InstanceInfo.png)
 
-# About the Instance
+
 ### Status Checks
 This is a tab that appears when you click on the instance's radio button. 
 
@@ -158,8 +161,8 @@ There's an instance status check which checks the instance itself.
 ### Monitoring
 Involves CloudWatch analysis. 
 
-# SSH Into The Instance
-### Via the Console
+# SSH into the Public Instance
+### Via the Console:
 Make sure your instance's radio button is clicked. 
 
 Press the button, "Connect," up above. 
@@ -168,7 +171,7 @@ A window will pop up that says, "Connect To Your Instance." Click the radio butt
 
 Benefit is that this bypasses Mac vs Windows. 
 
-### Via the Terminal
+### Via the Terminal:
 For Mac users, **open up the terminal** (or a plugin for windows) and cd into where you stored your key pair. 
 
 For first time use of the key pair, change permissions using the terminal on the private key you downloaded a bit ago: 
@@ -236,19 +239,22 @@ chkconfig on
 Now, can paste in public IP address in a browser, and check out the website you built. 
 
 ------------------------
+
 # EBS Volumes
 EBS = Elastic Block Storage
 
 When creating an instance, this is "Step 4: Add Storage"
 
-Essentially, a hard disk drive in the cloud. Provides persistent block storage volumes for EC2 instances. Each EBS volume is automatically replicated within its Availability Zone (providing availability and durability in case of component failure).
+### Remember:
+* Essentially, EBS is a virtual hard disk drive in the cloud (used by EC2). Every server has a disk.
+* EBS provides persistent block storage *volumes* for EC2 instances. 
+* Each EBS volume is automatically replicated within its Availability Zone (providing availability and durability in case of component failure).
+* You can change EBS volume sizes on the fly, including size and storage type. 
+* Volumes will *always be in the same availability zone* as the EC2 instance. 
+* You can *move an EC2 instance from one AZ to another* by taking a snapshot of it, creating an AMI from the snapshot, and then using the AMI to launch the EC2 instance in a new AZ.
+* You can *move an EC2 instance from one region to another* by taking a snapshot of it, creating an AMI from the snapshot, copying the AMI from one region to another, then using the copied AMI to launch the EC2 instanece in the new region. 
 
-The virtual hard disks that EC2 uses. Every server has a disk, and this is also the case for virtual servers. 
-
-Note that:
-* The EC2 and the EBS has to be in the same Availability Zone.
-
-## Types
+## EBS Types
 ### General Purpose (SSD)
 * API Name: gp2
 * For wide variety of work loads, up to 16,000 IPS/volume
@@ -278,14 +284,27 @@ Note that:
 * For when data is infrequently accessed, like data archiving, but where you have opted to not use glacier.
 
 ## EBS Volumes and SnapShots
+Snapshots exist on S3. Think of snapshots as a photograph of the disk, and that photo is stored on S3. 
+* Snapshots are point in time copies of volumes.
+* Snapshots are incremental, so only the blocks that have changed since your last snapshot are moved to S3. So, only the changes in the blocks are moved to S3. 
+* It can take some time for snapshots to be created. 
+* Best practice: when taking a snapshot for EBS volumes that serve as root devices, *stop the instance before taking the snapshot*. ... though you can take a snap while the instance is running.
+* You can create AMI's from Snapshots
+
+
 Go to "Volumes" on the left
 
 From A Cloud Guru: Whereever the EC2 instance is, the volume will be in the same availability zone. In a physical computer, you want the hard disk drive to be as close to the motherboard as possible. In a virtual machine, and a virtual hard disk drive, you want them in the same availability zone, otherwise there will be too much lag. 
 
 ## Deletion of Volumes
-After termination of an instance, the EBS volume will be automatically removed too, since delete on termination is automatically checked.
+After termination of an instance, the EBS volume will be automatically removed too, since delete on termination is automatically checked... since it's a root device volume. 
 
-### Example: instance with multiple EBS volumes added
+So, when you terminate an EC2 instance, by default the root device volume will be terminated. 
+
+Additional volumes, attached to that EC2 instance, however, will *continue to persist.* You will have to manually click the radio buttons of each of the volumes, and click "Actions > Delete Volumes."
+
+## Modify Volumes, Make a SnapShot, Move regions / AZs
+### Example: Instance with multiple EBS volumes added
 Amazon Linux AMI --> T2.micro instance
 
 Everything left as default in the Configure instance details. 
@@ -312,20 +331,198 @@ Can modify a volume
 * It can change some time for the changes to take effect. May also need to extend the OS file system on the volume - you run a command to repartition the drive to see the full 1000 gigs (in sys ops course).
 * Note that you don't have to stop an instance to change things about volumes!
 
-Move an instance and a volume from one availability zone to another:
+**Move an instance and a volume from one availability zone to another:**
+
+> Summary: Create a snapshot --> turn the snapshot into an AMI --> Use the AMI to launch into other Availability Zones. 
+
 * Find your root device volume (or volumes, depending on the scenario). Go to "Actions > Create Snapshot." 
   * Snapshot is basically a photograph of the disk.
 * Give it a description, and click Create snapshot. It will take a few minutes to create. 
 * Go to "Snapshots" on the left, to see the newly created snapshot. 
 * Click on the snapshot's radio button, then "Actions > Create Image"
 * Give the image a name, and leave everything else as default
-  * Note there are two types of virtualization types in AWS - paravirtual (PV) or hardware virtual machine (HVM) - so you can choose which one. Make sure it's on HVM if you want to have more instance types to launch from later on.
+  * Note there are two types of virtualization types in AWS - paravirtual (PV) or hardware virtual machine (HVM) - so you can choose which one. Make sure it's on HVM if you want to have many more instance types to launch from, later on.
+
+Hit "Create"
+
+Once the image has been created, we can use that image to provision new EC2 instances. 
+
+On the left, go to "Images > AMIs" to view the newly created image, and click "Launch." 
+
+Note how many EC2 instances are available, but you can just choose the t2.micro 
+
+Click button, Configure Instance Details"
+
+Can now choose to launch it into a *completely different subnet* / Availability Zone.
+
+Click "Add Storage," where you have a Root volume. In this example, we're not adding more storage, so click "Next: Add Tags." 
+
+In Configure Security Group, we use an existing security group, which has HTTP (source: 0.0.0.0/0), HTTP (::/0) and SSH (0.0.0.0/0) for inbound rules.
+
+Launch!
+
+**Can also copy the AMI into different regions** 
+
+> This lets us move across availability zones and/or across regions! The difference here is that we're copying the AMI from one region to another. Once the AMI is in a new region, we can choose whatever AZ that we wish. 
+
+In the list of AMIs, with the AMI's radio button clicked, go up to "Actions > Copy AMI."
+
+A window will pop up, and you can move the Amazon Machine Image from the existing region
+* Choose a destination region
+
+We can now use this image to launch our ec2 instances to the new destination region. 
+
+# AMI Types
+There are two different types of AMIs:
+* EBS 
+* Instance Store
+
+When you select your AMI, you can select it based on:
+* Region (see Regions and AZs)
+* Operating System
+* Architecture (32-bit vs 64-bit)
+* Launch permissions
+* Storage for the Root Device (aka Root Device Volume)
+  * Instance Store (Ephemeral storage)
+  * EBS Backed Volumes
+
+AMIs are categorized as *one* of the following:
+* Backed by EBS 
+  * root device for an instance launched from the AMI is an EBS volume created from an *EBS snapshot*.
+* Backed by instance store
+  * root device for an instance launched from the AMI is an instance store volume created from a *template stored in S3*.
+  * Sometimes called Ephemeral Storage
+
+## Example of Launching EBS Backed vs Instance Store Backed:
+### Launch an Instance that is EBS Backed
+Go to EC2 and launch an instance. Choose the Amazon Linux 2 AMI, use a t2.micro instance type, leave everything as default in...
+* ... the instance details config page,  
+* ... add storage,
+* ... add tags.
+
+... and use a self-created security group (which has HTTP (source: 0.0.0.0/0), HTTP (::/0) and SSH (0.0.0.0/0) for inbound rules).
+
+Launch it. 
+
+### Launch an Instance that is Instance Store Backed
+On the left, click "Community AMIs." 
+* We can sort by OS, Architecture, and by Root device type. 
+
+In Root device type (on the left), sort by "Instance Store." 
+
+Launch a default, perhaps called, "amzn-ami-pv-2012.03.2.x86_64-s3", though you can pick anyone you want. 
+
+Because you are launching an instance store type, the smallest of the instance types you can choose is a medium sized one, or an m3.medium.
+
+You can leave everything as default in:
+* Configure Instance Details
+* Add Storage <-- notice that volume type is "Instance Store"
+  * There will be a notification on the top that you can attach extra EBS volumes after launching the instance, *but not additional instance store volumes*.
+* Add Tags
+
+... and use a self-created security group (which has HTTP (source: 0.0.0.0/0), HTTP (::/0) and SSH (0.0.0.0/0) for inbound rules).
+
+Launch it.
+
+## Examine the Two Instances (launched above)
+How to tell the difference between the two instances:
+* the Instance Type size - m3.medium vs t2.micro
+
+### Go to Elastic Block Store > Volumes (on left)
+In the list of volumes, you'll only be able to see one volume - the EBS-backed volume.
+* We can't see the instance-store volume here. 
+
+### Persistant Storage vs Emphemoral Storage: Stop vs. Terminating the Instances
+For the **EBS-backed volume**, you can go to "Actions > Instance State > Stop"
+* All the data on the EBS-backed volume will continue to persist <--- *persistant storage*
+
+For the **instance-store-backed volume**, when you go to "Actions > Instance State," the only options you have is for "Reboot" or "Terminate."
+* Down below, under "Status Checks" for this volume there are two categories here (as usual) - System Status Checks and Instance Status Checks. If an underlying hypervisor (computer software, firmware or hardware that creates and runs virtual machines, aka the host) fails, the system status check will say "impaired," or something of the sort.
+  * If it's an EBS-backed volume, you just stop the instance, then restart it. When it restarts, it will load up on another hypervisor. 
+  * You can't do a stop/restart with the instance-store-backed volume if the underlying hypervisor has an issue. Instead, you'll have to terminate, which means *all data on the instance-store volume will be lost*. <-- *ephemeral storage*
+
+You can reboot both EBS-backed and instance store-backed, and you won't lost your data.
+
+### Termination
+By default, both *root* volumes will be deleted on termination. 
+
+However, with EBS volumes, you can tell AWS to keep the root device volume. 
+
+------------------------
+# ENI vs ENA vs EFA
+## ENI
+An Elastic Network Interface... a virtual network card for your EC2 instance, essentially.
+
+When you provision an EC2 instance, an ENI will be automatically attached. You can then add more as needed.
+
+ENI allows / provides:
+* one primary private IPv4 address (from the IPv4 address range of your VPC)
+* secondary private IPv4 addresses (from the IPv4 address range of your VPC)
+* one Elastic IP address (IPv4) per private IPv4 address
+* one public IPv4 address
+* IPv6 addresses
+* security groups
+* one MAC address
+* one source/destination check flag
+* one description of what the ENI is.
+
+Where an ENI is found (scenarios):
+* Basic networking
+* A management network separate from production network (so, multiple ENIs)
+* You'd have an additional ENI if you have network and security appliances in your VPC
+* Having multiple ENIs lets you create dual-homed instances with workloads / roles on distinct subnets. 
+  * database subnet segregated from production subnet with multiple ENIs, for example.
+  * You'd have multiple ENI's for each network, essentially.
+
+ENIs let you create low-budget solutions that are also high-availability.
+
+
+## EN 
+Enhanced Networking.
+* ENA is a subset of EN.
+* Think of when you need speeds between 10Gbps-100Gbps and reliable, high throughput.
+
+Uses single root I/O virtualization (SR-IOV)
+* provides high-performance networking abilities on *supported instance types*. 
+* SR-IOV is a method of device virtualization that essentially *speeds up your network* - it provides (compared to tranditional virtualized network interfaces):
+  * higher I/O performance
+  * lower CPU utilization
+
+EN provides:
+* higher bandwidth
+* higher packet per second (PPS) performance
+* lower inter-instance latencies
+
+Sometimes an ENI is not enough, regarding the network throughput you need when doing more hefty workloads. Enter, enhanced networking, for when you need good network performance. So, instead of using many ENI's (which won't necessarily increase your network throughput), use one ENA. 
+
+Cost: No additional charge
+
+### How to enable EN - Two Options: <-- depends on your instance type
+* ENA - Elastic Network Adapter
+  * Supports network speeds of up to **100Gbps** (gigabits; billions of bits / second; a measure of bandwidth)
+* VF - Intel 82599 Virtual Function interface
+  * Supports network speeds of up to **10 Gbps**
+  * Usually used for older instances, so choose ENA over VF, given the option, especially in exam questions. 
+
+## EFA
+Elastic Fabric Adapter.
+* For when you need to accelerate HPC and machine learning apps, or if you need to do an OS by-pass.
+
+A network device that you can attach to your EC2 instance.
+* accelerates High Performance Computing (HPC) and machine learning applications.
+
+If the scenario involves something regarding EN, and machine learning, think of EFA!
+
+EFA provides (compared to the TCP transport traditionally used in cloud-based HPC systems):
+* lower and more consistent latency
+* higher throughput 
+* OS-bypass
+  * enables HPC and machine learning applications to bypass the OS kernal. Communication can occur directly with the EFA device.
+  * Makes it faster with less latency.
+  * Only supported on Linux currently (not windows).
 
 
 ------------------------
-# Firewalls
-Firewalls enable the computer to communicate via its different ports. 
-
 ------------------------
 
 # Use the Terminal (Mac) To interact with AWS
@@ -441,4 +638,4 @@ aws s3 ls
 
 
 # Resources
-* A Cloud Guru's [AWS Certified Cloud Practitioner](https://acloud.guru/learn/aws-certified-cloud-practitioner) Course
+* A Cloud Guru's [AWS Certified Cloud Practitioner](https://acloud.guru/learn/aws-certified-cloud-practitioner) Course and the AWS Certified Solutions Architect Course. 
