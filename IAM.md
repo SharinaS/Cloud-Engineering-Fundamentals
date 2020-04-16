@@ -4,7 +4,14 @@ Roles are a way for one AWS service to use another AWS service.
 
 Used to secure the AWS environment. Always use roles, since there is no access into the AWS environment, rather than saving credentials on an EC2 instance.
 
-Roles are also easier to manage - can update policies easily, such as being able to provision other EC2 instances. Can apply roles to EC2 instances at any time, immediately. Roles are universal - don't need to specify what region they're in. 
+Roles are also easier to manage - can update policies easily, such as being able to provision other EC2 instances. Can apply roles to EC2 instances at any time, immediately. 
+
+Roles are universal - don't need to specify what region they're in. 
+
+## Roles and AWS CLI
+Roles are more secure than storing your access key and secret access key on individual EC2 instances (ie, SSH into an instance, and then do `aws configure`)
+
+Roles can be assigned to an EC2 instance after it's created, using both the console and the CLI. 
 
 # Simple Demo
 ## Create a Role
