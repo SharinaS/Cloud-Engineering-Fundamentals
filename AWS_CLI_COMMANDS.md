@@ -1,4 +1,42 @@
-## Access a Public EC2 Instance (the Web Server)
+# Contents
+* Setting up the CLI Command Line - super basics for demoing
+* SSH into an instance
+* Install MySQL
+* Apache
+* Use Describe for various services
+* Checking AWS CLI credentials from the terminal - configuration, etc.
+* Resources list
+
+# Setting up the CLI Command Line
+Basic setup: Set up a user in IAM.
+* Needs to have "Programmatic access," re: Access type. 
+* When setting up permissions, create a group that has "Administrator Access" applied to the group. 
+* Click next a couple times to then be able to "Create user."
+* Download that .csv file that gives the secret access key id.
+
+### Don't store your access keys on individual EC2 instances
+Setup roles instead, and store public and private keys inside .aws' config and credentials files. See notes below on checking AWS CLI credentials from the terminal.
+
+
+# To Use the AWS CLI 
+Type `aws`.
+
+Type aws + service + what you want to do
+
+For help on various things you can do:
+```
+aws help
+```
+
+To access the aws hidden directory, which contains at the least, config and credentials
+```
+cd .aws
+```
+
+
+--------------
+
+# SSH into a Public EC2 Instance 
 
 Via the terminal, navigate to where you stored your KeyPair. 
 
@@ -21,20 +59,19 @@ Elevate priviledges to root:
 sudo su
 ```
 
-## Install MySQL
+# Install MySQL
 yum install mysql -y
 
-## Apache
+# Apache
 Once you've accessed the EC2 instance (a public one)...
 
-### Check for existance of Apache
+## Check for existance of Apache
 
 ```
 service httpd status
 ```
 
-# Apache 
-### Install Apache
+## Install Apache
 ```
 yum install httpd -y
 ```
@@ -49,7 +86,7 @@ then,
 service httpd start
 ```
 
-Go to html directory
+## Go to html directory
 
 ```
 cd /var/www/html
@@ -69,12 +106,12 @@ You can check the code in the terminal with
 cat index.html
 ```
 
-Once Apache is setup, you can copy the public IP address of an instance, and paste it into a web browswer window, and hit enter :)
+Once Apache is setup, you can copy the public IP address of an instance, and paste it into a web browser window, and hit enter to see your webpage :)
 
 
 
-# Access Information about a Service
-## Access information about a stack in CloudFormation:
+# Describe - Access Information about a Service
+## Stack in CloudFormation:
 ```
 aws cloudformation describe-stacks --stack-name sharina-s3bucket
 ```
@@ -85,7 +122,21 @@ aws cloudformation describe-stacks --stack-name sharina-s3bucket
 aws ec2 describe-instances --instance-ids i-12345678901234567
 ```
 
+# S3
+List buckets
+```
+aws s3 ls
+```
+
+Make a bucket
+```
+aws s3 mb s3://sharina-cli-bucket
+```
+
 # Setting up AWS CLI Credentials / Profile and Checking Them via the CLI
+You can either set up credentials through the terminal with `aws configure`, or you use VS Code to store the credentials so you always have access to the CLI. 
+
+
 Get into aws
 ```
 cd .aws
@@ -95,12 +146,18 @@ Check what's inside - you should see at minimum, `cli config credentials`.
 ```
 cd .aws
 ```
+
 Open config and credentials using vs code
 
 ```
 code credentials config
 ```
 Modify the files as needed
+* Account #
+* Alias
+* Role
+* mfa_serial
+
 
 Check the default profile (or whatever profile is setup)
 
@@ -126,6 +183,8 @@ sharstubbs~/.aws$ aws iam list-account-aliases
 sharstubbs~/.aws$ aws iam list-account-aliases --profile training 
 ```
 
+### NOTE: 
+If you're using a different training account, and you have a default and perhaps a "profile training" account, make sure to add `--profile training` to the end of each command. 
 
 --------------
 # Resources

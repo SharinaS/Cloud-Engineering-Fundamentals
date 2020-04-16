@@ -294,7 +294,7 @@ Snapshots exist on S3. Think of snapshots as a photograph of the disk, and that 
 
 Go to "Volumes" on the left
 
-From A Cloud Guru: Whereever the EC2 instance is, the volume will be in the same availability zone. In a physical computer, you want the hard disk drive to be as close to the motherboard as possible. In a virtual machine, and a virtual hard disk drive, you want them in the same availability zone, otherwise there will be too much lag. 
+Paraphrased from A Cloud Guru: Whereever the EC2 instance is, the volume will be in the same availability zone. In a physical computer, you want the hard disk drive to be as close to the motherboard as possible. In a virtual machine, and a virtual hard disk drive, you want them in the same availability zone, otherwise there will be too much lag. 
 
 ## Deletion of Volumes
 After termination of an instance, the EBS volume will be automatically removed too, since delete on termination is automatically checked... since it's a root device volume. 
@@ -521,6 +521,67 @@ EFA provides (compared to the TCP transport traditionally used in cloud-based HP
   * Makes it faster with less latency.
   * Only supported on Linux currently (not windows).
 
+-----------------------
+# Encrypted Root Device Volumes & Snapshots
+A root device is essentially a harddisk (the EBS) that has your OS on it. 
+
+Nowadays, you can encrypt immediately, without the historically complex process of the past. 
+
+Remember:
+* Snapshots of encrypted volumes are encrypted automatically
+* Volumes restored from encrypted snapshots are encrypted automatically
+* You can share snapshots... but only if they're unencrypted
+  * You can share those snapshots with other AWS accounts or made public
+* You can encrypt root device volumes upon creation of the EC2 instance.
+
+## Example
+Go to EC2 and launch and instance - Linux AMI, t2.micro. 
+
+Leave everything as default for:
+* "Configure Instance Details"
+
+In the "Add Storage" note that there is  Root (the root device volume) and it's on General Purpose SSD (gp2), with "Encryption set to "Not Encrypted."
+* You can choose, within the pulldown, an option to encrypt the volume, if you decide upon creating the instance. 
+* Or, you can leave it as not encrypted, and create the instance. 
+
+For the example, re "Configure Security Group," ... use a self-created security group (which has HTTP (source: 0.0.0.0/0), HTTP (::/0) and SSH (0.0.0.0/0) for inbound rules).
+
+Launch. 
+
+### Check if it's encrypted
+On the left, go to "Elastic Block Store > Volumes" and click the radio button of the volume you created with the instance. 
+
+Check the tab, "Description," for Encryption. 
+
+### Encrypt if it was not done so upon creation:
+ > make snapshot of the enencrypted root device volume --> create a copy of the snapshot and enable encryption --> make AMI from the encrypted snapshot --> launch encrypted instance(s) from that AMI. 
+
+With the radio button clicked for the volume, go up to "Actions > Create Snapshot." 
+
+Give it a description-name, and hit the button "Create Snapshot."
+
+A new snapshot will be created (see "Elastic Block Store > Snapshots" on the left) and you'll see it's not encrypted.
+
+Click the radio button for the snapshot, and go to "Actions > Copy." 
+
+In the window that pops up, you can click the box that says, "Encrypt this snapshot." 
+* It will ask for the Master Key, and you can use your default key. 
+* Probably a good idea to update the description to a more readable thing.
+
+With the radio button of the new (encrypted) copy of the snapshot clicked, go to "Actions > Create Image"
+* Give it a name
+* Click "Create"
+* This creates an encrypted AMI.
+
+We can now use the encrypted AMI to launch encrypted EC2 instances.
+* Go to "Images > AMIs" on the left
+* Launch the AMI
+* default of t2.micro is good
+* default values in "Configure Instance Details" are fine
+* default values in "Add Storage" are fine 
+  * Note that it is encrypted! You won't be able to un-encrypt it at this point - the snapshot is encrypted, so no going back now.  
+* launch away for an encrypted instance. 
+
 
 ------------------------
 ------------------------
@@ -635,6 +696,7 @@ aws s3 ls
 
 # Build a Simple Web Server
 [Go to my file on building a simple web server](https://github.com/SharinaS/Cloud-Engineering-Fundamentals/blob/master/BUILD_WEB_SERVER.md), using Apache and an EC2 Instance. 
+
 
 
 # Resources
