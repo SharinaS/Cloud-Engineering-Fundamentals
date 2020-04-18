@@ -51,13 +51,49 @@ Grab the IPv4 Public IP value (the IP address) of the public instance you made.
 To SSH into the instance, type into the terminal the following, plus the IP address, plus the file name for the pem file. 
 
 ```
-ssh ec2-user@the-ip-address -i SharinaKeyPair.pem
+ssh -i my-key-pair-name.pem ec2-user@my-public-ip-address 
 ```
-Elevate priviledges to root:
+For ease, you can elevate priviledges to root:
 
 ```
 sudo su
 ```
+... but it's better not to. Use sudo infront of specific commands instead. 
+
+# SSH Into a Private Instance
+Don't do this in a production environment. 
+
+SSH into your public instance (see above).
+
+In a separate terminal tab, navigate to where your keypair.pem file is, and open it up with an editor like VSCode. Copy the contents (info regarding your private key). 
+
+Back in your terminal, where you're ssh'd into your public instance, open Nano and make a new file
+```
+nano new-key-pair-name.pem
+```
+Inside nano, paste the private key info. Save and exit. 
+
+Check that the file is inside your ec2-user directory
+```
+ls-la
+```
+
+Go to your console and copy the private IP address of your private instance.
+
+SSH into your private instance, using sudo:
+```
+ sudo ssh -i new-key-pair-name.pem ec2-user@my-private-ip-address
+```
+
+If you need to check to see if a file exists in the private instance, now you can ls into it:
+```
+ls -la
+```
+or 
+```
+ls-a
+```
+
 
 # Install MySQL
 yum install mysql -y
