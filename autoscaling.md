@@ -1,11 +1,11 @@
 # Three Components to Auto Scaling
 
-## Groups
+## (1) Groups
 A *logical component* to put your EC2 instances into. 
 
 Webserver group, Application group, Database group, etc.
 
-## Configuration Templates
+## (2) Configuration Templates
 Groups uses a launch template (launch configuration) for its EC2 instances.
 
 Allows for specification of information
@@ -16,7 +16,7 @@ Allows for specification of information
 * block device mapping
 * etc
 
-## Scaling Options
+## (3) Scaling Options
 Various options for scaling the Auto Scaling groups
 
 Configure a group to scale based on (5 options):

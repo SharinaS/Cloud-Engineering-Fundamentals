@@ -8,16 +8,16 @@ Instances monitored are reported as either:
 Health Checks of an Instance:
 * Performed by "talking" to the instance
 
-Load balancers never have an IP address; you are supplied a DNS name for the load balancer.
+Load balancers don't have an IP address; you are supplied a DNS name for the load balancer.
 
 ## 3 Types of Load Balancers
 ### Application Load Balancer
 * Operates at Layer 7 - Evaluates the code, so it can make intelligent routing decisions ("application-aware).
-  * Could have a group servers that are just for the payment gateway. Traffic would be sent to this group when there is a payment being made, otherwise traffic could be routed to another group of EC2 instances if a person was just browsing. 
+  * Could have a group of servers that are just for the payment gateway. Traffic would be sent to this group when there is a payment being made, otherwise traffic could be routed to another group of EC2 instances if a person was just browsing. 
   * Load balancer can see that language is changed to French, and load balance across all the French servers. 
   * It can see requests you're making and inside the HTML, etc, so it can make advanced routing, so specific requests can be made to specific web servers. 
 * Best suited for load balancing of HTTP and HTTPS traffic. 
-* Has a listener. After creation, you can view/edit rules with conditional logic!
+* Has a listener. After creation, you can view/edit rules with conditional logic, such as target group, condition and/or priority.
 
 See the course on Application Load Balancers in A Cloud Guru for more info! 
 
@@ -189,6 +189,7 @@ Add to the subnet you want it to be in (a public subnet)
 
 Can add in a bootstrap script to install and start Apache service, and write a little web page in our var/www directory. 
 
+User Data Option 1:
 ```
 #!/bin/bash
 yum update -y
@@ -198,6 +199,33 @@ chkconfig httpd on
 cd /var/www/html
 echo "<html><h1>Hello World</h1><html>" > index.html
 ```
+
+User Data Option 2:
+```
+#!/bin/bash
+yum update -y
+yum install httpd -y
+service httpd start
+chkconfig httpd on
+cd /var/www/html
+echo "<html><h1>Hello from the $(curl http://169.254.169.254/latest/meta-data/instance-id) instance!</h1><html>" > index.html
+```
+
+User Data Option 3: 
+```
+#!/bin/bash
+yum update -y
+yum install httpd -y
+service httpd start
+chkconfig httpd on
+echo "<html><h1>Hello from the $(curl http://169.254.169.254/latest/meta-data/instance-id) instance!</h1><html>" > /var/www/hmtl/index.html
+```
+you may need to mkdir /var/www/html if the Apache install doesn’t make it for you
+
+[Resource on Apache](https://serverfault.com/questions/125865/finding-out-what-user-apache-is-running-as)
+
+Meanwhile...
+
 Can keep storage as default.
 
 Add tags, specifically a Name.
