@@ -20,7 +20,7 @@ You can configure various conditions:
 ... and then the app load balancer, CloudFront or API Gateway will either allow the receipt of the content, or give a HTTP 403 Status Code.
 
 WAF allows 3 different behaviors:
-1. ALlow all requests except the ones you specify
+1. Allow all requests except the ones you specify
 2. Block all requests except the ones you specify
 3. Count the requests that match the properties you specify
 

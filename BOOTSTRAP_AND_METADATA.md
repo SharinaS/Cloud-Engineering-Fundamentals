@@ -115,4 +115,3 @@ Read the file with:
 ```
 cat public_ip.txt
 ```
-
