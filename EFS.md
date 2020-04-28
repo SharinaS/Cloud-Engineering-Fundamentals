@@ -4,9 +4,9 @@ EFS = Elastic File System
 EFS is a file storage service for Elastic Compute Cloud or EC2 intances. It provides a (simple) interface for creating and configuring file systems.
 * Has Read after Write Consistency
 
-EFS makes storage capacity elastic, as in, it grows and shrinks automatically as you add/remove files.
+> Choose when you need distributed, highly resilient storage for Linux instances and Linux-based applications. 
 
-In contrast, EBS allows only for mounting a virtual disk to one EC2 instance. You can have an EC2 instance or more sharing an EBS volume. You can have them sharing an EFS volume. 
+EFS makes storage capacity elastic, as in, it grows and shrinks automatically as you add/remove files.
 
 If you provision an EFS instance, it will just grow automatically. You add a terabite file, and it grows. 
 * Can support thousands of concurrent NFS connections
@@ -19,6 +19,9 @@ Data is stored across multiple availability zones within a region
 
 ### Billing:
 You only pay for the storage you use (no pre-provisioning required).
+
+## Contrast with EBS and with FSX
+In contrast, EBS allows only for mounting a virtual disk to one EC2 instance. You can have an EC2 instance or more sharing an EBS volume. You can have them sharing an EFS volume.
 
 # Store a website on EFS
 ### Go to EFS

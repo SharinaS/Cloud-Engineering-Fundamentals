@@ -125,6 +125,7 @@ Remember:
 * Note you cannot block an individual port, or a particular IP address (you have to Network ACLs), as in you cannot create deny rules.
 * In a security group, all inbound traffic is blocked by default - you have to go in and manually allow traffic in, such as SSH or HTTP, or MS SQL
 * All outbound traffic is allowed (because security groups are stateful)
+  * In contrast, when you create a new security group all inbound traffic *is not* allowed by default.
 * You can attach mutiple security groups to one instance (so, one security group can interact with certain ports).
 * You can have any number of EC2 instances within a security group.
 
@@ -155,6 +156,7 @@ When you select an instance, it will reveal details about that instance, includi
 This is a tab that appears when you click on the instance's radio button. 
 
 There's a system status check, which checks the underlying hypervisor, or the underlying machine. 
+* The underlying hypervisor for EC2 is the Nitro (Since 2017) and Xen.
 
 There's an instance status check which checks the instance itself.
 
@@ -523,9 +525,10 @@ EFA provides (compared to the TCP transport traditionally used in cloud-based HP
 
 -----------------------
 # Encrypted Root Device Volumes & Snapshots
-A root device is essentially a harddisk (the EBS) that has your OS on it. 
+A root device is essentially a hard disk (the EBS) that has your OS on it. 
 
 Nowadays, you can encrypt immediately, without the historically complex process of the past. 
+* To enable encryption at rest using EC2 and EBS, you must configure encryption when creating the EBS volume. 
 
 Remember:
 * Snapshots of encrypted volumes are encrypted automatically
