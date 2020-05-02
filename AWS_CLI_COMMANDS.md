@@ -1,13 +1,86 @@
-# Contents
-* Setting up the CLI Command Line - super basics for demoing
+# Table of Contents
+* [Accounts I'm in within AWS](#Account-You-Are-In---How-To-Tell)
+* Apache
+* [Dig command](#Using-Dig-to-Query-DNS) - DNS query
+* [Setting up the CLI Command Line](#Setting-up-the-AWS-CLI) - super basics for demoing
 * SSH into an instance
 * Install MySQL
-* Apache
-* Use Describe for various services
+* [Use Describe](#Describe---Access-Information-about-a-Service) for various services
 * Checking AWS CLI credentials from the terminal - configuration, etc.
 * Resources list
 
-# Setting up the CLI Command Line
+-----
+`less` command
+
+`ls /etc/resolve.conf`
+`cat /etc/resolve.conf`
+
+aws nameservers will be on the .2 of the subnet --> ie, 10.7.0.2. On amazon, they are always local. 
+
+barehost name given, then you'll get search us-west-2
+
+# Account You Are In - How To Tell
+```
+aws sts get-caller-identity
+```
+
+```
+aws iam list-account-aliases
+```
+
+# Query DNS
+## Dig
+Get info about the mail systems used:
+```
+dig -t mx 1strategy.com
+```
+ or `dig -t soa 1strategy.com` or `dig -t TXT 1strategy.com`
+
+Use of `dig` to query a single host
+
+With the domain name:
+```
+dig domain-name.com
+```
+With the public ip address of the webserver:
+```
+dig 11.111.11.111
+```
+To get just the IP address:
+```
+dig domain-name.com +short
+```
+Follow the route / tree taken to find the IP address:
+```
+dig domain-name.com +trace
+```
+
+```
+dig myserver
+```
+
+## Host
+```
+host 1strategy.com
+```
+
+```
+host www.1strategy.com
+```
+
+## TraceSearch 
+Sometimes not as helpful as just Dig.
+
+## WhoIs
+```
+whois 1strategy.com
+```
+
+### References: 
+* [Understanding the Dig Command](https://mediatemple.net/community/products/dv/204644130/understanding-the-dig-command)
+* [10 Dig Commands](https://www.tecmint.com/10-linux-dig-domain-information-groper-commands-to-query-dns/)
+
+# Setting up the AWS CLI
 Basic setup: Set up a user in IAM.
 * Needs to have "Programmatic access," re: Access type. 
 * When setting up permissions, create a group that has "Administrator Access" applied to the group. 
@@ -61,7 +134,7 @@ sudo su
 ... but it's better not to. Use sudo infront of specific commands instead. 
 
 # SSH Into a Private Instance
-Don't do this in a production environment. 
+> Don't do this in a production environment. 
 
 SSH into your public instance (see above).
 
@@ -156,6 +229,12 @@ aws cloudformation describe-stacks --stack-name sharina-s3bucket
 ### Specific Instance
 ```
 aws ec2 describe-instances --instance-ids i-12345678901234567
+```
+
+## Application Load Balancer
+Get info about all your load balancers:
+```
+aws elbv2 describe-load-balancers
 ```
 
 # S3

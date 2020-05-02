@@ -1,15 +1,19 @@
 # DNS
+## General Info About DNS
 DNS is on port 53, so that's where Route53 comes from. 
 
 Must understand dns back to front as a solutions architect. 
 
 DNS is like a phonebook. 
 
+DNS is a tree with 13 nameservers at the top. 
+* top level is the .com --> aws which maintains the records for the domain --> aws domain server provides the internal aws server --> www.1strategy.com is this ip address.
+
 > DNS is used to convert human friendly domain names into an internet protocol (IP). ie, catsareawesome.com --> http//82.124.91.1 <-- IPv4 address
 
 IP addresses are used by computers to identify each other on a network. They come in two types: IPv4 and IPv6. 
 
-### DNS Types (see below for most):
+## DNS Types (see below for most):
 * SOA Records
 * NS Records
 * A Records
@@ -87,6 +91,8 @@ Used by *Top Level Domain servers* to direct traffic to the Content DNS server.
 The *Content DNS server* contains the authoritative DNS records
 
 ## DNS Records
+In real life, there is really only A records and CNAMEs (CNAMES can only point to an A record; A record maps to an IP address) in AWS land. 
+
 ### A record
 Most fundamental type of DNS record.
 
@@ -152,11 +158,16 @@ Alias records provide a Route-52-specific extension to DNS functionality, by bei
   * CNAME records will *not* let you create an Alias record at the top node of a DNS namespace.
 
 Naked domain names are aka Zone Apex Record.
-* The entire domain minus the www infront of it. 
+* The entire domain minus the www infront of it.
+
+## Hosted Zone
+Hosted Zone is a key-value DB, which maps a domain name to an IP address. 
+
+It's a container for records, and contains info about how traffic should be routed for a specific domain (bar.com) and its subdomains (foo.bar.com).
 
 # Routing Policies Available with Route53
 ## Simple Routing Policy:
-> Can only have one record with multiple IP addresses. There are no health checks possible.
+> Can only have one record with multiple IP addresses. There are no health checks possible (though you can click yes to 'Evaluate Target Health')
 
 If you specify multiple values in a record, Route53 returns all values in a random order. 
 
@@ -435,3 +446,33 @@ Do this for your other Instances. You'll be able to associate each instance with
 > When one server fails (or is terminated), traffic for the website will be sent to one of the other instances. 
 
 [More, above](#Multivalue-Answer-Routing)
+
+# Resources
+* A Cloud Guru - AWS Certified Solutions Architect Course
+* [DNS Comic - How DNS Works](howdns.works)
+* [AWS docs: routing policies ](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/routing-policy.html)
+
+
+
+------------
+
+# Certificates Manager
+
+All certs live in Virginia. 
+
+Amazon issued certs auto-renew (which is a game changer).
+* Email will be sent 
+* or, you add a txt record to your DNS, and it will re-issue the cert for the domain without a human needed. 
+
+SSL Cert
+
+A cert is 1strategy.com AND *1.strategy.com.
+* the star provides validity for all subdomains and hosts under 1strategy.com.
+* Customers will forget to put a star, and this will cause big issues. 
+* Always have a wild card cert. 
+
+These are inter-related:
+Domain Name
+Hosted Zone (contains A records and CNAMEs)
+Certificate - maps to the domain
+
