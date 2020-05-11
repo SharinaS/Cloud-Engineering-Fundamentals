@@ -1,9 +1,9 @@
 # AWS Applications Index
 
-[SWF](#SWF)
+[SNS](#SNS)
 
-* [About SWF](#About-SWF)
-* [SQS vs SWF](#SQS-vs-SWF)
+* [Benefits](#Benefits)
+* [SQS vs SNS](#SQS-vs-SNS)
 
 [SQS](#SQS)
 
@@ -12,66 +12,14 @@
 * [Types of Queues](#Types-of-Queues)
 * [Visibility Timeout](#Visibility-Timeout)
 
-# SWF
+[SWF](#SWF)
 
-SWF = Simple Work Flow Service
-
-## About SWF
-
-A way of coordinating work across distributed application components... or a way to coordinate work across multiple components of your application.
-
-SWF is a way of coordinating both your applications as well with human beings / manual processes
-
-Task coordination use cases:
-
-* media processing
-* web application backends
-* busines process workflows
-* analysis piopeslines
-
-Tasks are invocations of various processing steps in an application, which are preformed by:
-
-* executable code
-* web service calls
-* human actions
-* scripts
-
-A way of combining the digital environment with human beings.
-
-In SWF, you've gotten a human element to factor into the design process. If there's any sort of manual process, you will be using SWF.
-
-## SWF Actors
-
-### Workflow Starters
-
-An app that can initiate a workflow.
-
-Ie, 
-
-* an e-commere website following the placement of an order
-* mobile app searching for bus times
-
-### Deciders
-
-This controls the flow of activity tasks in a workflow execution.
-
-If something has finished / failed in a workflow, a Decider chooses what to do next.
-
-### Activity Workers
-
-These carry out the activity tasks
-
-## SQS vs SWF
-
-The Thing|SQS|SWF|
-|-----|-----|-----|
-|Timing|Retention period up to 14 days| workflow executions up to 1 year|
-|API|message-oriented|*task*-oriented|
-|Duplication|Need to handle duplicated messages (default type)|A task is assigned only once and is never duplicated|
-|Tracking|Need to implement your own app-level tracking (esp w/multiple queues)|Keeps track of all tasks and events in an app|
-
+* [About SWF](#About-SWF)
+* [SQS vs SWF](#SQS-vs-SWF)
 
 # SQS
+
+SQS = Simple Queue Service
 
 ## About SQS
 
@@ -237,3 +185,114 @@ Events:
 
 If we lose an EC2 instance, another instance will appear, so the search will go on. 
 
+# SWF
+
+SWF = Simple Work Flow Service
+
+## About SWF
+
+A way of coordinating work across distributed application components... or a way to coordinate work across multiple components of your application.
+
+SWF is a way of coordinating both your applications as well with human beings / manual processes
+
+Task coordination use cases:
+
+* media processing
+* web application backends
+* busines process workflows
+* analysis piopeslines
+
+Tasks are invocations of various processing steps in an application, which are preformed by:
+
+* executable code
+* web service calls
+* human actions
+* scripts
+
+A way of combining the digital environment with human beings.
+
+In SWF, you've gotten a human element to factor into the design process. If there's any sort of manual process, you will be using SWF.
+
+## SWF Actors
+
+### Workflow Starters
+
+An app that can initiate a workflow.
+
+Ie, 
+
+* an e-commere website following the placement of an order
+* mobile app searching for bus times
+
+### Deciders
+
+This controls the flow of activity tasks in a workflow execution.
+
+If something has finished / failed in a workflow, a Decider chooses what to do next.
+
+### Activity Workers
+
+These carry out the activity tasks
+
+## SQS vs SWF
+
+The Thing|SQS|SWF|
+|-----|-----|-----|
+|Timing|Retention period up to 14 days| workflow executions up to 1 year|
+|API|message-oriented|*task*-oriented|
+|Duplication|Need to handle duplicated messages (default type)|A task is assigned only once and is never duplicated|
+|Tracking|Need to implement your own app-level tracking (esp w/multiple queues)|Keeps track of all tasks and events in an app|
+
+# SNS
+
+## About SNS
+
+A web service that works with notifications from the cloud
+
+* set up, operate, send notifications
+
+Lets developers publish messages from an application, to send them to subscribers or applications
+
+* highly scalable
+* flexible
+* cost-effective
+
+## Send push notifications
+
+* Directly to mobile devices
+  * Apple
+  * Google
+  * Fire OS
+  * Windows devices
+  * Android devices in China with Baidu Cloud Push
+* By SMS text message or email to Amazon Simple Queue Service (SQS) queues
+* HTTP endpoint(s)
+
+SNS lets you group multiple recipients using *topics*
+
+* Allows recipients to dynamically subscribe for identical copies of the same notification.
+* When you set a billing alert, that's a topic. When you set an autoscaling alert, that's a separate topic.
+* One topic supports deliveries to multiple endpoint types.
+  * An endpoint type could be a group of iOS, Android and SMS recipients.
+
+Once you publish to a topic, SNS delivers nicely formatted copies of your message to each subscriber.
+
+## Storage
+
+All messages published to SNS are stored redundantly across multiple AZs -- prevents messages from being lost.
+
+## Benefits
+
+* Push-based delivery (no polling) that is instant
+* Simple APIs with reasonably straightforward integration into applications
+* Flexible message delivery over multiple transport protocols
+* Inexpensive
+  * Pay as you go model with no up-front costs
+* Point and click interface on the web-based AWS Management Console
+
+## SQS vs SNS
+
+The Thing|SQS|SNS|
+|-----|-----|-----|
+|Service Type|messaging|messaging|
+|Push or Pull|pull-based (polls) - instances must poll the queue|push-based - messages are pushed out to different devices.|
