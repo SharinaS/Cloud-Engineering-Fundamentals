@@ -7,11 +7,9 @@
 
 * [Encryption at Rest](#Encryption-at-Rest)
 
-* [Multi AZ](#(1)-Multi-AZ)
+* [Multi AZ and Read Replicas](#Two-Features-of-Relational-DBs)
 
-* [Read Replicas](#(2)-Read-Replicas)
-
-[Non Relational Databases](#Non-Relational-Databases) - NoSQL
+* [Non Relational Databases](#Non-Relational-Databases) - NoSQL
 
 * [DynamoDB](#DynamoDB)
 
@@ -57,10 +55,10 @@ Relational databases have been around since the '70s.
 
 RDS uses online transaction processing - [OLTP](#OLTP-vs-OLAP).
 
-RDS runs on virtual machines, but you don't get access to those virtual machines. 
+RDS runs on virtual machines, but you don't get access to those virtual machines.
 
 * As in, *you can't SSH into your RDS instance*. You can't log in to the RDS operating system.
-* This comes up in terms of security question and patching/maintenance questions. 
+* This comes up in terms of security question and patching/maintenance questions.
   * Patching of the RDS Operating System and DB is Amazon's responsibility.
   * You can't go in and patch the operating system of your RDS instance; that's Amazon's responsibility (though you can do that for the EC2 instance)
 
