@@ -103,6 +103,7 @@ If the jobs is processed before the visibility timeout expires, the message will
 If the job is *not* processed before the visibility timeout expires, the message will *become visible again* and another reader will process it. 
 
 * Could result in the same message being delivered twice.
+* Longer visibility timeout means the messages don't become visible once obtained by a consumer
 
 Visibility timeout maximum: 12 hours
 
@@ -259,6 +260,10 @@ If something has finished / failed in a workflow, a Decider chooses what to do n
 
 These carry out the activity tasks
 
+### SWF Domain
+
+A collection of related workflows.
+
 ## SQS vs SWF
 
 The Thing|SQS|SWF|
@@ -299,6 +304,8 @@ SNS lets you group multiple recipients using *topics*
 * When you set a billing alert, that's a topic. When you set an autoscaling alert, that's a separate topic.
 * One topic supports deliveries to multiple endpoint types.
   * An endpoint type could be a group of iOS, Android and SMS recipients.
+
+Once you create a topic on SNS, an *Amazon Resource Name* is created.
 
 Once you publish to a topic, SNS delivers nicely formatted copies of your message to each subscriber.
 
@@ -367,6 +374,10 @@ A fully managed service that works with APIs
 It will distribute traffic. 
 
 Typical usage: Lambda functions
+
+> Increase performance of the API Gateway:
+> * Enable caching
+> * Set throttling limits
 
 ## How it Works
 
@@ -533,8 +544,6 @@ You can load the data and analyze it, and build custom applications for a busine
 
 ### Kinesis Streams
 
-#### The Work Flow
-
 Various devices, EC2, iOT, etc are the data producers.
 
 The data producers stream the data to Kinesis Streams. 
@@ -561,11 +570,16 @@ After analysis, the data is sent from the consumers to a variety of places that 
 * Redshift
 * RDS
 
-#### Data Capacity of the Stream
+Key components of Kinesis Streams:
 
-A function of the number of shards that you specify for the stream.
+* Producers
+* Shards
+* Consumers
 
-Total capacity = sum of the capacities of the shards
+Data Capacity of the Stream
+
+* A function of the number of shards that you specify for the stream.
+* Total capacity = sum of the capacities of the shards
 
 ### Kinesis Firehose
 
@@ -584,6 +598,14 @@ Data is then outputted from Firehose.
 * It can be outputted to Redshift via S3
 * Elastic search cluster
 
+The easiest way to load streaming data into data stores and analytics tools
+
+* Can capture, transform and load streaming data into S3, Redshift, Elasticsearch Service, Splunk.
+
+Key components of Kinesis Firehose:
+
+* Delivery streams
+* Records of data and destinations
 
 ### Kinesis Analytics
 
