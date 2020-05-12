@@ -1,10 +1,18 @@
-# Table of Contents
+# Commands Often Used to Work With the AWS CLI
+
+## Index
+
 * [Accounts I'm in within AWS](#Account-You-Are-In---How-To-Tell)
+* [AMI Properties](#AMI-Properties)
 * Apache
 * [Dig command](#Using-Dig-to-Query-DNS) - DNS query
 * [Setting up the CLI Command Line](#Setting-up-the-AWS-CLI) - super basics for demoing
 * SSH into an instance
-* Install MySQL
+  * [SSH Into a Private Instance](#SSH-Into-a-Private-Instance)
+  * [SSH into a Public EC2 Instance](#SSH-into-a-Public-EC2-Instance)
+* Install Databases (RDS)
+  * [Install MySQL Using Yum](#Install-MySQL)
+  * [Install PostgreSQL Using Yum](#Install-PostgreSQL)
 * [Use Describe](#Describe---Access-Information-about-a-Service) for various services
 * Checking AWS CLI credentials from the terminal - configuration, etc.
 * Resources list
@@ -136,6 +144,16 @@ sudo su
 # SSH Into a Private Instance
 > Don't do this in a production environment. 
 
+## Shortcut Using `-J`
+
+SSH into the jumpbox, and then immediately into the webserver, using the same private key, all in one command:
+
+```bash
+ssh -J ec2-user@public-ip-address ec2-user@private-ip-address -i id_rsa.pem
+```
+
+## Long way Using `-i`
+
 SSH into your public instance (see above).
 
 In a separate terminal tab, navigate to where your keypair.pem file is, and open it up with an editor like VSCode. Copy the contents (info regarding your private key). 
@@ -154,22 +172,43 @@ ls-la
 Go to your console and copy the private IP address of your private instance.
 
 SSH into your private instance, using sudo:
-```
+
+```bash
  sudo ssh -i new-key-pair-name.pem ec2-user@my-private-ip-address
 ```
 
 If you need to check to see if a file exists in the private instance, now you can ls into it:
+
 ```
 ls -la
 ```
+
 or 
 ```
 ls-a
 ```
 
+# Install Databases
 
-# Install MySQL
+## Install MySQL
+
+```bash
 yum install mysql -y
+```
+
+## Install PostgreSQL
+
+Applies to Fedora, Red Hat, CentOS, Scientific Linux, such as for a webserver EC2 instance
+
+Try (haven't done this yet) 
+
+```
+yum install postgresql-server
+
+```
+
+Or try following this resource:
+http://postgresguide.com/setup/install.html
 
 # Apache
 Once you've accessed the EC2 instance (a public one)...
@@ -299,8 +338,28 @@ sharstubbs~/.aws$ aws iam list-account-aliases --profile training
 ```
 
 ### NOTE: 
+
 If you're using a different training account, and you have a default and perhaps a "profile training" account, make sure to add `--profile training` to the end of each command. 
 
+# AMI Properties
+
+Get a list of AMI name properties:
+
+```bash
+aws ec2 describe-images --owners amazon --filters "Name=name,Values=amzn*" --query 'sort_by(Images, &CreationDate)[].Name'
+```
+
+Get the latest Amazon Linux AMI ImageID value by region:
+
+```bash
+aws ssm get-parameters --names /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2 --region us-east-2
+```
+
+Query for the Complete list of AWS Amazon Linux Parameter Store namespaces available:
+
+```
+aws ssm get-parameters-by-path --path "/aws/service/ami-amazon-linux-latest" --region us-east-2
+```
 --------------
 # Resources
 [AWS CLI Command Reference guide](https://docs.aws.amazon.com/cli/latest/reference/)
