@@ -12,7 +12,7 @@ When the user goes to the website, the user will pull the content down directly 
 
 A location where content will be cached. It is sepearate from a region or availability zone.
 
-They are not just read-only - you can write to them too.
+> They are not just read-only - you can write to them too.
 
 Objects are cached for the life of the TTL (Time to Live).
 
