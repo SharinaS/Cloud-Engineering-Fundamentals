@@ -8,11 +8,10 @@ Goal: Provide seamless and secure integration between on-premises IT environment
 
 > Outcome: You can store data in the cloud scalably and cost-effectively. 
 
-Storage gateway *replicates* the data into AWS.
-
 There are virtual or physical storage gateways available.
 
-* used to be just a virtual thing, but lately they released hardware applianes to have a physical storage gateway.
+* used to be just a virtual thing
+* lately they released hardware applianes to have a physical storage gateway.
 
 ## Storage gateway supports:
 
@@ -29,6 +28,10 @@ You download the Storage Gateway's software appliance as a *virtual machine imag
 # Types of Storage Gateways
 
 There are 3 types
+
+* File Gateway
+* Volume Gateway
+* Tape Gateway
 
 ## File Gateway
 

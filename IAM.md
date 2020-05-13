@@ -1,3 +1,47 @@
+# IAM
+
+IAM = Identity Access Management
+
+IAM includes:
+
+* Users
+* Groups
+* Roles
+* Policies
+
+IAM is universal
+
+* No region needs to be chosen.
+
+## Root Account
+
+The account created when you first set up your AWS account.
+
+It has complete Admin access.
+
+## New Users
+
+New users have *no permissions* when they are first created. 
+
+* Least priviledged.
+
+New users are assigned keys:
+
+* Access Key ID
+* Secret Access Keys
+* Used to access AWS via the APIs and CLI
+  * You can only view these keys once - store them in a secure spot!
+
+## Login
+
+### Multifactor Authentication
+
+Always set this up on your root account.
+
+### Password Rotation
+
+You can set up rotation policies.
+
 # Roles
 ## About
 Roles are a way for one AWS service to use another AWS service.
@@ -54,7 +98,9 @@ Head back over [to my EC2 notes](https://github.com/SharinaS/Cloud-Engineering-F
 
 
 # Switching Roles
+
 A company will have an organization within AWS. Within that organization, a role should have been created to allow users to assume the role in order to create sandboxes for learning. This is called configuring a role, which includes giving the account and role details. We'll call this role, "An-Admin."
+
 * Perhaps the account in full is called "assumed/An-Admin/user@helloworld.com," and it has a trusted entity as the account number for the master account. 
 
 When building the first part of a trust relationship - essential when preparing to switch roles - the administrator will create a new policy within the master account. It serves to say that the user, signed in within the master account, can switch to the roles listed within the policy.
