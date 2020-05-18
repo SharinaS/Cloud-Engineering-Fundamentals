@@ -2,9 +2,9 @@
 
 A Content Delivery Network (CDN) 
 
-Delivers webpages and other webcontent based on the geographical location of the user, content and the server. 
+Delivers webpages and other webcontent based on the geographical location of the user, content and the server.
 
-When the user goes to the website, the user will pull the content down directly from where that website's region is. 
+When the user goes to the website, the user will pull the content down directly from where that website's region is.
 
 ## Definitions
 
@@ -18,9 +18,16 @@ Objects are cached for the life of the TTL (Time to Live).
 
 You can clear cached objects, but you will be charged. 
 
-### Origin 
+### CloudFront Origin
 
-Origin of all the files that the CDN will distribute. Can be route53, an elastic load balancer, ec2 instance, or s3 bucket.
+Origin of all the files that the CDN will distribute. 
+
+Can be: 
+
+* Route53
+* an elastic load balancer, 
+* an EC2 instance
+* an S3 bucket.
 
 ### Distribution
 

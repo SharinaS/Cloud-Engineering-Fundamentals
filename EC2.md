@@ -1,7 +1,7 @@
-This document focuses on EC2 and the associated services and technologies that come with it.
-
 # EC2
+
 What EC2 is:
+
 * A virtual server or servers in the cloud.
 * Provides resizable copute capacity in the cloud. 
 * Reduces the time needed to obtain and boot new server instances
@@ -15,35 +15,48 @@ Note that:
   * You can also use a third party tool (bit locker, etc) to encrypt the root volume, or this can be done when creating AMI's in the AWS console or using the API.
 * Added volumtes can be encrypted. 
 
-### Architecture Note: 
+### Architecture Note 
+
 In case of failure, for production website, have at least two EC2 instances running in two separate availability zones. 
 
 By the way, a default Security Group is set up for you, so no matter what, you start with one.
 
 # Pricing Models
-On Demand 
-* Fixed rate by the hour or second with no committment (great for testing)
-* Good for low cost and flexibility, short term or unpredictable workloads that can't be interrupted. 
 
-Reserved 
+## On Demand
+
+* Fixed rate by the hour or second with no committment (great for testing)
+
+### Good for
+
+* low cost and flexibility
+* short term workloads
+* unpredictable workloads
+* workloads that can't be interrupted.
+
+## Reserved
+
 * Provides a "capacity reservation"
 * 1 or 3 years term contracts
 * The more you pay upfront, the more you save - significant discount.
-* Good for apps with steady state or predictable usage, or for apps that require reserve capacity. 
+* Good for apps with *steady state or predictable usage*, or for apps that require reserve capacity. 
 * Further breakdown:
   * Standard Reserved Instances - up to 75% off on demand instances, the more you pay upfront and the longer the contract, the bigger the discount.
   * Convertible Reserved Instances - Up to 54% off on demand. You can convert one reserved instance type over to another. 
   * Scheduled Reserved Instances - allows you to have reserved instances within a particular time window. Great for situations like schools that have specific working hours. 
 
-Spot
+## Spot
+
 * bid a price you want to pay; when the price hits the value you bid for, you get your instance. 
 * Amazon drops the price for an EC2 instance when they have excess capacity so people will use the capacity. So, the price moves around. 
 * Essentially Amazon is selling off its excess capacity at a certain rate --> supply and demand pricing.
 * Great for apps that are only feasible at very low compute prices and that have flexible start/stop times, and for users with urgent computing needs for large amounts of additional capacity.  
 * If it's terminated by AWS, you won't pay for the rest of the hour (unlike other instances, where you pay for the full hour if you terminate prior to the hour being up)
 
-Dedicated hosts
-* physical server(s) for license terms/conditions requirements - sometimes there are requirements that may not support multi-tenant virtualization. 
+## Dedicated hosts
+
+* **Physical** server(s)
+* For license terms/conditions requirements - sometimes there are requirements that may not support multi-tenant virtualization.
 * Can be purchased on-demand (hourly) and 70% off the on-demand price. 
 
 # Instance Types
@@ -100,7 +113,9 @@ While in the "Configure Instance Details" step, note that in the row of Network,
 Click "Next: Add Storage."
 
 ## Add Storage
+
 In the "Add Storage" step, the volume type, "root," (root device volume) is our EBS instance, or the virtual hard-disk in the cloud. Every time you "Add New Volume," you get more options to choose from under the column of "Volume Type." For a simple setup, choose "Volume Type" of "General Purpose SSD (pg2)." Choose General Purpose SSD in the Root. 
+
 * Our root device volume simply means where our operating system will be installed. 
   * Volume type for root device will only have 3 different types - General, provisioned or magnetic. 
   * IPS means input output per second. This is how fast the hard disk drive is. 
@@ -110,6 +125,7 @@ In the "Add Storage" step, the volume type, "root," (root device volume) is our 
 Click "Next: Add Tags." 
 
 ## Add Tags
+
 Next, we need to add key-value pairs of information about the instance by clicking on "Add Tag," such as name (of the instance), department, employee-id (of person who spun up the instance), etc. 
 
 Then click "Next: Configure Security Group."
