@@ -6,15 +6,25 @@ WAF = web application firewall
 
 (note that the sister topic is network ACLs for security (discussed in my S3 doc))
 
-Lets you monitor the HTTP and HTTP requests that are forwarded to CloudFront, an Application Load Balancer or API Gateway.
+WAF: 
 
-Also lets you control access to your content.
+* Lets you monitor the HTTP and HTTP requests that are forwarded to CloudFront, an Application Load Balancer or API Gateway.
+* Also lets you control access to your content.
+* Helps protect your apps from web exploits that could:
+  * affect app availability
+  * compromise security
+  * consume extra resources
 
-At the Layer 7 aware firewall. 
+Goes down to **Layer 7 aware** firewall.
+
+* Stops SQL injections
+* Stops cross-site scripting
+* etc.
 
 Remember, a query string parameter passes variables. The WAF sees down into layer 7 of the string, so they can see a lot more information. 
 
 You can configure various conditions:
+
 * specific IP addresses that can make a request
 * what query string parameters need to be passed for the request to be allowed. 
 
