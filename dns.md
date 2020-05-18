@@ -166,31 +166,38 @@ Hosted Zone is a key-value DB, which maps a domain name to an IP address.
 It's a container for records, and contains info about how traffic should be routed for a specific domain (bar.com) and its subdomains (foo.bar.com).
 
 # Routing Policies Available with Route53
-## Simple Routing Policy:
+
+## Simple Routing Policy
+
 > Can only have one record with multiple IP addresses. There are no health checks possible (though you can click yes to 'Evaluate Target Health')
 
 If you specify multiple values in a record, Route53 returns all values in a random order. 
 
 User --> DNS request to Route53 --> Route53 has 2 IP addresses (30.0.0.0.1 and 30.0.0.0.2)
+
 * Route53 will pick the IP addresses at random.
 
-Can change the TTL (lower it) to have increased speed of randomization. 
+Can change the TTL (lower it) to have increased speed of randomization.
 
 [Set up Simple Routing](#Set-up-Simple-Routing)
 
-## Weight Routing Policy:
+## Weight Routing Policy
+
 Allows you to split your traffic based on different weights assigned. 
 
-It adds up all the weights in the record set, and apportions them off appropriately. 
+It adds up all the weights in the record set, and apportions them off appropriately.
 
-You can have 10% of your traffic go to us-east-1, and 90% of traffic go to eu-west-1. 
+* You can have 10% of your traffic go to us-east-1, and 90% of traffic go to eu-west-1.
 
 User types domain name into browser --> DNS request to Route53 --> Route53 sends 30% traffic to us-east-1 **+** Route53 sends 70% traffic to us-west-2. 
 
 [Set up Weighted Routing](#Set-up-Weighted-Routing)
 
-## Latency-based Routing:
-Lets you route your traffic based on the lowest network latency for your end user, as in whichever region will give them the fastest response time. 
+## Latency-based Routing
+
+Lets you route your traffic based on the *lowest network latency* for your end user
+
+* ... as in whichever region will give them the fastest response time.
 
 To use it, you make a latency resource record set for the EC2 (or ELB) resource in each region that hosts your website. When Route53 gets a query for your site, it chooses the "latency resource record set" for the region that will provide the user with the lowest latency. Route53 will then respond with the value affiliated with that particular resource record set. 
 
