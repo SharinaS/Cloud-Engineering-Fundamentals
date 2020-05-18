@@ -1,9 +1,9 @@
 # Athena
 
-An interactive query service of S3.
+An interactive *query service* of S3.
 
 * Analyze and query data located in S3
-* Use standard SQL
+* Use standard **SQL**
 * Works directly with data stored in S3
 
 Essentially allows you to turn S3 into a database, so you can query the data using SQL.
@@ -32,8 +32,6 @@ Pay per TB scanned
 
 # Macie
 
-A service that queries S3, that also uses machine learning and natural language processing to work with PII.
-
 ## PII - Personally Identifiable Information
 
 Personal data used to establish an individual's identity.
@@ -47,11 +45,11 @@ Can be exploited by criminals
 
 Uses Machine Learning and Natural Language Processing (NLP) to deal with sensitive data stored in S3.
 
-Macie is essentially a security service.
+Macie is essentially a **security** service.
 
-* Discover sensitive data
-* Classify the data
-* Protect the PII. 
+* Discovers sensitive data
+* Classifies the data
+* Protects the PII 
 
 Provides:
 
@@ -65,6 +63,6 @@ Great for those taking credit card information on their website
 
 * Macie is great for PCI-DSS and preventing ID theft
 
-## CloudTrail
+## Macie and CloudTrail
 
 Macie can analyze CloudTrail logs for suspicious API activity.

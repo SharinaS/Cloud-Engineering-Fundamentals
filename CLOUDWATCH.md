@@ -1,9 +1,12 @@
 # About CloudWatch
+
 A monitoring service for:
+
 * AWS resources
 * Applications run on AWS
 
 Cloudwatch monitors performance for:
+
 * Compute
   * EC2 Instances
   * Autoscaling groups
@@ -15,10 +18,13 @@ Cloudwatch monitors performance for:
   * CloudFront
 
 CloudWatch with EC2 will by default monitor events *every 5 minutes* 
+
 * You can have 1 minute intervals by turning on *detailed monitoring*.
 
 ### CloudWatch & EC2
-CloudWatch can monitor at a host level. This includes metrics such as:
+
+CloudWatch can monitor at a **host level**. This includes metrics such as:
+
 * CPU
 * Network
 * Disk
