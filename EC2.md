@@ -270,7 +270,7 @@ When creating an instance, this is "Step 4: Add Storage"
 * You can change EBS volume sizes on the fly, including size and storage type. 
 * Volumes will *always be in the same availability zone* as the EC2 instance. 
 * You can *move an EC2 instance from one AZ to another* by taking a snapshot of it, creating an AMI from the snapshot, and then using the AMI to launch the EC2 instance in a new AZ.
-* You can *move an EC2 instance from one region to another* by taking a snapshot of it, creating an AMI from the snapshot, copying the AMI from one region to another, then using the copied AMI to launch the EC2 instanece in the new region. 
+* You can *move an EC2 instance from one region to another* by taking a snapshot of it, creating an AMI from the snapshot, copying the AMI from one region to another, then using the copied AMI to launch the EC2 instance in the new region. 
 
 ## EBS Types
 ### General Purpose (SSD)
