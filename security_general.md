@@ -1,21 +1,17 @@
-# Compliance
+# General Security Concepts in AWS
 
-AWS has checked off many compliances. 
+## Index (not complete)
 
-You can get copies of the reports and give them to your auditors.
+* [Artifact](#Artifact)
+* [Config](#Config)
+* [GuardDuty](#GuardDuty)
 
-On the console, go to AWS > Security, IDentify, & Compliance > Artifact
-
-* Has a whole list of access-controlled docs
-
-Examples: 
-
-* A PCI DSS Level 1 certification attests to the security of the AWS platform regarding credit card transactions.
-* A HIPAA certification attests to the fact that the AWS Platform has met the standard required for the secure storage of medical records in the US
+-----------
+-----------
 
 # Shared Responsibility Model
 
-[Read the doc](https://aws.amazon.com/compliance/shared-responsibility-model/)
+[Read the doc on AWS](https://aws.amazon.com/compliance/shared-responsibility-model/)
 
 AWS manages security **OF** the cloud, but security **IN** the cloud is the customer's responsibility. 
 
@@ -35,6 +31,22 @@ Customer retains control of what security they choose to implement.
 |Hardware and infrastructure
 
 You do patches on EC2. AWS is responsible for the OS on which S3 or RDS runs on.
+
+# Artifact
+
+AWS has checked off many compliances.
+
+You can get copies of the reports and give them to your auditors.
+
+On the console, go to AWS > Security, IDentify, & Compliance > Artifact
+
+* Has a whole list of access-controlled docs
+* Has on-demand access to security and compliance reports and select online agreements. 
+
+Examples: 
+
+* A PCI DSS Level 1 certification attests to the security of the AWS platform regarding credit card transactions.
+* A HIPAA certification attests to the fact that the AWS Platform has met the standard required for the secure storage of medical records in the US
 
 # WAF
 
@@ -66,14 +78,15 @@ There is:
 
 # Inspector
 
-Automated security assessment service for your EC2 instance(s).
+Automated **security assessment** service for your EC2 instance(s).
 
 * Looks for common vulnerabilities in the EC2 instance
   * "These patches need to be applied"
+* Looks for deviations from security best practices
 
 Helps improve sercurity and compliance of applications deployed on AWS. 
 
-You install it into your instance
+You *install it into your instance*
 
 A report is produced after evaluation.
 
@@ -83,14 +96,14 @@ Helps you provision your resources following best practices on AWS
 
 * optimize your entire AWS environment in real time
 
-Advises on (helps you assess):
+**Advises on** (but doesn't ensure):
 
 * Cost Optimization
 * performance
 * security
 * fault tolerance.
 
-> Looks at entire AWS account, not just EC2.
+Looks at entire AWS account (doesn't look within EC2 instances - use Insector for this)
 
 Includes:
 
@@ -120,7 +133,7 @@ Monitors the *configuration* / settings of your AWS environment.
 * how the resources are related to one another 
 * how they were configured in the past versus how they change
 
-Ie, security groups changed = config question.
+Config lets you continuously monitor and record *configuration* changes of your resources.
 
 # Athena
 
@@ -130,4 +143,21 @@ See file on this
 
 See file on this
 
+# GuardDuty
+
+Monitors the security of an account's AWS environment.
+
+Analyzes:
+
+* VPC Flow Logs
+* CloudTrail logs 
+* DNS query logs
+
+Can integrate with Amazon CloudWatch Events, to create GuardDuty alerts
+
+# Authorization vs Authentication
+
+Authentication checks who is accessing the system, and passes that info to the authorization porcess.
+
+The Authorization process checks what permissions the user has in AWS.
 

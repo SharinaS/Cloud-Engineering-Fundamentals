@@ -110,7 +110,11 @@ Failover:
 
 You must have *automatic backups* turned *on* in order to deploy a read replica.
 
-> For performance. *For scaling*... NOT for disaster recovery.
+> For performance. *For scaling*. For security.... NOT for disaster recovery. 
+
+Regarding Security:
+
+* public key encryption is used when RDS sets up communication between read replicas and the source DB instance.
 
 Use read replicas for very read-heavy DB workloads.
 
@@ -345,6 +349,11 @@ Used for business intelligence or data warehousing.
 
 A way to do business intelligence, or data warehousing in the cloud.
 
+Redshift is a **cloud data warehouse**.
+
+* You create a data warehouse with a set of nodes, which are referred to as a *cluster*.
+
+
 Used for online analytics processing - [OLAP](#OLTP-vs-OLAP)
 
 ## Overview
@@ -362,9 +371,10 @@ Used for online analytics processing - [OLAP](#OLTP-vs-OLAP)
 * Scale up to a petabyte or more for $1000/terabyte/year.
 * Cost is less than a 10th of most other data warehousing solutions.
 
-Priced based on the Compute Node Hours
+Priced based on *Compute Node Hours*
 
 * Compute Node Hours = the total # of hrs you run across all your compute nodes for the billing period. 
+  * Redshift launches a set of nodes called a Redshift cluster
 * You are billed for 1 unit / node / hour.
   * Billing is only for *compute nodes, not leader node hours*.
 
@@ -454,7 +464,7 @@ Aurora starts at 10Gb.
 
 It scales in 10Gb increments.
 
-It maxes out at 64Tb.
+It maxes out at **64TB**.
 
 Storage is scaled automatically
 
