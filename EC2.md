@@ -1,6 +1,11 @@
 # EC2
 
-What EC2 is:
+## Index (not complete)
+
+* [Placement Groups](#Types-of-Placement-Groups)
+* [Pricing](#Pricing-Models)
+
+# What EC2 is
 
 * A virtual server or servers in the cloud.
 * Provides resizable copute capacity in the cloud. 
@@ -40,15 +45,21 @@ By the way, a default Security Group is set up for you, so no matter what, you s
 * Provides a "capacity reservation"
 * 1 or 3 years term contracts
 * The more you pay upfront, the more you save - significant discount.
-* Good for apps with *steady state or predictable usage*, or for apps that require reserve capacity. 
+* Good for apps with *steady state or predictable usage*, or for apps that require reserve capacity.
 
-### Further breakdown:
+### Reserved has 3  types of pricing
 
-* Standard Reserved Instances 
+* NURI - No upfront
+* PURI - Partial upfront
+* AURI - All upfront
+
+### Reserved has 3 types
+
+* Standard 
   * up to 75% off on demand instances, the more you pay upfront and the longer the contract, the bigger the discount.
-* Convertible Reserved Instances 
+* Convertible
   * Up to 54% off on demand. You can convert one reserved instance type over to another. 
-* Scheduled Reserved Instances 
+* Scheduled 
   * allows you to have reserved instances within a particular time window. Great for situations like schools that have specific working hours. 
 
 ## Spot
@@ -66,6 +77,7 @@ By the way, a default Security Group is set up for you, so no matter what, you s
 * Can be purchased on-demand (hourly) and 70% off the on-demand price. 
 
 # Instance Types
+
 Not as important for the Solutions Architect Associate exam, but good to start learning.
 
 Think, FIGHT DR MCPXZ AU
@@ -114,6 +126,10 @@ Ideal for:
 ## Partition
 
 Instances are partitioned into groups so one partition doesn't share underlying hardware with another partition.
+
+Each partition has its own set of racks to supply its network and power source. 
+
+* Isolation is designed to prevent the impact of hardware failure within your application.
 
 Great for large distributed and replicated workloads
 

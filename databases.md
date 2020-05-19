@@ -271,6 +271,10 @@ Used for:
 * IoT
 * etc
 
+### Storage Amount
+
+Upon sign-up, you'll get 25 GB in the first 12 months under the Free Tier. 
+
 ### DynamoDB has two types of reads 
 
 > Note the 1 second rule to remember the difference between these.

@@ -1,3 +1,5 @@
+# HA Architecture
+
 Everything fails... at some point. So, always plan for failure. 
 
 Topics within HA Architecture (see other md files for details on the topics):
@@ -17,22 +19,40 @@ Topics within HA Architecture (see other md files for details on the topics):
   * Quick Start CF templates built by AWS
 * Elastic Beanstalk
 
-### Multi-AZ vs Read Replicas for RDS
+# Multi-AZ vs Read Replicas for RDS
+
 Multi-AZ: For disaster recovery
 Read Replicas for RDS: For performance
 
 For a simulated failure of RDS. You can force a failover from one AZ to another by doing a reboot of the DB. Go up to "actions > reboot". Click "Reboot With Failover?" It will take a website down for a few minutes.
+
 * Can do this with any RDS instance that has multi-AZ configured.
 
-### Scaling out vs Scaling up
-Scaling out: Where we use auto scaling groups and we add additional EC2 instances. 
+# Scaling out vs Scaling up
 
-Scaling up: Where we increase the resources inside our EC2 instances
+## Scaling out
+
+We use auto scaling groups and we add additional EC2 instances.
+
+Horizontal scaling means an app doesn't store previous session info on specific ec2 instances, so any instance can process the request. 
+
+Horizontal scaling is a principle of sound design when it comes to reliability. 
+
+## Scaling up
+
+We increase the resources inside our EC2 instances
+
 * Go from a t2.micro to a 6x extra large.
 * An EC2 instance is changed to have more RAM
 
-## S3 storage classes
+### Elasticity
+
+The ability to scale computing resources up or down, while *only paying for the resources used*. 
+
+# S3 storage classes
+
 Highly available:
+
 * Standard S3 
   * expensive 
   * availability of 99.99%
@@ -49,7 +69,7 @@ Highly available:
 
 
 
-## Availability, Durability, Reliability, Resiliency
+# Availability, Durability, Reliability, Resiliency
 Availability - The percent of a time period when the service will be able to respond to your request in some fashion. 
 * Takes into account the mean time between failures and the mean time to repair. 
 * Refers to the likelihood that you can access a resource or service when you need it.
@@ -71,7 +91,8 @@ Durability - The on-going existence of the object or resource
 Resources: 
 [Quora](https://www.quora.com/What-are-the-differences-between-reliability-availability-resiliency-and-fault-tolerance-in-IT-systems)
 
-### Placement Groups
+# EC2 Placement Groups
+
 Can only be of the following types:
 * Cluster
 * Spread
@@ -80,7 +101,9 @@ Can only be of the following types:
 [AWS' brief description of placement groups](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/placement-groups.html)
 
 # Example Scenarios
+
 ## Example of highly available architecture
+
 User --> Route 53 (with health check --> Regions
 
 Region 1 has:
@@ -102,13 +125,17 @@ Region 2 has:
 Because of all this replication, we have architecture that allows for a region failure or an AZ failure. That way, if one goes down, the other region can pick up the slack, or the other AZ can pick up the slack, depending on the scenario. 
 
 ## Example Scenario
+
 Requirement: Website requires a minimum of 6 instances. It must be able to tolerate the failure of 1 AZ. The ideal architecture (while being cost effective) is...
 
 ... 3 AZs with 3 instances in each AZ. 
+
 * 9 instances in total is needed, b/c if we lose 1 AZ we'll still have 6 instances to look after the environment. 
 
 ## Example Scenario: What can be done to reduce the risk of a single bad deployment taking the entire site down? 
+
 Some Options to consider:
+
 * Multiple autoscaling groups and boundaries. This allows for a staged or 'canary' deployment process.
 * Use Route 53, which provides health checks to distribute load across some/numerous ELBs.
 * Under each load balancer, use multiple Target groups or auto scaling groups.
