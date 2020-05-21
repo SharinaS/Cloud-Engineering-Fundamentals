@@ -9,7 +9,7 @@
 
 * [Multi AZ and Read Replicas](#Two-Features-of-Relational-DBs)
 
-* [Non Relational Databases](#Non-Relational-Databases) - NoSQL
+[Non Relational Databases](#Non-Relational-Databases) - NoSQL
 
 * [DynamoDB](#DynamoDB)
 
@@ -110,7 +110,11 @@ Failover:
 
 You must have *automatic backups* turned *on* in order to deploy a read replica.
 
-> For performance. *For scaling*... NOT for disaster recovery.
+> For performance. *For scaling*. For security.... NOT for disaster recovery. 
+
+Regarding Security:
+
+* public key encryption is used when RDS sets up communication between read replicas and the source DB instance.
 
 Use read replicas for very read-heavy DB workloads.
 
@@ -233,7 +237,9 @@ RDS instance is encrypted --> (data stored at rest in the underlying storage is 
 
 # Non Relational Databases
 
-Databases that consist of a collection, which is a table. Inside the collection you have documents, which is are rows. Key value pairs are your fields, or columns.
+Databases that consist of a collection, which is a table. Inside the collection you have documents, which is are rows. 
+
+**Key value pairs** are your fields / columns.
 
 Allows you to add as many different columns as you like, unlike relational DBs, which require consistency across all the records. This is b/c non-relational DBs are set up like JSON.
 
@@ -246,6 +252,8 @@ AWS NoSQL Database:
 ## DynamoDB
 
 NoSQL DB service.
+
+> DynamoDB is serverless with no servers to provision, patch, or manage and no software to install, maintain, or operate. DynamoDB automatically scales tables up and down to adjust for capacity and maintain performance. Availability and fault tolerance are built in, eliminating the need to architect your applications for these capabilities. -- *Certified Cloud Practitioner Practice Exam Course*
 
 Overview:
 
@@ -266,6 +274,10 @@ Used for:
 * ad-tech
 * IoT
 * etc
+
+### Storage Amount
+
+Upon sign-up, you'll get 25 GB in the first 12 months under the Free Tier. 
 
 ### DynamoDB has two types of reads 
 
@@ -345,6 +357,11 @@ Used for business intelligence or data warehousing.
 
 A way to do business intelligence, or data warehousing in the cloud.
 
+Redshift is a **cloud data warehouse**.
+
+* You create a data warehouse with a set of nodes, which are referred to as a *cluster*.
+
+
 Used for online analytics processing - [OLAP](#OLTP-vs-OLAP)
 
 ## Overview
@@ -362,9 +379,10 @@ Used for online analytics processing - [OLAP](#OLTP-vs-OLAP)
 * Scale up to a petabyte or more for $1000/terabyte/year.
 * Cost is less than a 10th of most other data warehousing solutions.
 
-Priced based on the Compute Node Hours
+Priced based on *Compute Node Hours*
 
 * Compute Node Hours = the total # of hrs you run across all your compute nodes for the billing period. 
+  * Redshift launches a set of nodes called a Redshift cluster
 * You are billed for 1 unit / node / hour.
   * Billing is only for *compute nodes, not leader node hours*.
 
@@ -454,7 +472,7 @@ Aurora starts at 10Gb.
 
 It scales in 10Gb increments.
 
-It maxes out at 64Tb.
+It maxes out at **64TB**.
 
 Storage is scaled automatically
 

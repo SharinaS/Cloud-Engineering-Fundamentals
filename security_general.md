@@ -1,40 +1,30 @@
-# Compliance
+# General Security Concepts in AWS
 
-AWS has checked off many compliances. 
+## Index (not complete)
+
+* [Artifact](#Artifact)
+* [Config](#Config)
+* [GuardDuty](#GuardDuty)
+* [Who To Contact - Abuse Team](#Abuse-Team)
+
+-----------
+-----------
+
+# Artifact
+
+AWS has checked off many compliances.
 
 You can get copies of the reports and give them to your auditors.
 
 On the console, go to AWS > Security, IDentify, & Compliance > Artifact
 
 * Has a whole list of access-controlled docs
+* Has on-demand access to security and compliance reports and select online agreements. 
 
 Examples: 
 
 * A PCI DSS Level 1 certification attests to the security of the AWS platform regarding credit card transactions.
 * A HIPAA certification attests to the fact that the AWS Platform has met the standard required for the secure storage of medical records in the US
-
-# Shared Responsibility Model
-
-[Read the doc](https://aws.amazon.com/compliance/shared-responsibility-model/)
-
-AWS manages security **OF** the cloud, but security **IN** the cloud is the customer's responsibility. 
-
-Customer retains control of what security they choose to implement.
-
-|AWS| Customer|
-|-----|-----|
-|*responsible for security of the cloud* | *responsible for security in the cloud* |
-|regions | Client-side data |
-|AZs | Server-side data |
-|Edge locations | Networking traffic protection |
-|Compute | OS (EC2), network and firewall configuration |
-|Storeage | Platform, applications, identity and access management |
-|Networking | Customer data
-|Database
-|Software
-|Hardware and infrastructure
-
-You do patches on EC2. AWS is responsible for the OS on which S3 or RDS runs on.
 
 # WAF
 
@@ -66,14 +56,15 @@ There is:
 
 # Inspector
 
-Automated security assessment service for your EC2 instance(s).
+Automated **security assessment** service for your EC2 instance(s).
 
 * Looks for common vulnerabilities in the EC2 instance
   * "These patches need to be applied"
+* Looks for deviations from security best practices
 
 Helps improve sercurity and compliance of applications deployed on AWS. 
 
-You install it into your instance
+You *install it into your instance*
 
 A report is produced after evaluation.
 
@@ -83,14 +74,14 @@ Helps you provision your resources following best practices on AWS
 
 * optimize your entire AWS environment in real time
 
-Advises on (helps you assess):
+**Advises on** (but doesn't ensure):
 
 * Cost Optimization
 * performance
 * security
 * fault tolerance.
 
-> Looks at entire AWS account, not just EC2.
+Looks at entire AWS account (doesn't look within EC2 instances - use Insector for this)
 
 Includes:
 
@@ -111,16 +102,11 @@ Records console actions and api calls to increase visibility into your user and 
 
 See file on this
 
-Lets you monitor *performance*. 
+Lets you monitor *performance* of a service.
 
 # Config
 
-Monitors the *configuration* / settings of your AWS environment.
-
-* how the resources are related to one another 
-* how they were configured in the past versus how they change
-
-Ie, security groups changed = config question.
+See file on this
 
 # Athena
 
@@ -130,4 +116,39 @@ See file on this
 
 See file on this
 
+# GuardDuty
+
+Monitors the security of an account's AWS environment.
+
+Analyzes:
+
+* VPC Flow Logs
+* CloudTrail logs 
+* DNS query logs
+
+Can integrate with Amazon CloudWatch Events, to create GuardDuty alerts
+
+# Authorization vs Authentication
+
+Authentication checks who is accessing the system, and passes that info to the authorization porcess.
+
+The Authorization process checks what permissions the user has in AWS.
+
+# Abuse Team
+
+ The **AWS Abuse team** can assist you when AWS resources are being used to engage in the following types of abusive behavior:
+
+I. Spam: You are receiving unwanted emails from an *AWS-owned IP address*, or *AWS resources are being used* to spam websites or forums.
+
+II. Port scanning: Your logs show that one or more *AWS-owned IP addresses* are sending packets to multiple ports on your server, and you believe this is an attempt to discover unsecured ports.
+
+III. Denial of service attacks (DOS): Your logs show that one or more *AWS-owned IP addresses* are being used to flood ports on your resources with packets, and you believe this is an attempt to overwhelm or crash your server or software running on your server.
+
+IV. Intrusion attempts: Your logs show that one or more *AWS-owned IP addresses* are being used to attempt to log in to your resources.
+
+V. Hosting objectionable or copyrighted content: You have evidence that *AWS resources are being used to host* or distribute illegal content or distribute copyrighted content without the consent of the copyright holder.
+
+VI. Distributing malware: You have evidence that *AWS resources are being used to distribute* software that was knowingly created to compromise or cause harm to computers or machines on which it is installed.
+
+-- From *AWS Certified Cloud Practitioner Practice Exam Course*
 

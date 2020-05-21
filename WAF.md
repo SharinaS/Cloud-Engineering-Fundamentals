@@ -8,7 +8,10 @@ WAF = web application firewall
 
 WAF: 
 
-* Lets you monitor the HTTP and HTTP requests that are forwarded to CloudFront, an Application Load Balancer or API Gateway.
+* Lets you monitor the HTTP and HTTP requests that are forwarded to 
+  * CloudFront
+  * Application Load Balancer
+  * API Gateway.
 * Also lets you control access to your content.
 * Helps protect your apps from web exploits that could:
   * affect app availability

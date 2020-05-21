@@ -11,14 +11,15 @@ Goal: Provide seamless and secure integration between on-premises IT environment
 There are virtual or physical storage gateways available.
 
 * used to be just a virtual thing
-* lately they released hardware applianes to have a physical storage gateway.
+* lately they released hardware appliances to have a physical storage gateway.
 
-## Storage gateway supports:
+## Storage gateway supports
 
 * VMware ESXi
 * Microsft Hyper-V (as the hypervisor)
 
 ## Download
+
 You download the Storage Gateway's software appliance as a *virtual machine image*.
 
 * Install it on a host in your data center
@@ -40,15 +41,15 @@ Two types:
 * NFS - Network File System
 * (SMB)
 
-A way to store files directly into S3. For "flat files"
+> A way to store files directly into S3. For "flat files"
 
-* A way to store your application server data in S3.
+* A way to store your application *server data* in S3.
 
 Files are stored as objects in S3 buckets. 
 
 Files are accessed through a *Network File System (NFS)* mount point.
 
-> Application Server ----- *via NFS* ----> Storage Gateway ----> Direct Connect / internet / Amazon VPC ------> Amazon S3
+Application Server ----- *via NFS* ----> Storage Gateway ----> Direct Connect / internet / Amazon VPC ------> Amazon S3
 
 S3 stores the following in the user-metadata of the object associated with the file:
 

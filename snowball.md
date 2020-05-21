@@ -1,3 +1,11 @@
+# Snowball and Snowmobile
+
+## Index - not complete
+
+[Snowball](#Snowball)
+
+[Snowmobile](#Snowmobile)
+
 # Snowball
 
 Can import to S3 and export from S3.
@@ -35,7 +43,7 @@ To use it, you just copy your files over to the `s3://your-address-from-snowball
 
 Amazon then picks it up, and they transfer your stuff over to an S3 bucket.
 
-## Snowball Edge
+# Snowball Edge
 
 There is also a Snowball Edge, which is *100TB* of storage and computer abilities. 
 
@@ -43,12 +51,12 @@ This thing gives not just *storage*, but also *compute*!
 
 It can help support local workloads in remote or offline locations. You can stick one of these things in an aircraft as you're testing the airplane. It's like having a mini AWS available. 
 
-## Snowmobile
+# Snowmobile
 
 Migration & Transfer > Snowball
 
 Snowmobile is an Exabyte-scale data transfer service. 
 
-You can transfer up to *100 petabyes (PB)* (1,000 terabytes) per Snomobile. The thing is pulled by a Semi truck. 
+* You can transfer up to *100 petabyes (PB)* (1,000 terabytes) per Snomobile. The thing is pulled by a Semi truck. 
 
 Can move video libraries, and other huge amounts of data.

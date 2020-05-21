@@ -6,6 +6,26 @@ Delivers webpages and other webcontent based on the geographical location of the
 
 When the user goes to the website, the user will pull the content down directly from where that website's region is.
 
+## Use Cases
+
+From *AWS Certified Cloud Practitioner Practice Exam Course*:
+
+### Accelerate static website content delivery.
+
+CloudFront can speed up the delivery of your static content (for example, images, style sheets, JavaScript, and so on) to viewers across the globe. By using CloudFront, you can take advantage of the AWS backbone network and CloudFront edge servers to give your viewers a fast, safe, and reliable experience when they visit your website.
+
+### Live & on-demand video streaming.
+
+The Amazon CloudFront CDN offers multiple options for streaming your media – both pre-recorded files and live events – at sustained, high throughput required for 4K delivery to global viewers.
+
+### Security.
+
+CloudFront integrates seamlessly with AWS Shield for Layer 3/4 DDoS mitigation and AWS WAF for Layer 7 protection.
+
+### Customizable content delivery with Lambda@Edge.
+
+Lambda@Edge is a feature of Amazon CloudFront that lets you run code closer to users of your application, which improves performance and reduces latency.
+
 ## Definitions
 
 ### Edge Location

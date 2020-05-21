@@ -8,6 +8,8 @@ An interactive *query service* of S3.
 
 Essentially allows you to turn S3 into a database, so you can query the data using SQL.
 
+A managed service.
+
 ## Benefits
 
 Serverless (nothing to provision)

@@ -1,30 +1,44 @@
 # About EFS
+
 EFS = Elastic File System
 
-EFS is a file storage service for Elastic Compute Cloud or EC2 intances. It provides a (simple) interface for creating and configuring file systems.
+EFS is a file storage service for Elastic Compute Cloud or EC2 intances. It provides a (simple) interface for creating and configuring *file systems*.
+
 * Has Read after Write Consistency
 
-> Choose when you need distributed, highly resilient storage for Linux instances and Linux-based applications. 
+> Choose when you need distributed, highly resilient storage for Linux instances and Linux-based applications.
+
+EFS supports NSFv4 (Network File System version 4) protocol
+
+## Scalable
 
 EFS makes storage capacity elastic, as in, it grows and shrinks automatically as you add/remove files.
 
 If you provision an EFS instance, it will just grow automatically. You add a terabite file, and it grows. 
+
 * Can support thousands of concurrent NFS connections
-* Can scale up to the petabytes
+* Can scale up to the petabytes (same size as Snowball)
 
-EFS supports NSFv4 (Network File System version 4) protocol
+## Compare to other services
 
-### Regions:
+Choose over S3 when the question talks about files, and multiple EC2 instances involved. S3 is object storage, so it's not idea for file (and folder) storage.
+
+In contrast, EBS allows only for mounting a single virtual disk to one EC2 instance. You can have an EC2 instance or more sharing an EBS volume. An EBS Volume can be attached to one EC2 instance at a time, hence, no other EC2 instance can connect to that EBS Provisioned IOPS Volume.
+
+## Regions
+
 Data is stored across multiple availability zones within a region
 
-### Billing:
+## Billing
+
 You only pay for the storage you use (no pre-provisioning required).
 
-## Contrast with EBS and with FSX
-In contrast, EBS allows only for mounting a virtual disk to one EC2 instance. You can have an EC2 instance or more sharing an EBS volume. You can have them sharing an EFS volume.
+--------
+--------
 
 # Store a website on EFS
-### Go to EFS
+
+## Go to EFS
 
 Click "Create file system"
 
@@ -44,7 +58,8 @@ Check the box to "Enable encryption of data at rest" and use the KMS master key
 
 Click Next, and then "Create file system."
 
-### Provision EC2 instances
+## Provision EC2 instances
+
 Make a couple Amazon Linux 2 instances, t2.micro. In "configure Instance Details," at the top of the page, change the number of instances to "2."
 
 For this example, leave it all as default, but create a bootstrap script down below:
@@ -60,7 +75,8 @@ The last line says to install the amazon efs utils tool in order for us to mount
 
 Click next, and leave everything as default for the next few pages, except choose to use your own securty group (which has which has HTTP (source: 0.0.0.0/0), HTTP (::/0) and SSH (0.0.0.0/0) for inbound rules)
 
-### Check out the Security Groups
+## Check out the Security Groups
+
 We provisioned our EFS into a default security group. We need to make sure to modify our inbound rules, since we're going to create a webserver.
 
 Go to "Inbound" rules tabl and click "Edit."
@@ -87,7 +103,8 @@ Make sure to go back a directory with `cd ..`, so your terminal looks like this:
 [root@ip-111-11-11-11 www]#
 ```
 
-### Mount the EFS to our EC2 instances:
+## Mount the EFS to our EC2 instances
+
 Go to EFS on the console.
 
 Click the radio button for the file system you created. Scroll down to the link under DNS name that says: "Amazon EC2 mount instructions (from local VPC)"

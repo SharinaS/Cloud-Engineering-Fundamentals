@@ -6,7 +6,9 @@ IAM includes:
 
 * Users
 * Groups
+  * Lets you create a list of pre-defined permissions that any user made a part of the group will be granted. 
 * Roles
+  * Used to grant resources permissions to other resources and are generally not for end-users
 * Policies
 
 IAM is universal

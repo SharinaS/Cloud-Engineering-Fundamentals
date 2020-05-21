@@ -1,6 +1,12 @@
 # EC2
 
-What EC2 is:
+## Index (not complete)
+
+* [EBS](#EBS-Volumes)
+* [Placement Groups](#Types-of-Placement-Groups)
+* [Pricing](#Pricing-Models)
+
+# What EC2 is
 
 * A virtual server or servers in the cloud.
 * Provides resizable copute capacity in the cloud. 
@@ -9,6 +15,7 @@ What EC2 is:
 * EC2 is a compute based service; it's not serverless (it's a virtual server in the cloud). 
 
 Note that:
+
 * Termination protection is turned off by default, so you must turn it on if you want it. 
 * The EBS-backed instance has a default action for the root EBS volume to be deleted when the instance is terminated, however non-root volumes will not be deleted.
 * EBS Root volumes of your default AMI can be encrypted
@@ -39,11 +46,22 @@ By the way, a default Security Group is set up for you, so no matter what, you s
 * Provides a "capacity reservation"
 * 1 or 3 years term contracts
 * The more you pay upfront, the more you save - significant discount.
-* Good for apps with *steady state or predictable usage*, or for apps that require reserve capacity. 
-* Further breakdown:
-  * Standard Reserved Instances - up to 75% off on demand instances, the more you pay upfront and the longer the contract, the bigger the discount.
-  * Convertible Reserved Instances - Up to 54% off on demand. You can convert one reserved instance type over to another. 
-  * Scheduled Reserved Instances - allows you to have reserved instances within a particular time window. Great for situations like schools that have specific working hours. 
+* Good for apps with *steady state or predictable usage*, or for apps that require reserve capacity.
+
+### Reserved has 3  types of pricing
+
+* NURI - No upfront
+* PURI - Partial upfront
+* AURI - All upfront
+
+### Reserved has 3 types
+
+* Standard 
+  * up to 75% off on demand instances, the more you pay upfront and the longer the contract, the bigger the discount.
+* Convertible
+  * Up to 54% off on demand. You can convert one reserved instance type over to another. 
+* Scheduled 
+  * allows you to have reserved instances within a particular time window. Great for situations like schools that have specific working hours. 
 
 ## Spot
 
@@ -60,6 +78,7 @@ By the way, a default Security Group is set up for you, so no matter what, you s
 * Can be purchased on-demand (hourly) and 70% off the on-demand price. 
 
 # Instance Types
+
 Not as important for the Solutions Architect Associate exam, but good to start learning.
 
 Think, FIGHT DR MCPXZ AU
@@ -92,6 +111,40 @@ A1 - Arm-based workloads (scale out workloads)
 
 U-6tb1 - Bare Metal
 
+# Types of Placement Groups
+
+No charge for creating a placement group.
+
+## Cluster
+
+Instances are tightly grouped within a single AZ.
+
+Ideal for:
+
+* high-performance computing apps
+  * they need low-latency network performance
+
+## Partition
+
+Instances are partitioned into groups so one partition doesn't share underlying hardware with another partition.
+
+Each partition has its own set of racks to supply its network and power source. 
+
+* Isolation is designed to prevent the impact of hardware failure within your application.
+
+Great for large distributed and replicated workloads
+
+* Hadoop
+* Cassandra
+* Kafka
+
+## Spread
+
+A small group of instances is placed across distinct underlying hardware.
+
+Used to reduce correlated failures.
+
+----------------
 ----------------
 
 # Provision an EC2 Instance 
@@ -131,9 +184,11 @@ Next, we need to add key-value pairs of information about the instance by clicki
 Then click "Next: Configure Security Group."
 
 ## Security Group
+
 > Note that a security group is a virtual firewall (which enables the computer to communicate via its different ports) in the cloud, so you can specify if it's open to the entire world, or only to "My IP" (only you can SSH into the webserver). For web traffic, though, you want to set it up so it can respond to web requests.
 
 Remember:
+
 * Rule changes on a security group will take place immediately
 * Security Grups are stateful
   * When you create an inbound rule, an outbound rule is automatically created (when you come in, you're allowed out)
@@ -157,6 +212,7 @@ Hit "Review and Launch."
 
 
 ## Launch
+
 In "Step 7," hit "Launch." In the box that appears, "Select an existing key pair or create a new key pair," change the dropdown to read "Create a new key pair" and give the private key pair a name. Then click "Download Key Pair" into a safe location, and Launch Instance."
 
 ![image of key value pairs](/assets/ec2KeyValue.png)
@@ -259,37 +315,57 @@ Now, can paste in public IP address in a browser, and check out the website you 
 ------------------------
 
 # EBS Volumes
+
 EBS = Elastic Block Storage
 
 When creating an instance, this is "Step 4: Add Storage"
 
-### Remember:
-* Essentially, EBS is a virtual hard disk drive in the cloud (used by EC2). Every server has a disk.
-* EBS provides persistent block storage *volumes* for EC2 instances. 
-* Each EBS volume is automatically replicated within its Availability Zone (providing availability and durability in case of component failure).
-* You can change EBS volume sizes on the fly, including size and storage type. 
-* Volumes will *always be in the same availability zone* as the EC2 instance. 
-* You can *move an EC2 instance from one AZ to another* by taking a snapshot of it, creating an AMI from the snapshot, and then using the AMI to launch the EC2 instance in a new AZ.
-* You can *move an EC2 instance from one region to another* by taking a snapshot of it, creating an AMI from the snapshot, copying the AMI from one region to another, then using the copied AMI to launch the EC2 instance in the new region. 
+Essentially, EBS is a virtual hard disk drive in the cloud (used by EC2). Every server has a disk.
+
+* One EBS Volume can be attached to one EC2 instance at a time, hence, no other EC2 instance can connect to that EBS Provisioned IOPS Volume.
+* EBS provides persistent block storage volumes for EC2 instances.
+
+## AZs and Regions
+
+Each EBS volume is *automatically replicated* within its Availability Zone (providing availability and durability in case of component failure).
+
+Volumes will *always be in the same availability zone* as the EC2 instance. 
+
+You can *move an EC2 instance from one AZ to another* by taking a snapshot of it, creating an AMI from the snapshot, and then using the AMI to launch the EC2 instance in a new AZ.
+
+You can *move an EC2 instance from one region to another* by taking a snapshot of it, creating an AMI from the snapshot, copying the AMI from one region to another, then using the copied AMI to launch the EC2 instance in the new region. 
 
 ## EBS Types
+
+* General
+* Provisioned
+* Throughput
+* Cold Hard
+* Magnetic
+
+You can change EBS volume sizes on the fly, including size and storage type.
+
 ### General Purpose (SSD)
+
 * API Name: gp2
 * For wide variety of work loads, up to 16,000 IPS/volume
 
 ### Provisioned IPS (SSD)
+
 * API Name: io1
 * Highest performance SSD volume
 * Designed for mission critical 
 * Great for databases
 * Max IOPS is 64,000
 
-### Throughput Optimised Hard Disk Drive
+### Throughput Optimised Hard Disk Drive (HDD)
+
 * API Name: st1
-* For Big data and data warehousing
+* For big data and data warehousing
 * 500 IOPS per volume
 
 ### Cold Hard Disk Drive 
+
 * API Name: sc1
 * Magnetic
 * Lowest cost
@@ -297,12 +373,15 @@ When creating an instance, this is "Step 4: Add Storage"
 * IOPS is 250.
 
 ### EBS Magnetic
+
 * API Name: Standard
 * A Previous generation hard disk drive
 * For when data is infrequently accessed, like data archiving, but where you have opted to not use glacier.
 
-## EBS Volumes and SnapShots
-Snapshots exist on S3. Think of snapshots as a photograph of the disk, and that photo is stored on S3. 
+## EBS and SnapShots
+
+Think of snapshots as a photograph of the disk, and that photo is stored on S3.
+
 * Snapshots are point in time copies of volumes.
 * Snapshots are incremental, so only the blocks that have changed since your last snapshot are moved to S3. So, only the changes in the blocks are moved to S3. 
 * It can take some time for snapshots to be created. 
