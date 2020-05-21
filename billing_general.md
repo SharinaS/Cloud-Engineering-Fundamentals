@@ -299,17 +299,32 @@ A huge part of the Cloud Practitioner exam
 
 Two types:
 
-* Simple Monthly Calculator (hosted on S3)
-  * Lets you build out your own environment and helps you estimate the cost.
-  * Monthly cost
-  * A no-frills calculator, kinda reminiscent of if CraigsList had a calculator ....
-* Total Cost of Ownership Calculator
-  * Compares costs between if you do something on premises versus the cost of putting your business on AWS
-  * You versus AWS services
-  * AKA TCO calculator
-  * Pretty graphs and tables of values, with a report your can download (You could save 69% a year by moving infrastructure to AWS.... )
-  * Evaluates 
-    * Server costs
-    * Storage costs
-    * Network costs
-    * IT Labor costs
+## Simple Monthly Calculator (hosted on S3)
+
+* Lets you build out your own environment and helps you estimate the cost.
+* Monthly cost
+* A no-frills calculator, kinda reminiscent of if CraigsList had a calculator ....
+
+## Total Cost of Ownership Calculator (TCO)
+
+* Compares costs between if you do something on premises versus the cost of putting your business on AWS
+* You versus AWS services
+* AKA TCO calculator
+* Pretty graphs and tables of values, with a report your can download (You could save 69% a year by moving infrastructure to AWS.... )
+* Evaluates 
+  * Server costs
+  * Storage costs
+  * Network costs
+  * IT Labor costs
+
+## AWS Budgets
+
+AWS Budgets gives you the ability to set custom budgets that alert you when your costs or usage exceed (or are forecasted to exceed) your budgeted amount.
+
+Budgets can be tracked at the monthly, quarterly, or yearly level, and you can customize the start and end dates. You can further refine your budget to track costs associated with multiple dimensions, such as AWS service, linked account, tag, and others. Budget alerts can be sent via email and/or Amazon Simple Notification Service (SNS) topic.
+
+You can also use AWS Budgets to set a custom reservation utilization target and receive alerts when your utilization drops below the threshold you define. RI utilization alerts support Amazon EC2, Amazon RDS, Amazon Redshift, and Amazon ElastiCache reservations.
+
+Budgets can be created and tracked from the AWS Budgets dashboard or via the Budgets API.
+
+--Udemy AWS Certified Solutions Architect Associate Practice Tests 

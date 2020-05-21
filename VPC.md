@@ -1,15 +1,21 @@
-The following are notes taken while studying for the AWS Certified Solutions Architect Exam, Chapter 7. My main resource was A Cloud Guru, so please only use these notes for increasing your personal knowledge and *nothing more*. 
+# VPC
 
-Big Study Hint: You should be able to build a VPC from memory to pass the AWS Certified Solutions Architect Exam.
+## Index - not complete
+
+[NAT Instances and Gateways](#NAT-Instances-and-Gateways)
 
 # What is a VPC
+
 VPC = "Virtual Private Cloud"
 
 A virtual data center in the cloud.
 
 A VPC is a *collection* of internet gateways, route tables, network access control lists (ACLs), security groups, EC2 instances, private and public subnets.
 
-A VPC consists of:
+> Amazon Virtual Private Cloud (Amazon VPC) lets you provision a logically isolated section of the AWS Cloud where you can launch AWS resources in a virtual network that you define. You have complete control over your virtual networking environment. --*AWS Certified Cloud Practitioner Practice Exam Course*
+
+## A VPC consists of:
+
 * IGWs (Virtual Private Gateways)
 * Route Tables
 * Network Access Control Lists (stateless)
@@ -18,7 +24,8 @@ A VPC consists of:
 
 Amazon VPC lets you provision a virtual networking environment. You can fully control it, and customize it. You can have security groups and network access control lists to help control acces to AWS EC2 instances in each subnet. 
 
-With a VPC, we can:
+## With a VPC, we can:
+
 * Launch instances into a subnet of my choosing
 * Assign custom IP address ranges in each subnet
 * Configure route tables between subnets
@@ -27,19 +34,20 @@ With a VPC, we can:
 * Assign security groups to individual instances
 * Have Subnet network access control lists (ACLS)
 
-### Default VPC:
+## Default VPC:
+
 * User friendly
 * Can immediately deploy instances 
 * All subnets have a route out to the internet - they're all internet accessible.
 
 In a default VPC, all Amazon EC2 instances are assigned two IP addresses at launch - a public IP address and a private IP address.
 
-### Examples
+## Examples
 Example: A public-facing subnet for your webservers, with backend systems like a DB placed in a private-facing subnet. 
 
 Example: A Hardware Virtual Private Network (VPN) connection between a corporate datacenter and your VPC. The AWS cloud becomes an extension of your corporate datacenter. 
 
-### Subnets
+## Subnets
 1 subnet = 1 availability zone.
 
 You can't have 1 subnet spread across multiple availability zones.
@@ -50,7 +58,7 @@ You can't have 1 subnet spread across multiple availability zones.
 10.0.0.0/28
 * This is the smallest subnet you can use within a VPC. 
 
-### VPC Peering
+## VPC Peering
 Allows you to connect one VPC with another via a direct network route using private IP addresses. 
 
 Instances act as though they are on the same private network.
@@ -59,30 +67,36 @@ Can peer VPCs with other AWS accounts, and with other VPCs in the same account.
 * Peering is in a star configuration (1 central VPC peers with 4 others).
 * Can peer across regions
 
-### Transitive Peering
+## Transitive Peering
 Instances within one VPC can talk to the instances within a connected VPC. For instances to talk to each other, you have to directly connect a VPC to another VPC. You can't talk to an instance in secondarily connected VPCs. 
 
 In other words, there is *no transitive peering!*
 
-### Security Groups
+## Security Groups
+
 These are *stateful*.
 
 Security groups...
+
 * evaluate all rules before deciding whether to allow traffic. 
 * operate at the instance level
 * support "allow" rules only.
 
-### Network Access Control Lists (ACLs)
+## Network Access Control Lists (ACLs)
+
 These are *stateless*. 
 
 You can add deny and allow rules. When you open a port on inbound, it doesn't mean a port opens on outbound. 
 
-### Availability Zones... when it comes to this stuff:
+## Availability Zones... when it comes to this stuff:
+
 An availability zone in my AWS account can be a totally different availability zone from the one found in another AWS account, even though they may be called the same (ie, US-East-1A). This is because they are randomized when you choose them in the following steps. 
 
 ---------------
+---------------
 
 # Create a Custom VPC - VPC with Public & Private Subnets
+
 This custom VPC is built step by step, using the AWS Console. 
 
 "Create VPC"

@@ -9,7 +9,7 @@
 
 * [Multi AZ and Read Replicas](#Two-Features-of-Relational-DBs)
 
-* [Non Relational Databases](#Non-Relational-Databases) - NoSQL
+[Non Relational Databases](#Non-Relational-Databases) - NoSQL
 
 * [DynamoDB](#DynamoDB)
 
@@ -237,7 +237,9 @@ RDS instance is encrypted --> (data stored at rest in the underlying storage is 
 
 # Non Relational Databases
 
-Databases that consist of a collection, which is a table. Inside the collection you have documents, which is are rows. Key value pairs are your fields, or columns.
+Databases that consist of a collection, which is a table. Inside the collection you have documents, which is are rows. 
+
+**Key value pairs** are your fields / columns.
 
 Allows you to add as many different columns as you like, unlike relational DBs, which require consistency across all the records. This is b/c non-relational DBs are set up like JSON.
 
@@ -250,6 +252,8 @@ AWS NoSQL Database:
 ## DynamoDB
 
 NoSQL DB service.
+
+> DynamoDB is serverless with no servers to provision, patch, or manage and no software to install, maintain, or operate. DynamoDB automatically scales tables up and down to adjust for capacity and maintain performance. Availability and fault tolerance are built in, eliminating the need to architect your applications for these capabilities. -- *Certified Cloud Practitioner Practice Exam Course*
 
 Overview:
 

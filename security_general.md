@@ -5,32 +5,10 @@
 * [Artifact](#Artifact)
 * [Config](#Config)
 * [GuardDuty](#GuardDuty)
+* [Who To Contact - Abuse Team](#Abuse-Team)
 
 -----------
 -----------
-
-# Shared Responsibility Model
-
-[Read the doc on AWS](https://aws.amazon.com/compliance/shared-responsibility-model/)
-
-AWS manages security **OF** the cloud, but security **IN** the cloud is the customer's responsibility. 
-
-Customer retains control of what security they choose to implement.
-
-|AWS| Customer|
-|-----|-----|
-|*responsible for security of the cloud* | *responsible for security in the cloud* |
-|regions | Client-side data |
-|AZs | Server-side data |
-|Edge locations | Networking traffic protection |
-|Compute | OS (EC2), network and firewall configuration |
-|Storeage | Platform, applications, identity and access management |
-|Networking | Customer data
-|Database
-|Software
-|Hardware and infrastructure
-
-You do patches on EC2. AWS is responsible for the OS on which S3 or RDS runs on.
 
 # Artifact
 
@@ -124,16 +102,11 @@ Records console actions and api calls to increase visibility into your user and 
 
 See file on this
 
-Lets you monitor *performance*. 
+Lets you monitor *performance* of a service.
 
 # Config
 
-Monitors the *configuration* / settings of your AWS environment.
-
-* how the resources are related to one another 
-* how they were configured in the past versus how they change
-
-Config lets you continuously monitor and record *configuration* changes of your resources.
+See file on this
 
 # Athena
 
@@ -160,4 +133,22 @@ Can integrate with Amazon CloudWatch Events, to create GuardDuty alerts
 Authentication checks who is accessing the system, and passes that info to the authorization porcess.
 
 The Authorization process checks what permissions the user has in AWS.
+
+# Abuse Team
+
+ The **AWS Abuse team** can assist you when AWS resources are being used to engage in the following types of abusive behavior:
+
+I. Spam: You are receiving unwanted emails from an *AWS-owned IP address*, or *AWS resources are being used* to spam websites or forums.
+
+II. Port scanning: Your logs show that one or more *AWS-owned IP addresses* are sending packets to multiple ports on your server, and you believe this is an attempt to discover unsecured ports.
+
+III. Denial of service attacks (DOS): Your logs show that one or more *AWS-owned IP addresses* are being used to flood ports on your resources with packets, and you believe this is an attempt to overwhelm or crash your server or software running on your server.
+
+IV. Intrusion attempts: Your logs show that one or more *AWS-owned IP addresses* are being used to attempt to log in to your resources.
+
+V. Hosting objectionable or copyrighted content: You have evidence that *AWS resources are being used to host* or distribute illegal content or distribute copyrighted content without the consent of the copyright holder.
+
+VI. Distributing malware: You have evidence that *AWS resources are being used to distribute* software that was knowingly created to compromise or cause harm to computers or machines on which it is installed.
+
+-- From *AWS Certified Cloud Practitioner Practice Exam Course*
 

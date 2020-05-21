@@ -2,6 +2,7 @@
 
 ## Index (not complete)
 
+* [EBS](#EBS-Volumes)
 * [Placement Groups](#Types-of-Placement-Groups)
 * [Pricing](#Pricing-Models)
 
@@ -321,11 +322,12 @@ When creating an instance, this is "Step 4: Add Storage"
 
 Essentially, EBS is a virtual hard disk drive in the cloud (used by EC2). Every server has a disk.
 
-EBS provides persistent block storage *volumes* for EC2 instances.
+* One EBS Volume can be attached to one EC2 instance at a time, hence, no other EC2 instance can connect to that EBS Provisioned IOPS Volume.
+* EBS provides persistent block storage volumes for EC2 instances.
+
+## AZs and Regions
 
 Each EBS volume is *automatically replicated* within its Availability Zone (providing availability and durability in case of component failure).
-
-You can change EBS volume sizes on the fly, including size and storage type.
 
 Volumes will *always be in the same availability zone* as the EC2 instance. 
 
@@ -334,6 +336,14 @@ You can *move an EC2 instance from one AZ to another* by taking a snapshot of it
 You can *move an EC2 instance from one region to another* by taking a snapshot of it, creating an AMI from the snapshot, copying the AMI from one region to another, then using the copied AMI to launch the EC2 instance in the new region. 
 
 ## EBS Types
+
+* General
+* Provisioned
+* Throughput
+* Cold Hard
+* Magnetic
+
+You can change EBS volume sizes on the fly, including size and storage type.
 
 ### General Purpose (SSD)
 
@@ -348,10 +358,10 @@ You can *move an EC2 instance from one region to another* by taking a snapshot o
 * Great for databases
 * Max IOPS is 64,000
 
-### Throughput Optimised Hard Disk Drive
+### Throughput Optimised Hard Disk Drive (HDD)
 
 * API Name: st1
-* For Big data and data warehousing
+* For big data and data warehousing
 * 500 IOPS per volume
 
 ### Cold Hard Disk Drive 
@@ -368,9 +378,9 @@ You can *move an EC2 instance from one region to another* by taking a snapshot o
 * A Previous generation hard disk drive
 * For when data is infrequently accessed, like data archiving, but where you have opted to not use glacier.
 
-## EBS Volumes and SnapShots
+## EBS and SnapShots
 
-Snapshots exist on S3. Think of snapshots as a photograph of the disk, and that photo is stored on S3.
+Think of snapshots as a photograph of the disk, and that photo is stored on S3.
 
 * Snapshots are point in time copies of volumes.
 * Snapshots are incremental, so only the blocks that have changed since your last snapshot are moved to S3. So, only the changes in the blocks are moved to S3. 
