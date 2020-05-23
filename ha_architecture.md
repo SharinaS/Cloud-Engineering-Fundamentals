@@ -3,6 +3,7 @@
 Everything fails... at some point. So, always plan for failure. 
 
 Topics within HA Architecture (see other md files for details on the topics):
+
 * Load Balancers
   * Application Load Balancers
   * Network Load Balancers

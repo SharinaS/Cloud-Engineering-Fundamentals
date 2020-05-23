@@ -1,11 +1,19 @@
+# AutoScaling
+
+## Index (in the works)
+
+[Order of Termination](#Order-of-Termination)
+
 # Three Components to Auto Scaling
 
 ## (1) Groups
+
 A *logical component* to put your EC2 instances into. 
 
 Webserver group, Application group, Database group, etc.
 
 ## (2) Configuration Templates
+
 Groups uses a launch template (launch configuration) for its EC2 instances.
 
 Allows for specification of information
@@ -17,34 +25,41 @@ Allows for specification of information
 * etc
 
 ## (3) Scaling Options
+
 Various options for scaling the Auto Scaling groups
 
 Configure a group to scale based on (5 options):
-* a schedule (ie, workers arrive at a certain time in the day). 
+
+* a schedule (ie, workers arrive at a certain time in the day)
 * predictive scaling
 * demand
 * manual control
 * maintaining current instance levels all the time.
 
 ### Maintain current instance levels all the time:
+
 A specific number of instances can be set to run at all times, within an Auto Scaling group.
 
-EC2 Auto Scaling does a periodic health check on running instances within an Auto Scaling group in order to maintain the desired instance levels. 
+EC2 Auto Scaling does a periodic health check on running instances within an Auto Scaling group in order to maintain the desired instance levels.
+
 * If an unhealthy instance is found, it terminates it and launches a new instance.
 
-### Scale manually:
+### Scale manually
+
 Most basic form of scaling.
 
 Specify the change in the max, min or desired capacity of your auto scaling group. 
 
 EC2 Auto Scaling manages the process of creating/terminating instances to maintain the updated capacity. 
 
-### Scale based on a schedule:
+### Scale based on a schedule
+
 Helpful to implement when you know the exact times you need to increase/decrease the number of instances in your group, based on the increased/decreased need. 
 
 The scaling actions are done automatically, based on time and date.
 
-### Scale based on demand:
+### Scale based on demand
+
 Most popular type of Auto Scaling. 
 
 Uses scaling policies to scale resources - parameters are defined that control the scaling process. 
@@ -53,15 +68,33 @@ Super helpful for changeable conditions, but you don't know when the conditions 
 
 Example: You have a web app that runs on 2 instances, and you want the CPU usesage of the Auto Scaling group to be about 50% when the load on the app changes.
 
-### Predictive scaling:
+### Predictive scaling
+
 Relatively new.
 
 Use Amazon EC2 Auto Scaling + AWS Auto Scaling to scale resources across multiple services. 
 
-Good for when you want to use predictive and dynamic scaling to maintain ideal availability and performance. 
+Good for when you want to use predictive and dynamic scaling to maintain ideal availability and performance.
+
 * proactive
 * reactive
 
+# Order of Termination
+
+The default termination policy is designed to help ensure that your network architecture spans Availability Zones evenly. With the default termination policy, the behavior of the Auto Scaling group is as follows:
+
+1. If there are instances in multiple Availability Zones, choose the Availability Zone with the most instances and at least one instance that is not protected from scale in. If there is more than one Availability Zone with this number of instances, choose the Availability Zone with the instances that use the oldest launch configuration.
+
+2. Determine which unprotected instances in the selected Availability Zone use the oldest launch configuration. If there is one such instance, terminate it.
+
+3. If there are multiple instances to terminate based on the above criteria, determine which unprotected instances are closest to the next billing hour. (This helps you maximize the use of your EC2 instances and manage your Amazon EC2 usage costs.) If there is one such instance, terminate it.
+
+4. If there is more than one unprotected instance closest to the next billing hour, choose one of these instances at random.
+
+-- *AWS AWS Certified Solutions Architect Associate Practice Tests*
+
+----------
+----------
 
 # Make One - with the AWS Console
 ## Make a Configuration

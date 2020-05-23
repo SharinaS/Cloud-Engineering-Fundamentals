@@ -107,6 +107,7 @@ You want to have the home url sent to one AZ, and the url with, say, /images/ wi
 
 
 -------------------
+-------------------
 
 # Provision a New Load Balancer via the Console - Super Basic Example
 Notes inspired by the Certified Cloud Practitioner course with A Cloud Guru.

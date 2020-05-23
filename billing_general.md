@@ -1,3 +1,9 @@
+# Billing
+
+## Index (in the works)
+
+
+
 # About AWS Billing
 
 [AWS Whitepaper on Pricing](https://d1.awsstatic.com/whitepapers/aws_pricing_overview.pdf?did=wp_card&trk=wp_card) - comes up about 30% for Cloud Practitioner Exam
@@ -311,13 +317,17 @@ Two types:
 * You versus AWS services
 * AKA TCO calculator
 * Pretty graphs and tables of values, with a report your can download (You could save 69% a year by moving infrastructure to AWS.... )
-* Evaluates 
+* Evaluates:
   * Server costs
   * Storage costs
   * Network costs
   * IT Labor costs
 
-## AWS Budgets
+The AWS TCO tool at minimum only needs to ask you about server and storage configuration details
+
+* may be phrased as how many "on-premises virtual machines" there are.
+
+# AWS Budgets
 
 AWS Budgets gives you the ability to set custom budgets that alert you when your costs or usage exceed (or are forecasted to exceed) your budgeted amount.
 
@@ -328,3 +338,9 @@ You can also use AWS Budgets to set a custom reservation utilization target and 
 Budgets can be created and tracked from the AWS Budgets dashboard or via the Budgets API.
 
 --Udemy AWS Certified Solutions Architect Associate Practice Tests 
+
+# Cost Explorer
+
+ helps you visualize and manage your AWS costs and usages over time. It offers a set of reports you can view data with for up to the last 13 months, forecast how much you're likely to spend for the next three months. You use Cost Explorer to identify areas that need further inquiry and see trends to understand your costs.
+
+* get recommendations for what Reserved Instances to purchase.
