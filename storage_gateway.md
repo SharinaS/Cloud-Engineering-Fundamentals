@@ -4,6 +4,9 @@ It's a virtual or physical device that replicates your data into AWS. It's used 
 
 A service that connects a software appliance that's on-premise with a cloud-based storage.
 
+* The gateway connects to AWS storage services, such as Amazon S3, Amazon S3 Glacier, Amazon S3 Glacier Deep Archive, Amazon EBS, and AWS Backup
+  * Backup is a fully managed backup service. Backup automates and consolidates backup tasks. It's a policy-based backup solution.
+
 Goal: Provide seamless and secure integration between on-premises IT environment and AWS' storage infrastructure. 
 
 > Outcome: You can store data in the cloud scalably and cost-effectively. 
