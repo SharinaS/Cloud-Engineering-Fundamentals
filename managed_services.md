@@ -5,7 +5,7 @@
 * CloudFront
 * Redshift
 * Lambda
-* RDS
+* RDS!
 * Athena
 * Neptune
 

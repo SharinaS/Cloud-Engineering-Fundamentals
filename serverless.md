@@ -61,7 +61,7 @@ Architecture Components:
 Architectures can get very complicated. Use AWS **X-ray** to debug.
 
 * Designed to debug serverless applications.
-
+* Can be used for non-serverless, too, when there are performance issues. 
 
 # Lambda
 

@@ -68,6 +68,8 @@ You *install it into your instance*
 
 A report is produced after evaluation.
 
+Inspector is not used for performance issues.
+
 # Trusted Advisor
 
 Helps you provision your resources following best practices on AWS

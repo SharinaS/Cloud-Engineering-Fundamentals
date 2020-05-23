@@ -23,7 +23,17 @@ Customer retains control of what security they choose to implement.
 |Software
 |Hardware and infrastructure
 
-You do patches on EC2. AWS is responsible for the OS on which S3 or RDS runs on.
+### EC2
+
+You do patches on EC2. 
+
+### S3 and RDS
+
+AWS is responsible for the OS on which S3 or RDS runs on.
+
+### RDS
+
+Installing the database software is AWS’ responsibility.
 
 ## Shared Controls
 
@@ -36,3 +46,12 @@ Shared Controls are controls which apply to both the infrastructure layer and cu
 * Configuration Management – AWS maintains the configuration of its infrastructure devices, but a customer is responsible for configuring their own guest operating systems, databases, and applications.
 
 * Awareness & Training - AWS trains AWS employees, but a customer must train their own employees.
+
+## Inherited Controls
+
+Inherited Controls are controls which a customer fully inherits from AWS such as **physical controls and environmental controls**.
+
+As a customer deploying an application on AWS infrastructure, you inherit security controls pertaining to the AWS physical, environmental and media protection, and no longer need to provide a detailed description of how you comply with these control families.
+
+For example: Let’s say you have built an application in AWS for customers to securely store their data. But your customers are concerned about the security of the data and ensuring compliance requirements are met. To address this, you assure your customer that “our company does not host customer data in its corporate or remote offices, but rather in AWS data centers that have been certified to meet industry security standards.” That includes physical and environmental controls to secure the data, which is the responsibility of Amazon. Companies do not have physical access to the AWS data centers, and as such, they fully inherit the physical and environmental security controls from AWS.
+--*AWS Certified Cloud Practitioner Practice Exam Course*

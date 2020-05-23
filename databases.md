@@ -1,5 +1,22 @@
 # Index
+
+[Authentication](#Authentication)
+
+[Data Warehousing](#Data-Warehousing)
+
+[ElastiCache](#ElastiCache)
+
+[Non Relational Databases](#Non-Relational-Databases) - NoSQL
+
+* [DynamoDB](#DynamoDB)
+
+[Redshift DB](#Redshift)
+
 [Relational Databases](#Relational-Databases) - RDS
+
+* [Aurora DB](#Aurora)
+
+  * [Migrate to Aurora](#Migrate-to-Aurora)
 
 * [Backups for RDS](#Backups-for-RDS)
 
@@ -9,21 +26,7 @@
 
 * [Multi AZ and Read Replicas](#Two-Features-of-Relational-DBs)
 
-[Non Relational Databases](#Non-Relational-Databases) - NoSQL
-
-* [DynamoDB](#DynamoDB)
-
-[Data Warehousing](#Data-Warehousing)
-
 [OLTP vs OLAP](#OLTP-vs-OLAP)
-
-[ElastiCache](#ElastiCache)
-
-[Redshift DB](#Redshift)
-
-[Aurora DB](#Aurora)
-
-* [Migrate to Aurora](#Migrate-to-Aurora)
 
 # AWS Databases
 
@@ -66,7 +69,15 @@ RDS is NOT Serverless
 
 * The exception is Aurora - Aurora Serverless is serverless.
 
+RDS is a managed database service
+
+* Amazon is the one that manages the underlying operating system of the database instance and not you.
+* Circumvent this by deploying, say, your Oracle database to Amazon EC2 instances with data replication between two different Availability Zones.
+  * HINT: The deployment of this architecture can easily be achieved by using Cloudformation and Quick Start. The Quick Start deploys the Oracle primary database (using the preconfigured, general-purpose starter database from Oracle) on an Amazon EC2 instance in the first Availability Zone. It then sets up a second EC2 instance in a second Availability Zone, copies the primary database to the second instance by using the DUPLICATE command, and configures Oracle Data Guard. --*Udemy AWS Certified Solutions Architect Associate Practice Tests*
+
 ## Types of Relational Databases on AWS - 6 in total
+
+There are relational databases, and then there is the service called RDS. 
 
 * SQL Server
 * Oracle
@@ -75,7 +86,7 @@ RDS is NOT Serverless
 * Aurora
 * MariaDB
 
-## Two Features of Relational DBs
+## Two Features of RDS
 
 ### (1) Multi AZ
 
@@ -114,7 +125,7 @@ You must have *automatic backups* turned *on* in order to deploy a read replica.
 
 Regarding Security:
 
-* public key encryption is used when RDS sets up communication between read replicas and the source DB instance.
+* **public key encryption** is used when RDS sets up communication between read replicas and the source DB instance.
 
 Use read replicas for very read-heavy DB workloads.
 
@@ -241,13 +252,11 @@ Databases that consist of a collection, which is a table. Inside the collection 
 
 **Key value pairs** are your fields / columns.
 
-Allows you to add as many different columns as you like, unlike relational DBs, which require consistency across all the records. This is b/c non-relational DBs are set up like JSON.
+* Allows you to add as many different columns as you like, unlike relational DBs, which require consistency across all the records. This is b/c non-relational DBs are set up like JSON.
 
 Non-relational databases are NoSQL services.
 
-AWS NoSQL Database:
-
-* DynamoDB
+AWS' NoSQL Database is DynamoDB
 
 ## DynamoDB
 
@@ -264,7 +273,7 @@ Overview:
 * Fully managed DB
 * Supports key-value data models
 * Stored on SSD storage (this is why it's so fast)
-* Spread across 3 geographically distinct data centres (multiple AZs) (redundancy)
+* Spread across **3** geographically distinct data centres (multiple AZs) (redundancy)
 
 Used for:
 
@@ -278,6 +287,10 @@ Used for:
 ### Storage Amount
 
 Upon sign-up, you'll get 25 GB in the first 12 months under the Free Tier. 
+
+### Make It Even Faster
+
+Amazon DynamoDB Accelerator (DAX) is a fully managed, highly available, in-memory cache that can reduce Amazon DynamoDB response times from milliseconds to **microseconds**, even at millions of requests per second.
 
 ### DynamoDB has two types of reads 
 
@@ -449,6 +462,16 @@ You can restore snapshots to a new AZ in the event of an outage.
 
 * Redshift can asynchronously replicate your snapshots to S3 in another region for disaster recovery. 
 
+## Enhanced VPC routing
+
+When you use Amazon Redshift Enhanced VPC Routing, Amazon Redshift forces all COPY and UNLOAD traffic between your cluster and your data repositories through your Amazon VPC. By using Enhanced VPC Routing, you can use standard VPC features, such as VPC security groups, network access control lists (ACLs), VPC endpoints, VPC endpoint policies, internet gateways, and Domain Name System (DNS) servers. 
+
+Hence, if the problem is that of the requirements is to use **VPC flow logs** to monitor all the COPY and UNLOAD traffic of your Redshift cluster that moves in and out of your VPC. The answer is to enable Enhanced VPC routing on your Amazon Redshift cluster.
+
+You use these features to tightly manage the flow of data between your Amazon Redshift cluster and other resources. When you use Enhanced VPC Routing to route traffic through your VPC, you can also use VPC flow logs to monitor COPY and UNLOAD traffic. 
+
+If Enhanced VPC Routing is not enabled, Amazon Redshift routes traffic through the Internet, including traffic to other services within the AWS network.
+
 # Aurora
 
 ## Overview
@@ -527,6 +550,8 @@ Support for user-defined replication delay - none
 
 Support for different data or schema vs primary - no.
 
+In case of an infrastructure failure, Amazon RDS performs an automatic failover to a read replica (or to the standby in the case of a non-Aurora RDS), so that you can resume database operations as soon as the failover is complete. Since the endpoint for your DB Instance remains the same after a failover, your application can resume database operation without the need for manual administrative intervention.
+
 ## Aurora Backups
 
 Are always enabled by default. Backups don't impact DB performance.
@@ -537,9 +562,9 @@ Allowed. This does not impact performance of your production DB.
 
 Snapshots can be shared with other AWS accounts.
 
-## Amazon Aurora Serverless
+## Aurora Serverless
 
-An Aurora Serverless DB cluster automatically starts up/down and scales capacity up/down based on your app's needs. 
+An Aurora Serverless DB cluster automatically starts up/down and scales capacity up/down based on your app's needs. [See AWS userguide](https://docs.amazonaws.cn/en_us/AmazonRDS/latest/AuroraUserGuide/aurora-serverless.how-it-works.html).
 
 It's on demand and autoscaling. And "simple!"
 
@@ -551,7 +576,39 @@ Good for workloads that are:
 
 Example: You want to save as much $ as possible, you don't know when people will access your website, it needs to cope with unpredictable workloads, and it needs to scale.
 
-Serverless lets you pay only when someone is accessing your website (vs by the minute or by the hour). 
+Serverless lets you pay only when someone is accessing your website (vs by the minute or by the hour).
+
+> With Aurora Serverless , you can create a database endpoint without specifying the DB instance class size. You set the minimum and maximum capacity. With Aurora Serverless, the database endpoint connects to a proxy fleet that routes the workload to a fleet of resources that are automatically scaled. Because of the proxy fleet, connections are continuous as Aurora Serverless scales the resources automatically based on the minimum and maximum capacity specifications. Database client applications don't need to change to use the proxy fleet. Aurora Serverless manages the connections automatically. Scaling is rapid because it uses a pool of "warm" resources that are always ready to service requests. Storage and processing are separate, so you can scale down to zero processing and pay only for storage. --*Udemy AWS Certified Solutions Architect Associate Practice Tests*
+
+Aurora Serverless introduces a new serverless DB engine mode for Aurora DB clusters.
+
+## Aurora Provisioned DB Cluster 
+
+Take note that a non-Serverless DB cluster for Aurora is called a provisioned DB cluster. Aurora Serverless clusters and provisioned clusters both have the same kind of high-capacity, distributed, and highly available storage volume.
+
+When you work with Amazon Aurora without Aurora Serverless (provisioned DB clusters), you can choose your DB instance class size and create Aurora Replicas to increase read throughput. If your workload changes, you can modify the DB instance class size and change the number of Aurora Replicas. This model works well when the database workload is predictable, because you can adjust capacity manually based on the expected workload.
+
+Non-Serverless DB clusters use the provisioned DB engine mode.
+
+## Migration
+
+It takes time to migrate a, say, Oracle database to Aurora. If you want to do this, and it's not an urgent failure sort of situation, you can use AWS Schema Conversion Tool and AWS Database Migration Service. 
+
+See more info about [migration below](#Migrate-to-Aurora)
+
+## Custom Endpoints
+
+Amazon Aurora typically involves a cluster of DB instances instead of a single instance. Each connection is handled by a specific DB instance. When you connect to an Aurora cluster, the host name and port that you specify point to an intermediate handler called an endpoint. Aurora uses the endpoint mechanism to abstract these connections. Thus, you don't have to hardcode all the hostnames or write your own logic for load-balancing and rerouting connections when some DB instances aren't available.
+
+For certain Aurora tasks, different instances or groups of instances perform different roles. For example, the primary instance handles all data definition language (DDL) and data manipulation language (DML) statements. Up to 15 Aurora Replicas handle read-only query traffic.
+
+Using endpoints, you can map each connection to the appropriate instance or group of instances based on your use case. For example, to perform DDL statements you can connect to whichever instance is the primary instance. To perform queries, you can connect to the reader endpoint, with Aurora automatically performing load-balancing among all the Aurora Replicas. For clusters with DB instances of different capacities or configurations, you can connect to custom endpoints associated with different subsets of DB instances. For diagnosis or tuning, you can connect to a specific instance endpoint to examine details about a specific DB instance.
+
+The custom endpoint provides load-balanced database connections based on criteria other than the read-only or read-write capability of the DB instances. For example, you might define a custom endpoint to connect to instances that use a particular AWS instance class or a particular DB parameter group. Then you might tell particular groups of users about this custom endpoint. For example, you might direct internal users to low-capacity instances for report generation or ad hoc (one-time) querying, and direct production traffic to high-capacity instances. 
+
+Hence, creating a custom endpoint in Aurora based on the specified criteria for the production traffic and another custom endpoint to handle the reporting queries is the correct answer.
+
+--*Udemy AWS Certified Solutions Architect Associate Practice Tests*
 
 # ElastiCache
 
@@ -608,6 +665,24 @@ Choose this one if you *also* need:
 * *multiple AZs*
 * persistence
 * *backup / restore capabilities*
+
+# Authentication
+
+You can authenticate to your DB instance using AWS Identity and Access Management (IAM) database authentication. **IAM database authentication works with MySQL and PostgreSQL**. With this authentication method, you don't need to use a password when you connect to a DB instance. Instead, you use an authentication token.
+
+An authentication token is a unique string of characters that Amazon RDS generates on request. Authentication tokens are generated using AWS Signature Version 4. Each token has a lifetime of 15 minutes. You don't need to store user credentials in the database, because authentication is managed externally using IAM. You can also still use standard database authentication.
+
+IAM database authentication provides the following benefits:
+
+Network traffic to and from the database is encrypted using Secure Sockets Layer (SSL).
+
+You can use IAM to centrally manage access to your database resources, instead of managing access individually on each DB instance.
+
+For applications running on Amazon EC2, you can use profile credentials specific to your EC2 instance to access your database instead of a password, for greater security.
+
+ Note that although you can create and assign an IAM Role to your EC2 instances, you still need to configure your RDS to use IAM DB Authentication.
+
+ -- *Udemy AWS Certified Solutions Architect Associate Practice Tests*
 
 ------------
 ------------

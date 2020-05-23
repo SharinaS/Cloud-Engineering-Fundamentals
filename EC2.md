@@ -2,7 +2,10 @@
 
 ## Index (not complete)
 
+* [AMI Types](#AMI-Types)
 * [EBS](#EBS-Volumes)
+  * [EBS Types](#EBS-Types)
+* [Encryption](#Encrypted-Root-Device-Volumes-&-Snapshots)
 * [Placement Groups](#Types-of-Placement-Groups)
 * [Pricing](#Pricing-Models)
 
@@ -30,6 +33,16 @@ By the way, a default Security Group is set up for you, so no matter what, you s
 
 # Pricing Models
 
+For Linux- Ubuntu-based Amazon EC2 usage: EC2 instances are billed on one second increments, with a minimum of one minute. 
+
+For all other instance types (non-Linux or Ubuntu), billing is by the hour!
+
+Per-second EC2 billing is available for instances launched in:
+
+* On-Demand, Reserved and Spot forms
+* All regions and Availability Zones
+* Amazon Linux and Ubuntu
+
 ## On Demand
 
 * Fixed rate by the hour or second with no committment (great for testing)
@@ -51,8 +64,12 @@ By the way, a default Security Group is set up for you, so no matter what, you s
 ### Reserved has 3  types of pricing
 
 * NURI - No upfront
+  * No upfront payment is required. You are billed a discounted hourly rate  for every hour within the term, regardless of whether the Reserved Instance is being used. No Upfront Reserved Instances are based on a contractual obligation to pay monthly for the entire term of the reservation. A successful billing history is required before you can purchase No Upfront Reserved Instances.
 * PURI - Partial upfront
+  *  A portion of the cost must be paid up front and the remaining hours in the term are billed at a discounted hourly rate, regardless of whether you’re using the Reserved Instance.
 * AURI - All upfront
+  * With the All Upfront option, you pay for the entire Reserved Instance term with one upfront payment. This option provides you with the largest discount compared to On-Demand instance pricing.
+  * With AURI, there's nothing to pay monthly.
 
 ### Reserved has 3 types
 
@@ -78,6 +95,8 @@ By the way, a default Security Group is set up for you, so no matter what, you s
 * Can be purchased on-demand (hourly) and 70% off the on-demand price. 
 
 # Instance Types
+
+[Go to AWS Instance Types](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-types.html)
 
 Not as important for the Solutions Architect Associate exam, but good to start learning.
 
@@ -237,6 +256,7 @@ Involves CloudWatch analysis.
 
 # SSH into the Public Instance
 ### Via the Console:
+
 Make sure your instance's radio button is clicked. 
 
 Press the button, "Connect," up above. 
@@ -246,6 +266,7 @@ A window will pop up that says, "Connect To Your Instance." Click the radio butt
 Benefit is that this bypasses Mac vs Windows. 
 
 ### Via the Terminal:
+
 For Mac users, **open up the terminal** (or a plugin for windows) and cd into where you stored your key pair. 
 
 For first time use of the key pair, change permissions using the terminal on the private key you downloaded a bit ago: 
@@ -318,11 +339,12 @@ Now, can paste in public IP address in a browser, and check out the website you 
 
 EBS = Elastic Block Storage
 
-When creating an instance, this is "Step 4: Add Storage"
+(When creating an instance on the console, this is "Step 4: Add Storage")
+
 
 Essentially, EBS is a virtual hard disk drive in the cloud (used by EC2). Every server has a disk.
 
-* One EBS Volume can be attached to one EC2 instance at a time, hence, no other EC2 instance can connect to that EBS Provisioned IOPS Volume.
+* **One EBS Volume can be attached to one EC2 instance** at a time, hence, no other EC2 instance can connect to that EBS Provisioned IOPS Volume.
 * EBS provides persistent block storage volumes for EC2 instances.
 
 ## AZs and Regions
@@ -331,9 +353,12 @@ Each EBS volume is *automatically replicated* within its Availability Zone (prov
 
 Volumes will *always be in the same availability zone* as the EC2 instance. 
 
+* Paraphrased from A Cloud Guru: Whereever the EC2 instance is, the volume will be in the same availability zone. In a physical computer, you want the hard disk drive to be as close to the motherboard as possible. In a virtual machine, and a virtual hard disk drive, you want them in the same availability zone, otherwise there will be too much lag. 
+
 You can *move an EC2 instance from one AZ to another* by taking a snapshot of it, creating an AMI from the snapshot, and then using the AMI to launch the EC2 instance in a new AZ.
 
 You can *move an EC2 instance from one region to another* by taking a snapshot of it, creating an AMI from the snapshot, copying the AMI from one region to another, then using the copied AMI to launch the EC2 instance in the new region. 
+
 
 ## EBS Types
 
@@ -380,23 +405,27 @@ You can change EBS volume sizes on the fly, including size and storage type.
 
 ## EBS and SnapShots
 
-Think of snapshots as a photograph of the disk, and that photo is stored on S3.
+Think of snapshots as a photograph of the disk, and that photo is **stored on S3**.
 
 * Snapshots are point in time copies of volumes.
 * Snapshots are incremental, so only the blocks that have changed since your last snapshot are moved to S3. So, only the changes in the blocks are moved to S3. 
 * It can take some time for snapshots to be created. 
-* Best practice: when taking a snapshot for EBS volumes that serve as root devices, *stop the instance before taking the snapshot*. ... though you can take a snap while the instance is running.
 * You can create AMI's from Snapshots
 
+### Snapshots are asynchronous
 
-Go to "Volumes" on the left
+The point-in-time snapshot is created immediately, but the status of the snapshot is pending until the snapshot is complete (when all of the modified blocks have been transferred to Amazon S3), which can take several hours for large initial snapshots or subsequent snapshots where many blocks have changed. While it is completing, an in-progress snapshot is not affected by ongoing reads and writes to the volume hence, you can still use the volume.
 
-Paraphrased from A Cloud Guru: Whereever the EC2 instance is, the volume will be in the same availability zone. In a physical computer, you want the hard disk drive to be as close to the motherboard as possible. In a virtual machine, and a virtual hard disk drive, you want them in the same availability zone, otherwise there will be too much lag. 
+having multiple pending snapshots of a volume may result in reduced volume performance until the snapshots complete.
+
 
 ## Deletion of Volumes
+
 After termination of an instance, the EBS volume will be automatically removed too, since delete on termination is automatically checked... since it's a root device volume. 
 
 So, when you terminate an EC2 instance, by default the root device volume will be terminated. 
+
+### Additional Volumes
 
 Additional volumes, attached to that EC2 instance, however, will *continue to persist.* You will have to manually click the radio buttons of each of the volumes, and click "Actions > Delete Volumes."
 
@@ -414,12 +443,14 @@ Add Storage:
 * All have default sizes and no encryption. Delete on termination kept the way it is by default. 
 
 Configure Security Group:
+
 * Select existing security group
   * Inbound HTTP with 0.0.0.0/0, HTTP with ::/0, SSH with 0.0.0.0/0
 
 Review and launch. 
 
 Can modify a volume
+
 * Click on volume's radio button, and up in Actions, click "Modify Volume." 
 * You can go in and change the size. 
   * change the throughput optimized HDD (st1) from 500 --> 1000 gigs.
@@ -430,7 +461,11 @@ Can modify a volume
 
 **Move an instance and a volume from one availability zone to another:**
 
-> Summary: Create a snapshot --> turn the snapshot into an AMI --> Use the AMI to launch into other Availability Zones. 
+-----
+
+Create a snapshot --> turn the snapshot into an AMI --> Use the AMI to launch into other Availability Zones. 
+
+-----
 
 * Find your root device volume (or volumes, depending on the scenario). Go to "Actions > Create Snapshot." 
   * Snapshot is basically a photograph of the disk.
@@ -470,11 +505,19 @@ A window will pop up, and you can move the Amazon Machine Image from the existin
 We can now use this image to launch our ec2 instances to the new destination region. 
 
 # AMI Types
+
+An Amazon Machine Image (AMI) is a template that contains a software configuration (for example, an operating system, an application server, and applications). This pre-configured template save time and avoid errors when configuring settings to create new instances. You specify an AMI when you launch an instance, and you can launch as many instances from the AMI as you need. You can also launch instances from as many different AMIs as you need.
+
+* = you can create as many virtual servers as you need from a single template 
+* in contrast, an EBS snapshot is a point-in-time copy of your EBS volume)
+
 There are two different types of AMIs:
-* EBS 
+
+* EBS (Elastic Block Store)
 * Instance Store
 
 When you select your AMI, you can select it based on:
+
 * Region (see Regions and AZs)
 * Operating System
 * Architecture (32-bit vs 64-bit)
@@ -483,16 +526,42 @@ When you select your AMI, you can select it based on:
   * Instance Store (Ephemeral storage)
   * EBS Backed Volumes
 
+## EBS Backed vs Instance Store Backed
+
 AMIs are categorized as *one* of the following:
+
 * Backed by EBS 
-  * root device for an instance launched from the AMI is an EBS volume created from an *EBS snapshot*.
+  * root device for an instance launched from the AMI is an EBS volume created from an **EBS snapshot**.
 * Backed by instance store
-  * root device for an instance launched from the AMI is an instance store volume created from a *template stored in S3*.
+  * root device for an instance launched from the AMI is an instance store volume created from a **template stored in S3**.
   * Sometimes called Ephemeral Storage
 
-## Example of Launching EBS Backed vs Instance Store Backed:
+See below - [Persistant Storage vs Emphemoral Storage](#Persistant-Storage-vs-Emphemoral-Storage)
+
+### More on Instance Stores
+
+The data in an instance store persists only during the lifetime of its associated instance. If an instance reboots (intentionally or unintentionally), data in the instance store persists. However, data in the instance store is lost under any of the following circumstances:
+
+- The underlying disk drive fails
+
+- The instance stops
+
+- The instance terminates
+
+
+
+Therefore, do not rely on instance store for valuable, long-term data. Instead, use more durable data storage such as **Amazon S3, Amazon EBS, or Amazon EFS**. When you stop or terminate an instance, every block of storage in the instance store is reset. Hence, your data cannot be accessed through the instance store of another instance.
+
+If you create an AMI from an instance, the data on its instance store volumes aren't preserved and aren't present on the instance store volumes of the instances that you launch from the AMI. You can specify instance store volumes for an instance only when you launch it. You can't detach an instance store volume from one instance and attach it to a different instance.
+
+-- *Udemy AWS Certified Solutions Architect Associate Practice Test*
+
+## Example of Launching EBS Backed vs Instance Store Backed
+
 ### Launch an Instance that is EBS Backed
+
 Go to EC2 and launch an instance. Choose the Amazon Linux 2 AMI, use a t2.micro instance type, leave everything as default in...
+
 * ... the instance details config page,  
 * ... add storage,
 * ... add tags.
@@ -522,110 +591,51 @@ You can leave everything as default in:
 Launch it.
 
 ## Examine the Two Instances (launched above)
+
 How to tell the difference between the two instances:
+
 * the Instance Type size - m3.medium vs t2.micro
 
 ### Go to Elastic Block Store > Volumes (on left)
+
 In the list of volumes, you'll only be able to see one volume - the EBS-backed volume.
+
 * We can't see the instance-store volume here. 
 
-### Persistant Storage vs Emphemoral Storage: Stop vs. Terminating the Instances
+### Persistant Storage vs Emphemoral Storage
+
+Stop vs. Terminating the Instances
+
 For the **EBS-backed volume**, you can go to "Actions > Instance State > Stop"
+
 * All the data on the EBS-backed volume will continue to persist <--- *persistant storage*
 
 For the **instance-store-backed volume**, when you go to "Actions > Instance State," the only options you have is for "Reboot" or "Terminate."
-* Down below, under "Status Checks" for this volume there are two categories here (as usual) - System Status Checks and Instance Status Checks. If an underlying hypervisor (computer software, firmware or hardware that creates and runs virtual machines, aka the host) fails, the system status check will say "impaired," or something of the sort.
-  * If it's an EBS-backed volume, you just stop the instance, then restart it. When it restarts, it will load up on another hypervisor. 
-  * You can't do a stop/restart with the instance-store-backed volume if the underlying hypervisor has an issue. Instead, you'll have to terminate, which means *all data on the instance-store volume will be lost*. <-- *ephemeral storage*
 
-You can reboot both EBS-backed and instance store-backed, and you won't lost your data.
+* Down below, under "Status Checks" for this volume, there are two categories here (as usual) - System Status Checks and Instance Status Checks. If an underlying hypervisor (computer software, firmware or hardware that creates and runs virtual machines, aka the host) fails, the system status check will say "impaired," or something of the sort.
+  * If it's an **EBS-backed volume**, you just stop the instance, then restart it. When it restarts, it will load up on another hypervisor. 
+  * You can't do a stop/restart with the **instance-store-backed volume** if the underlying hypervisor has an issue. Instead, you'll have to terminate, which means *all data on the instance-store volume will be lost*. <-- *ephemeral storage*
+
+You can **reboot both EBS-backed and instance store-backed**, and you won't lost your data.
 
 ### Termination
+
 By default, both *root* volumes will be deleted on termination. 
 
 However, with EBS volumes, you can tell AWS to keep the root device volume. 
 
 ------------------------
-# ENI vs ENA vs EFA
-## ENI
-An Elastic Network Interface... a virtual network card for your EC2 instance, essentially.
 
-When you provision an EC2 instance, an ENI will be automatically attached. You can then add more as needed.
-
-ENI allows / provides:
-* one primary private IPv4 address (from the IPv4 address range of your VPC)
-* secondary private IPv4 addresses (from the IPv4 address range of your VPC)
-* one Elastic IP address (IPv4) per private IPv4 address
-* one public IPv4 address
-* IPv6 addresses
-* security groups
-* one MAC address
-* one source/destination check flag
-* one description of what the ENI is.
-
-Where an ENI is found (scenarios):
-* Basic networking
-* A management network separate from production network (so, multiple ENIs)
-* You'd have an additional ENI if you have network and security appliances in your VPC
-* Having multiple ENIs lets you create dual-homed instances with workloads / roles on distinct subnets. 
-  * database subnet segregated from production subnet with multiple ENIs, for example.
-  * You'd have multiple ENI's for each network, essentially.
-
-ENIs let you create low-budget solutions that are also high-availability.
-
-
-## EN 
-Enhanced Networking.
-* ENA is a subset of EN.
-* Think of when you need speeds between 10Gbps-100Gbps and reliable, high throughput.
-
-Uses single root I/O virtualization (SR-IOV)
-* provides high-performance networking abilities on *supported instance types*. 
-* SR-IOV is a method of device virtualization that essentially *speeds up your network* - it provides (compared to tranditional virtualized network interfaces):
-  * higher I/O performance
-  * lower CPU utilization
-
-EN provides:
-* higher bandwidth
-* higher packet per second (PPS) performance
-* lower inter-instance latencies
-
-Sometimes an ENI is not enough, regarding the network throughput you need when doing more hefty workloads. Enter, enhanced networking, for when you need good network performance. So, instead of using many ENI's (which won't necessarily increase your network throughput), use one ENA. 
-
-Cost: No additional charge
-
-### How to enable EN - Two Options: <-- depends on your instance type
-* ENA - Elastic Network Adapter
-  * Supports network speeds of up to **100Gbps** (gigabits; billions of bits / second; a measure of bandwidth)
-* VF - Intel 82599 Virtual Function interface
-  * Supports network speeds of up to **10 Gbps**
-  * Usually used for older instances, so choose ENA over VF, given the option, especially in exam questions. 
-
-## EFA
-Elastic Fabric Adapter.
-* For when you need to accelerate HPC and machine learning apps, or if you need to do an OS by-pass.
-
-A network device that you can attach to your EC2 instance.
-* accelerates High Performance Computing (HPC) and machine learning applications.
-
-If the scenario involves something regarding EN, and machine learning, think of EFA!
-
-EFA provides (compared to the TCP transport traditionally used in cloud-based HPC systems):
-* lower and more consistent latency
-* higher throughput 
-* OS-bypass
-  * enables HPC and machine learning applications to bypass the OS kernal. Communication can occur directly with the EFA device.
-  * Makes it faster with less latency.
-  * Only supported on Linux currently (not windows).
-
------------------------
 # Encrypted Root Device Volumes & Snapshots
+
 A root device is essentially a hard disk (the EBS) that has your OS on it. 
 
 Nowadays, you can encrypt immediately, without the historically complex process of the past. 
-* To enable encryption at rest using EC2 and EBS, you must configure encryption when creating the EBS volume. 
+
+> To enable encryption at rest using EC2 and EBS, you must configure encryption when creating the EBS volume. 
 
 Remember:
+
 * Snapshots of encrypted volumes are encrypted automatically
 * Volumes restored from encrypted snapshots are encrypted automatically
 * You can share snapshots... but only if they're unencrypted
@@ -652,7 +662,8 @@ On the left, go to "Elastic Block Store > Volumes" and click the radio button of
 Check the tab, "Description," for Encryption. 
 
 ### Encrypt if it was not done so upon creation:
- > make snapshot of the enencrypted root device volume --> create a copy of the snapshot and enable encryption --> make AMI from the encrypted snapshot --> launch encrypted instance(s) from that AMI. 
+
+make snapshot of the enencrypted root device volume --> create a copy of the snapshot and enable encryption --> make AMI from the encrypted snapshot --> launch encrypted instance(s) from that AMI. 
 
 With the radio button clicked for the volume, go up to "Actions > Create Snapshot." 
 
@@ -685,13 +696,21 @@ We can now use the encrypted AMI to launch encrypted EC2 instances.
 ------------------------
 
 # Use the Terminal (Mac) To interact with AWS
+
+You use **access keys** to sign programmatic requests that you make to AWS if you use AWS CLI commands (using the SDKs) or using AWS API operations. Like a user name and password, you must use both the access key ID and secret access key together to authenticate your requests.
+
+In contrast, The **AWS key pair** is used to securely connect to your Amazon EC2 instances.
+
 ## Gain Access to Your EC2 Instance
+
 Make sure there is a User added within IAM on the Amazon console with Administrator Access. 
 
 If you're using credentials (don't; a role is much more secure):
+
 * You should have an Access key ID and a Secret access key downloaded somewhere (regenerate these by going to `IAM` > `Users` > the user name > `Security Credentials` tab, and under the "Access keys" section click `Make inactive` or `Delete`... and then click `Create access key` to generate a new set of keys. Make sure to download the **.csv file!**).
 
 ## Head over to the terminal. 
+
 In the Amazon console, go to EC2 > Running Instances. Click the box next to the instance name, and click on Description tab. Copy to clipboard the "IPv4 Public IP." Also make note of the "Key pair name" in this section.
 
 Navigate to the folder you downloaded (or moved) the **.pem** file into and type into the terminal:
@@ -715,11 +734,13 @@ So, your terminal will have something like as its path:
 -------------------
 
 # Configure the EC2 Instance to Interact with S3 (or other AWS Services)
+
 We need to configure the EC2 instance otherwise the terminal will complain that it's unable to locate credentials when you do something like try to make an S3 bucket. 
 
 Can either give it **credentials** of the administrator that was set up above, or you can do it by using **roles**. 
 
 ### To Use Credentials:
+
 *Note that using the command line as demoed in this section leaves port 22 completely open... so it could be hacked... so the access keys can be easily found and used to gain control of the AWS account. Other option - use roles to increase security! (see below).*
 
 
@@ -791,11 +812,6 @@ Ask it to try and connect to S3 - to list the buckets that exist - using the rol
 ```
 aws s3 ls
 ```
-
-# Build a Simple Web Server
-[Go to my file on building a simple web server](https://github.com/SharinaS/Cloud-Engineering-Fundamentals/blob/master/BUILD_WEB_SERVER.md), using Apache and an EC2 Instance. 
-
-
 
 # Resources
 * A Cloud Guru's [AWS Certified Cloud Practitioner](https://acloud.guru/learn/aws-certified-cloud-practitioner) Course and the AWS Certified Solutions Architect Course. 
