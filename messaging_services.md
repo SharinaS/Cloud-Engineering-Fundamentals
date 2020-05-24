@@ -82,7 +82,10 @@ Messages can be kept in the queue from 1 minute - 14 days.
 
 ## Visibility Timeout
 
-The amount of time the message is invisible in the SQS queue *after* a reader picks up that message. 
+> Invisibility time for the message that prevents **duplicate messages**.
+
+
+The amount of time the message is invisible in the SQS queue **after a reader picks up** that message. 
 
 If the jobs is processed before the visibility timeout expires, the message will be *deleted* from the queue.
 
@@ -130,7 +133,7 @@ Great for applications that can deal with messages occasionally out of order and
 
 Complements the standard queue.
 
-Choose FIFO queues when your application can't cope with messages out of sequence or duplicates.
+> Choose FIFO queues when your application can't cope with messages out of sequence or duplicates.
 
 Has *FIFO delivery*: first-in-first-out
 
@@ -145,14 +148,17 @@ Has *exactly-once processing*
 Supports *message groups*
 
 * message groups allow multiple ordered message groups within a single queue.
+* Messages that belong to the same message group are always processed one by one, in a strict order relative to the message group (however, messages that belong to different message groups might be processed out of order)
 
 Transactions per second: limited to *300 transactions / second (TPS)*
 
-* Not as fast as standard queues.
+* **Not as fast** as standard queues.
 
 ## Amazon SQS Long Polling
 
-A way to retrieve messages from your SQS queues.
+> Reduces the cost of using SQS by eliminating the number of **empty responses**.
+
+A way to retrieve messages from your SQS queues. [See more on AWS](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-short-and-long-polling.html#sqs-long-polling).
 
 Short polling is the regular way to do it. Short polling *returns immediately*, even if the message queue being polled is empty.
 
@@ -160,6 +166,14 @@ Long polling *doesn't return a response until*:
 
 * a message arrives in the message queue,
 * or the long poll times out
+
+Long polling reduces the number of empty resonses by allowing SQS to **wait until a message is available**... before sending a response to a ReceiveMessage request.
+
+### Start Long Polling 
+
+Change the ReceiveMessageWaitTimeSeconds property of a queue to a value greater than zero.
+
+In other words, increase the receive message wait time for the queue.
 
 ### Example
 
@@ -257,4 +271,8 @@ Category|SQS|SNS|
 
 # MQ
 
-If you're using messaging with existing applications and want to move your messaging service to the cloud quickly and easily, it is recommended that you consider Amazon MQ. It supports industry-standard APIs and protocols so you can switch from any standards-based message broker to Amazon MQ without rewriting the messaging code in your applications.
+If you're using messaging with **existing applications** and want to move your messaging service to the cloud quickly and easily, it is recommended that you consider Amazon MQ. 
+
+It supports industry-standard APIs and protocols so you can switch from any standards-based message broker to Amazon MQ **without rewriting the messaging code** in your applications.
+
+SQS, in contrast, would make you likely rewrite your messaging code :( 

@@ -108,6 +108,7 @@ Can only be of the following types:
 User --> Route 53 (with health check --> Regions
 
 Region 1 has:
+
 * An auto scaling group
 * public subnets
   * with webserver in each
@@ -116,6 +117,7 @@ Region 1 has:
   * with DB servers
 
 Region 2 has:
+
 * An auto scaling group
 * public subnets
   * with webserver in each

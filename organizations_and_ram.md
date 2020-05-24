@@ -51,7 +51,13 @@ You can share
 
 Many organizations use multiple accounts to create administrative or billing isolation, and limit the impact of errors. RAM eliminates the need to create duplicate resources in multiple accounts, reducing the operational overhead of managing those resources in every single account you own. 
 
-You can create resources centrally in a multi-account environment, and use RAM to share those resources across accounts in three simple steps: create a Resource Share, specify resources, and specify accounts. RAM is available to you at no additional charge.
+You can create resources centrally in a multi-account environment, and use RAM to share those resources across accounts in three simple steps: 
+
+1. create a Resource Share,
+2. specify resources, and 
+3. specify accounts. 
+
+RAM is available to you at no additional charge.
 
 RAM leverages existing policies and permissions set in AWS Identity and Access Management (IAM) to govern the consumption of shared resources. RAM also provides comprehensive visibility into shared resources to set alarms and visualize logs through integration with Amazon CloudWatch and AWS CloudTrail.
 

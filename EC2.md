@@ -8,6 +8,7 @@
 * [Encryption](#Encrypted-Root-Device-Volumes-&-Snapshots)
 * [Placement Groups](#Types-of-Placement-Groups)
 * [Pricing](#Pricing-Models)
+* [Security Group](#Security-Group)
 
 # What EC2 is
 
@@ -17,15 +18,40 @@
   * Allows for quickly scaling capacity as computing requirements change
 * EC2 is a compute based service; it's not serverless (it's a virtual server in the cloud). 
 
-Note that:
+## Termination
 
-* Termination protection is turned off by default, so you must turn it on if you want it. 
-* The EBS-backed instance has a default action for the root EBS volume to be deleted when the instance is terminated, however non-root volumes will not be deleted.
-* EBS Root volumes of your default AMI can be encrypted
+Termination protection is turned off by default, so you must turn it on if you want it. 
+
+The EBS-backed instance has a default action for the root EBS volume to be deleted when the instance is terminated, however non-root volumes will not be deleted.
+
+## Hibernation
+
+When you hibernate an instance, we signal the operating system to perform hibernation (suspend-to-disk). Hibernation saves the contents from the instance memory (RAM) to your Amazon EBS root volume. We persist the instance's Amazon EBS root volume and any attached Amazon EBS data volumes. When you start your instance:
+
+* The Amazon EBS root volume is restored to its previous state
+
+* The RAM contents are reloaded
+
+* The processes that were previously running on the instance are resumed
+
+* Previously attached data volumes are reattached and the instance retains its instance ID
+
+You can hibernate an instance only if it's enabled for hibernation and it meets the hibernation prerequisites.
+
+If you no longer need an instance, you can terminate it at any time, including when it is in a stopped (hibernated) state. 
+
+Problem:  A solutions architect wants to design a solution to save costs for Amazon EC2 instances that do not need to run during a 2-week company shutdown The applications running on the instances store data in instance memory (RAM) that must be present when the instances resume operation.
+
+Solution: Run the applications on instances enabled for hibernation. Hibernate the instances before the shutdown. 
+
+
+## Encryption
+
+EBS Root volumes of your default AMI can be encrypted
   * You can also use a third party tool (bit locker, etc) to encrypt the root volume, or this can be done when creating AMI's in the AWS console or using the API.
 * Added volumtes can be encrypted. 
 
-### Architecture Note 
+## Architecture Note 
 
 In case of failure, for production website, have at least two EC2 instances running in two separate availability zones. 
 
@@ -131,8 +157,6 @@ A1 - Arm-based workloads (scale out workloads)
 U-6tb1 - Bare Metal
 
 # Types of Placement Groups
-
---> See also my notes called ec2_placement.md <--
 
 Three types:
 
