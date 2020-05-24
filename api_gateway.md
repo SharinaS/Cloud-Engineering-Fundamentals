@@ -3,8 +3,6 @@
 * [About API Gateway](#About)
 * [API Caching](#API-Caching)
 * [Configure and Deploy](#Configure-and-Deploy)
-* [CORS](#CORS)
-* [How CORS works](#How-CORS-works)
 * [What the API Gateway Can Do](#What-it-Can-Do)
 
 
@@ -51,7 +49,7 @@ Typical usage: Lambda functions
 * Scales effortlessly 
   * No need for autoscaling groups
 * Track and control usage by API key
-* Connect to CloudWatch to log all reqeusts for monitoring
+* Connect to CloudWatch to log all requests for monitoring
 * Maintain multiple version of your API
   * Ie, test and dev version versus production API
 
@@ -68,7 +66,7 @@ You can log results to CloudWatch
 ### How to Configure an API Gateway 
 
 1. Define an API (container)
-2. Define Resouces and nested resources (URL paths)
+2. Define resources and nested resources (URL paths)
 
 For each Resource:
 
@@ -85,7 +83,7 @@ Deploy API to a "stage"
 * uses API Gateway domain by default
 * or, use a custom domain name
 
-API Gateway supports AWS Certificate Manager, so you can get free SSL/TSL certs.
+>API Gateway supports AWS Certificate Manager, so you can get free SSL/TSL certs.
 
 ## API Caching
 

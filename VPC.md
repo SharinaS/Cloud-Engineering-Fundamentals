@@ -1,8 +1,23 @@
 # VPC
 
-## Index - not complete
+## Index (in the works)
 
-[NAT Instances and Gateways](#NAT-Instances-and-Gateways)
+[Bastion Host](#Bastion-Host)
+
+[NAT Instances and Nat Gateways](#NAT-Instances-and-Nat-Gateways)
+
+* [NAT Gateway](#NAT-Gateways)
+* [Elastic IP Address](#Elastic-IP-Address)
+
+[Network Access Control Lists](#Network-Access-Control-Lists)
+
+[Security Groups](#Security-Groups)
+
+[What is a VPC](#What-is-a-VPC)
+
+[VPC Endpoint](#VPC-Endpoint)
+
+[VPC Flow Logs](#VPC-Flow-Logs)
 
 # What is a VPC
 
@@ -24,7 +39,7 @@ A VPC is a *collection* of internet gateways, route tables, network access contr
 
 Amazon VPC lets you provision a virtual networking environment. You can fully control it, and customize it. You can have security groups and network access control lists to help control acces to AWS EC2 instances in each subnet. 
 
-## With a VPC, we can:
+## With a VPC, we can
 
 * Launch instances into a subnet of my choosing
 * Assign custom IP address ranges in each subnet
@@ -34,7 +49,7 @@ Amazon VPC lets you provision a virtual networking environment. You can fully co
 * Assign security groups to individual instances
 * Have Subnet network access control lists (ACLS)
 
-## Default VPC:
+## Default VPC
 
 * User friendly
 * Can immediately deploy instances 
@@ -43,23 +58,27 @@ Amazon VPC lets you provision a virtual networking environment. You can fully co
 In a default VPC, all Amazon EC2 instances are assigned two IP addresses at launch - a public IP address and a private IP address.
 
 ## Examples
+
 Example: A public-facing subnet for your webservers, with backend systems like a DB placed in a private-facing subnet. 
 
 Example: A Hardware Virtual Private Network (VPN) connection between a corporate datacenter and your VPC. The AWS cloud becomes an extension of your corporate datacenter. 
 
 ## Subnets
+
 1 subnet = 1 availability zone.
 
 You can't have 1 subnet spread across multiple availability zones.
 
 10.0.0.0/16
+
 * This is the largest subnet you can use within the VPC, and the most commonly used. 
 
 10.0.0.0/28
 * This is the smallest subnet you can use within a VPC. 
 
 ## VPC Peering
-Allows you to connect one VPC with another via a direct network route using private IP addresses. 
+
+Allows you to connect one VPC with another via a direct network route using **private IP addresses**. 
 
 Instances act as though they are on the same private network.
 
@@ -67,7 +86,8 @@ Can peer VPCs with other AWS accounts, and with other VPCs in the same account.
 * Peering is in a star configuration (1 central VPC peers with 4 others).
 * Can peer across regions
 
-## Transitive Peering
+## No Transitive Peering
+
 Instances within one VPC can talk to the instances within a connected VPC. For instances to talk to each other, you have to directly connect a VPC to another VPC. You can't talk to an instance in secondarily connected VPCs. 
 
 In other words, there is *no transitive peering!*
@@ -82,18 +102,23 @@ Security groups...
 * operate at the instance level
 * support "allow" rules only.
 
-## Network Access Control Lists (ACLs)
-
-These are *stateless*. 
-
-You can add deny and allow rules. When you open a port on inbound, it doesn't mean a port opens on outbound. 
-
 ## Availability Zones... when it comes to this stuff:
 
-An availability zone in my AWS account can be a totally different availability zone from the one found in another AWS account, even though they may be called the same (ie, US-East-1A). This is because they are randomized when you choose them in the following steps. 
+An availability zone in my AWS account can be a totally different availability zone from the one found in another AWS account, even though they may be called the same (ie, US-East-1A). This is because they are randomized when you choose them in the following steps.
 
----------------
----------------
+## What is Created with a VPC
+
+***When we create a custom VPC, it creates 3 things:*** 
+ 
+* A default Route Table
+* A Network Access Control List (Network ACL)
+* A default Security Group is created (can identify it with the VPC ID)
+
+***2 Things are NOT created***
+
+* an Internet Gateway
+* Subnet(s)
+
 
 # Create a Custom VPC - VPC with Public & Private Subnets
 
@@ -114,16 +139,6 @@ Tenancy: `default`
 * Dedicated will cost a fortune.
 
 Hit "Create"
-
-***When we create a custom VPC, it creates 3 things:***  
-* A default Route Table
-* A Network Access Control List (Network ACL)
-* A default Security Group is created (can identify it with the VPC ID)
-
-***2 Things are NOT created***
-* an Internet Gateway
-* Subnet(s)
-
 
 *To use the VPC we need to create some subnets.*
 
@@ -156,10 +171,15 @@ Also note that we only have 251 available IP addresses. We should be getting 256
   * There will always be 5 addresses that are reserved for other uses, which explains our 251 vs 256. 
 
 ## Make a Subnet Publicly Accessible
+
+-------------
+
 From A Cloud Guru: 
-*"By default, any user-created VPC subnet WILL NOT automatically assign Public IPv4 Addresses to instances – the only subnet that does this is the “Default” VPC subnets automatically created by AWS in your account." The simplest way to make the instance reachable from the outside world is therefore to **create an elastic IP address and associate it with your instance.***
+"By default, any user-created VPC subnet WILL NOT automatically assign Public IPv4 Addresses to instances – the only subnet that does this is the “Default” VPC subnets automatically created by AWS in your account." 
 
 For a subnet to be publicly accessible, we'll need *EC2 instances* to launch in it with public IP addresses. 
+
+------------------------
 
 Select the subnet you want to make public - the radio button. 
 
@@ -180,7 +200,14 @@ Now, we have a public and private subnet.
 Next, we need an **Internet Gateway**, which gives us a way to get into the VPC. Then, we'll need to configure our route tables. 
 
 ## Add an Internet Gateway
-From A Cloud Guru: "The purpose of an "Egress-Only Internet Gateway" is to allow IPv6 based traffic within a VPC to access the Internet, whilst denying any Internet based resources the possibility of initiating a connection back into the VPC."
+
+From A Cloud Guru: 
+
+----------------
+
+"The purpose of an "Egress-Only Internet Gateway" is to allow IPv6 based traffic within a VPC to access the Internet, whilst denying any Internet based resources the possibility of initiating a connection back into the VPC."
+
+-----------
 
 Give it a name. 
 
@@ -198,7 +225,12 @@ aws ec2 attach-internet-gateway --vpc-id "vpc-092524f82494c9b63" --internet-gate
 Now, we need to configure our Routes Table so we have a route out into the internets.
 
 ## Configure Routes Table
-*"A route table specifies how packets are forwarded between the subnets within your VPC, the internet, and your VPN connection." - AWS* 
+
+-------------
+
+"A route table specifies how packets are forwarded between the subnets within your VPC, the internet, and your VPN connection." - AWS 
+
+----------------
 
 Make a route out into the Internet.
 
@@ -252,12 +284,18 @@ Make sure the "Auto-assign Public IP" drop down says "Use subnet setting (Enable
 Add a tag to help identify the instance. Add a key of "Name" and then write a descriptive name value.
 
 ### Click "Next: Configure Security Group"
+
+--------------
+
 AWS says, "... if you want to set up a web server and allow Internet traffic to reach your instance, add rules that allow unrestricted access to the HTTP and HTTPS ports."
 
 Note that...
+
 * a security group is "a set of firewall rules that control the traffic for your instance," says AWS.
 * security groups do not span VPCs.
 * when you create a new security group, all outbound traffic is allowed by default. 
+
+-------------
 
 Within the "Assign a security group" row, choose the radio button that says, "Create a new security group." Give it a good name and description. 
 
@@ -268,9 +306,15 @@ Click "Review Instance and Launch" button - this will create an HTTP instance th
 Then, click "Launch" button.
 
 ### Select or Create a New Key Pair
+
+-------------
+
 A key pair lets you securely connect to your instance. A key pair consists of:
+
 * a public key (AWS stores this one)
 * a private key (you store this one)
+
+-------------
 
 A window will pop up that tells you to choose or create a key pair. If you make a new key pair, remember to download the key pair and keep it somewhere you'll find again. 
 
@@ -382,14 +426,29 @@ ping private-ip-address-of-private-instance
 ```
 -------------
 
-# NAT Instances and Gateways
+# NAT Instances and Nat Gateways
 NAT = network address translation
 
-When you're in a private subnet, how do you install updates? Install updates? Download software? Must use NAT Instances or Nat Gateways, since there is no route set up to the Internet from the private subnet. These things make it possible to communicate with our Internet Gateway, without making our private subnet public.
+> **Problem**: EC2 instances for the application tier running in private subnets need to download software patches from the internet. However, the instances cannot be directly accessible from the internet. 
+
+> **Solution**: 
+> * Configure a NAT gateway in a public subnet. 
+> * Define a custom route table with a route to the NAT gateway for internet traffic and associate it with the
+private subnets for the application tier. 
+
+When you're in a private subnet, how do you install updates? Install updates? Download software? Download software patches? 
+
+Must use NAT Instances or Nat Gateways, since there is no route set up to the Internet from the private subnet. These things make it possible to communicate with our Internet Gateway, without making our private subnet public.
 
 In other words, when our instances in our private subnets need to access the internet, they do so via either a NAT Instance or a NAT gateway. 
 
-Nat Gateways are used 99% of the time; Nat Instances are *individual EC2 instances* that do this. Gateways are *highly available, spread across multiple AZ's*. Instances are on their way out... but they're still on the exam.
+Nat Gateways are used 99% of the time. Gateways are *highly available, spread across multiple AZ's*. 
+
+Jump down to more about [Nat Gateways](#Create-a-NAT-Gateway)...
+
+## Nat Instances
+
+Nat Instances are *individual EC2 instances* that do this. Instances are on their way out... but they're still on the exam.
 
 Problems with NAT Instance architecture:
 * It is a single virtual machine
@@ -464,6 +523,7 @@ Click "Save routes."
 Now we have a route within our main route table, which says, go over this elastic network interface (eni-).
 
 ### Terminate the Instance, since, seriously, so many issues with this architecture!
+
 Click the radio button for the nat instance. Click the Actions pulldown menu above. Choose "Instance State > Terminate"
 
 Remember to remove the route associated with this instance, too. Go to VPC > Route Tables.
@@ -472,22 +532,63 @@ Click on your main route table, click the tab below that says "Routes." You'll s
 
 Go to "Edit routes," and click on the "x" to the right of the route, then click "Save routes."
 
-## Create a NAT Gateway - scaleable and highly available
-Things to Note:
-* They are redundant inside the availability zone, which means you can have more than 1 internet gateway for your instances per VPC.
-* You can only have one NAT gateway in an AZ.
-  * To create AZ-independant architecture, you must create a NAT gateway in *each* availability zone, and configure your routing to ensure that resources use the NAT gateway in the same AZ that they're in (otherwise when a gateway goes down, things stop working).
-* Preferred by the enterprise
-* It scales automatically
+## NAT Gateways
+
+NAT =  network address translation
+
+> Purpose in Life: enable instances in a private subnet to connect to the internet or other AWS services, but prevent the internet from initiating a connection with those instances.
+
 * No need to patch the OS 
 * Not associated with any security groups! (Doesn't need to be behind one)
 * Automatically assigned a public ip address
 * No need to disable source/destination checks
 
-How it works:
-Your instance is in the private subnet, it has a route in the Route Table to the NAT Gateway in the public instance. When your instance runs a yum update, it goes to the Nat Gateway, then traverses out. 
+### Scaleable and highly available
+
+* It scales automatically
+
+### Location
+
+To create a NAT gateway, you must specify the public subnet in which the NAT gateway should reside.
+
+### Availability Zones
+
+You can only have one NAT gateway in an AZ.
+  
+To create AZ-independant architecture, you must create a NAT gateway in *each* availability zone, and configure your routing to ensure that resources use the NAT gateway in the same AZ that they're in (otherwise when a gateway goes down, things stop working)
+
+Each NAT gateway is created in a specific Availability Zone and implemented with redundancy in that zone. You have a quota on the number of NAT gateways you can create in an Availability Zone.
+
+
+### Update the Route Table
+
+After you've created a NAT gateway, you must update the route table associated with one or more of your private subnets to point internet-bound traffic to the NAT gateway. This enables instances in your private subnets to communicate with the internet.
+
+### Elastic IP Address
+
+You must also specify an Elastic IP address to associate with the NAT gateway when you create it. The Elastic IP address cannot be changed after you associate it with the NAT Gateway.
+
+An Elastic IP address is a property of network interfaces.
+
+More info on elastic IP addresses:
+
+Associate an Elastic IP address with any instance or network interface for any VPC in your account. With an Elastic IP address, you can mask the failure of an instance by rapidly remapping the address to another instance in your VPC. 
+
+Note that the advantage of associating the Elastic IP address with the network interface instead of directly with the instance is that you can move all the attributes of the network interface from one instance to another in a single step.
+
+Billing:
+
+* To ensure efficient use of Elastic IP addresses, we impose a small hourly charge when they aren't associated with a running instance, or when they are associated with a stopped instance or an unattached network interface. While your instance is running, you aren't charged for one Elastic IP address associated with the instance, but you are charged for any additional Elastic IP addresses associated with the instance.
+
+### Example
+Your instance is in the private subnet, it has a route in the Route Table to the NAT Gateway in the public instance. When your instance runs a yum update, it goes to the Nat Gateway, then traverses out.
+
+### Billing
+
+NAT gateway hourly usage and data processing rates apply. Amazon EC2 charges for data transfer also apply
 
 ### Make a Gateway
+
 Go to VPC > Vitual Private Cloud > NAT Gateways.
 
 Click the button, "Create NAT Gateway."
@@ -511,25 +612,33 @@ Click the "save" and "close" button.
 
 ---------------
 
-# Network Access Control Lists (Network ACL)
+# Network Access Control Lists 
+
+> Use a network ACL to block specific IP Addresses.
+
 "A network ACL is an optional layer of security that acts as a firewall for controlling traffic in and out of a subnet," says AWS.
 
-Go to VPC > Security (to the left) > Network ACLs.
+These are *stateless*. 
 
-You'll see a list of Access Control Lists. Two were created at some point along the journey - one with 2 subnets (sits inside our custom VPC), and one with 3 subnets (sits within the default VPC). 
+You can add deny and allow rules. When you open a port on inbound, it doesn't mean a port opens on outbound. 
 
-In other words, when we created the custom VPC, a network ACL was created by default. By default, it allows all outbound and inbound traffic. 
+VPC > Security (to the left) > Network ACLs.
+
+* You'll see a list of Access Control Lists. Two were created at some point along the journey - one with 2 subnets (sits inside our custom VPC), and one with 3 subnets (sits within the default VPC). 
+
+When we created the custom VPC, a network ACL was created by default. By default, it allows all outbound and inbound traffic. 
 
 Everytime we add a subnet to our VPC, it will be associated with our default Network ACL. In fact, it *must* be associated with a network ACL - if you don't explicitly associate a subnet with a netowrk ACL, the subnet will be automatically associated with the default network ACL. 
 
 Note, we can associate a subnet with a new NACL, but *a subnet itself can only be associated with one network ACL at a given time*. Network ACLs can have multiple subnets on them, however. 
+
 * When you associate a network ACL with a subnet, the previous association is removed.
 
 The Default NACL has Inbound Rules. Each rule is incremented by 100. (see more below).
 
 You can create custom network ACLs. By default each custom network ACL *denies* all inbound and outbound traffic until you add rules. 
 
-*if you're using network ACLs, they will always be evaluated before security groups.* So if you **deny** a specific port on your ACL, it will never reach your security group. So, NACls will always act first before security groups. 
+*if you're using network ACLs, they will always be evaluated before security groups.* So if you **deny** a specific port on your ACL, it will never reach your security group. So, **NACls will always act first before security groups.** 
 
 ... So, you can use a network ACL to block specific IP Addresses.
 * You can't block specific IP addresses using security groups.
@@ -567,17 +676,14 @@ Edit Outbound rules
 ### About the Order of Rules:
 The rules are evaluated in order - 100 (HTTP), 200 (HTTPS), 300 (SSH) for inbound rules. So, if there's a deny rule setup as rule 400, the deny won't activate till everything else is done. If you set up a deny rule for a specific IP address, the deny rule needs to be numbered 99, in this case, so it's before the allow rules. 
 
-----------------
-# Custom VPCs and Elastic Load Balancers
-When you provision a load balancer, you'll need *at least two* public subnets. Otherwise, it won't let you create a load balancer. 
 
-That is all for now, regarding this topic.
 
------------------
 # VPC Flow Logs
+
 A feature that lets you capture information about IP traffic going to/from network interfaces in a VPC. 
 
-Flow log data is stored, reviewed and retrieved using CloudWatch Logs. 
+Flow log data is stored, reviewed and retrieved using **CloudWatch Logs**. 
+
 * Alternatively you can send logs to an S3 Bucket. 
 
 Can do logs at the VPC level, Subnet level or Network Interface level. 
@@ -596,8 +702,8 @@ Note:
   * DHCP traffic not monitored
   * traffic to the reserved IP address for the default VPC router also not monitored.
 
------------------
 # Bastion Host
+
 Used to securely administer EC2 instances.
 
 **A Bastion Host allows you to SSH or RDP into an EC2 instance located in a private subnet.** 
@@ -612,68 +718,9 @@ If we have a public subnet, the bastion host can go inside the public subnet. Th
 Note that you can't use a NAT Gateway as a Bastion host; you have to go ahead and configure a bastion host. 
 
 -----------------
-# Direct Connect
-A direct connection from your data center into AWS, using dedicated lines. It is an AWS service. 
 
-Allows for private connectivity between AWS and a datacenter, office, etc. 
-
-Direct connect locations are spread all over the world. 
-
-Within direct connect is a "AWS cage," which has routers. Customers routers then connect to the routers within the AWS cage. None of this traverses the internet. There is use of the AWS backbone network. 
-
-Useful for high throughput workloads (ie lots of network traffic). 
-
-Useful for when you need a stable and reliable and secure connection. For example, if you have situation where you're trying to use a VPN connection but it keeps dropping out b/c of the amount of throughput, you can use a direct connect to solve those issues. 
-
-## Steps for Setup
-Note that if one does not have a direct connect connection at your location, one can't do these steps. 
-
-1. Create a virtual interface in the Direct Connect console - this is a Public Virtual Interface.
-2. Go to the VPC console > VPN connections. Create a Customer Gateway.
-3. Create a Virtual Private Gateway
-4. Attach the Virtual Private Gateway to the desired VPC.
-5. Select VPN Connections and create new VPN Connection
-6. Select the Virtual Private Gateway and the Customer Gateway (both of which make up a VPN connection)
-7. Once the VPN is available, set up the VPN on the customer gateway or firewall.
-
-^-- memorize these steps for the exam and watch this video on YouTube, called [How do I configure a VPN over AWS Direct Connect?](https://www.youtube.com/watch?v=dhpTTT6V1So). 
-
------------------
-# Global Accelerator
-A service in which you create accelerators to improve availability and performance of your app for local and global users. Global Accelerator directs traffic to optimal endpoints over the AWS global (backbone) network. Much more efficient. 
-
-GA gives you *two static IP addresses* that you associate with your accelerator. You can also bring your own IP addresses. 
-
-User --> Edge location --> AWS Global Accelerator --> Endpoint group --> Endpoints
-
-You can control traffic using traffic dials, so it's very highly configurable (this is done within the endpoint group, like an EC2 instance).
-
-### Components to a Global Accelerator
-* Static IP addresses
-* Accelerator
-* DNS name (supplied with set up of accelerator)
-  * will point to the static IP addresses that GA assigns to you. 
-  * can use your accelerator's static IP addresses or DNS name to route traffic to your accelerator, or route traffic using your own custom domain name. 
-* Network Zone
-  * An isolated unit with its own set of physical infrastructure... but think of it as an AWS Availability Zone. 
-  * When an accelerator is configured, two IPv4 addresses will be allocated so there's always a healthy static IP address in an isolated network zone to try by a client application.
-* Listener (one or more)
-  * Processes inbound connections from clients to GA, based on the port and protocol (TCP or UDP protocols) you configure. 
-  * Each listener has an endpoint group (or more) associated with it; traffic is forwarded to endpoints in one of the groups. 
-* Endpoint Group
-  * Endpoint groups are associated with listeners by specifiying the Regions you want to distribute traffic to. 
-  * Each endpoint group is associaed with a specific AWS Region
-  * A "traffic dial" can increase or decrease the percentage of traffic that would be otherwise be directed to an endpoint group. 
-* Endpoint
-  * These are Network Load Balancers, Application Load Balancers, EC2 instances, Elastic IP addresses.
-  * An Application Load Balancer endpoint can be an internet-facing or internal.
-  * For each endpoint, you can configure weights (weights are numbers that you use to indicate the proportion of traffic to route to each one) so you can do things like performance testing within a region. 
-
-### How to Build One
-See A Cloud Guru's AWS Certified Solutions Architect, Chapter 7.11 for a demo
-
------------------
 # VPC Endpoint
+
 Allows traffic between your VPC and the other service to *not leave* the Amazon network. It's a *private connection* between your VPC to supported AWS services and VPC endpoint services (powered by PrivateLink). No internet gateway, NAT device, VPN connection or AWS Direct Connect connection required! A public IP address is not required either! 
 
 Endpoints are *virtual devices*. 
@@ -685,19 +732,19 @@ Benefits:
 * No bandwidth constraints
 
 Two Types of VPC Endpoints:
+
 * Interface 
   * Endpoints support many services
 * Gateway
   * Endpoints support only S3 and DynamoDB
 
 ### How to Build One
+
 See A Cloud Guru's AWS Certified Solutions Architect, Chapter 7.12 for a demo, which starts about 1/2 way through the chapter.
 
 -----------------
 # Learning Moments
 Hardest part to building a VPC, when doing this for the first time, is making sure that one is working within or with the correct subnet, given the goals for that subnet. So, labeling each subnet descriptively is really important. Actually, label *everything* descriptively. I didn't at first, and that got me in a bit of confused trouble at times. 
-
-
 
 -----------------
 
