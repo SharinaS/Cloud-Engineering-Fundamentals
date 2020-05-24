@@ -20,11 +20,14 @@
 
 * [Backups for RDS](#Backups-for-RDS)
 
-* [Set up RDS Database](#Set-up-RDS-Database)
-
 * [Encryption at Rest](#Encryption-at-Rest)
 
+* [Enhanced Monitoring](#Enhanced-Monitoring)
+
 * [Multi AZ and Read Replicas](#Two-Features-of-Relational-DBs)
+
+* [Set up RDS Database](#Set-up-RDS-Database)
+
 
 [OLTP vs OLAP](#OLTP-vs-OLAP)
 
@@ -58,22 +61,26 @@ Relational databases have been around since the '70s.
 
 RDS uses online transaction processing - [OLTP](#OLTP-vs-OLAP).
 
-RDS runs on virtual machines, but you don't get access to those virtual machines.
+## RDS runs on virtual machines
+
+... but you don't get access to those virtual machines.
 
 * As in, *you can't SSH into your RDS instance*. You can't log in to the RDS operating system.
 * This comes up in terms of security question and patching/maintenance questions.
   * Patching of the RDS Operating System and DB is Amazon's responsibility.
   * You can't go in and patch the operating system of your RDS instance; that's Amazon's responsibility (though you can do that for the EC2 instance)
 
-RDS is NOT Serverless
+## RDS is NOT Serverless
 
 * The exception is Aurora - Aurora Serverless is serverless.
 
-RDS is a managed database service
+## RDS is a managed database service
 
-* Amazon is the one that manages the underlying operating system of the database instance and not you.
-* Circumvent this by deploying, say, your Oracle database to Amazon EC2 instances with data replication between two different Availability Zones.
-  * HINT: The deployment of this architecture can easily be achieved by using Cloudformation and Quick Start. The Quick Start deploys the Oracle primary database (using the preconfigured, general-purpose starter database from Oracle) on an Amazon EC2 instance in the first Availability Zone. It then sets up a second EC2 instance in a second Availability Zone, copies the primary database to the second instance by using the DUPLICATE command, and configures Oracle Data Guard. --*Udemy AWS Certified Solutions Architect Associate Practice Tests*
+Amazon is the one that manages the underlying operating system of the database instance and not you.
+
+Or, circumvent the managed part by deploying, say, your Oracle database to Amazon EC2 instances with data replication between two different Availability Zones.
+
+* HINT: The deployment of this architecture can easily be achieved by using Cloudformation and Quick Start. The Quick Start deploys the Oracle primary database (using the preconfigured, general-purpose starter database from Oracle) on an Amazon EC2 instance in the first Availability Zone. It then sets up a second EC2 instance in a second Availability Zone, copies the primary database to the second instance by using the DUPLICATE command, and configures Oracle Data Guard. --*Udemy AWS Certified Solutions Architect Associate Practice Tests*
 
 ## Types of Relational Databases on AWS - 6 in total
 
@@ -87,6 +94,9 @@ There are relational databases, and then there is the service called RDS.
 * MariaDB
 
 ## Two Features of RDS
+
+* Multi-AZ
+* Read Replicas
 
 ### (1) Multi AZ
 
@@ -245,6 +255,56 @@ Encryption is done with the **AWS Key Management Service (KMS)**.
 
 RDS instance is encrypted --> (data stored at rest in the underlying storage is encrypted) +  (automated backups, read replicas & snapshots are encrypted).
 
+## Enhanced Monitoring
+
+Amazon RDS provides metrics in real time for the operating system (OS) that your DB instance runs on. 
+
+You can view the metrics for your DB instance using the console, or consume the Enhanced Monitoring JSON output from CloudWatch Logs in a monitoring system of your choice. 
+
+By default, Enhanced Monitoring metrics are stored in the CloudWatch Logs for 30 days. 
+
+* To modify the amount of time the metrics are stored in the CloudWatch Logs, change the retention for the RDSOSMetrics log group in the CloudWatch console.
+
+### CPU Utilization Metrics
+
+There are differences between CloudWatch and Enhanced Monitoring Metrics re CPU utilization:
+
+| CloudWatch | Enhanced Monitoring |
+|-----|-----|
+| gathers metrics from the hypervisor for a DB instance | gathers metrics from an agent on the instance |
+| the hypervisor layer performs a small amount of work| useful when you want to see how different processes or threads on a DB instance use the CPU|
+| b/c of the work from the hypervisor, you might find differences between the measurements (more so if your DB instances use smaller instance classes) ||
+|Does not provide the percentage of the CPU bandwidth and total memory consumed by each database process in your RDS instance|Can check the percentage of the CPU bandwidth and total memory consumed by each process |
+| Can monitor the CPU Utilization of your database instance ||
+
+-- *Udemy Certified Solutions Architect Associate Practice Tests*
+
+## How to Increase Write Throughput 
+
+Scenario: You are using a large EC2 Instance with one 500 GB EBS volume to host a relational database.
+
+Solution:
+
+You can achieve this by either setting up a standard **RAID 0** configuration (with 2 EBS volumes) or simply by increasing the **size** of the EC2 instance.
+
+RAID = Redundant Array of Inexpensive Disks
+
+Some EC2 instance types can drive more I/O throughput than what you can provision for a single EBS volume. You can join multiple gp2, io1, st1, or sc1 volumes together in a RAID 0 configuration to use the available bandwidth for these instances. 
+
+RAID 0 is used to increase performance. It will make reliability worse.
+
+* It stripes the data across all the drives. 
+* Prevent loss of all data by doing backups.
+
+All RAID is accomplished at the software level. For greater I/O performance than you can achieve with a single volume, RAID 0 can stripe multiple volumes together.
+
+for on-instance redundancy, RAID 1 can mirror two volumes together, so if you lost one drive, you will still retain the data. 
+
+More info in this [YouTube video](https://youtu.be/eE7Bfw9lFfs)
+
+### HVM AMIs
+
+Take note that HVM AMIs are required to take advantage of enhanced networking and GPU processing. In order to pass through instructions to specialized network and GPU devices, the OS needs to be able to have access to the native hardware platform which the HVM virtualization provides.
 
 # Non Relational Databases
 
@@ -312,6 +372,24 @@ Strongly Consistent Reads:
 * Example:
   * An app writes to a DynamoDB table. You want to read the data in <= 1 second.
 * Returns a result that reflects all writes that received a successful response prior to the read.
+
+### How to Improve Performance
+
+**Goal**: Distribute workload evenly and use the provisioned throughput efficiently.
+
+**Solution**: Use partition keys with high-cardinality attributes, which have a large number of distinct values for each item. 
+
+**Explanation**: See this great blog post on AWS about [Partition Keys](https://aws.amazon.com/blogs/database/choosing-the-right-dynamodb-partition-key/)
+
+DynamoDB evenly distributes provisioned throughput but only up to a limit. Reading or writing above the limit can be caused by these issues:
+
+* Uneven distribution of data due to the wrong choice of partition key
+* Frequent access of the same key in a partition (the most popular item, also known as a hot key)
+* A request rate greater than the provisioned throughput
+
+To avoid request throttling, design your DynamoDB table with the right partition key to meet your access requirements and provide even distribution of data.
+
+**Warning**: Don't mix up partition key with partition group, regarding EC2 instances and placement types!
 
 # Data Warehousing
 
@@ -665,6 +743,10 @@ Choose this one if you *also* need:
 * *multiple AZs*
 * persistence
 * *backup / restore capabilities*
+
+If you need to authenticate users to allow only certain engineers into the ElastiCache cluster so they can execute Redis commands, use **Redis AUTH**.
+
+* Redis AUTH command can improve data security by requiring the user to enter a password before they are granted permission to execute Redis commands on a password-protected Redis server.
 
 # Authentication
 

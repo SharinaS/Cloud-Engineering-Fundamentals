@@ -124,7 +124,7 @@ P3 - Pics, graphics/general purpose GPU
 
 X1 - Extreme memory optimization
 
-Z1D - Exteme memory and CPU (high compute capacity and high memory footprint)
+Z1D - Extreme memory and CPU (high compute capacity and high memory footprint)
 
 A1 - Arm-based workloads (scale out workloads)
 
@@ -132,20 +132,39 @@ U-6tb1 - Bare Metal
 
 # Types of Placement Groups
 
+--> See also my notes called ec2_placement.md <--
+
+Three types:
+
+* Cluster 
+* Partition
+* Spread
+
 No charge for creating a placement group.
+
+The name you use for a placement group must be unique within your AWS account. 
+
+
 
 ## Cluster
 
 Instances are tightly grouped within a single AZ.
 
+The only type that can't span multiple AZs.
+
 Ideal for:
 
 * high-performance computing apps
   * they need low-latency network performance
+  * and high network throughput
+
+Essentially a grouping of the instances very very close to each other.
 
 ## Partition
 
 Instances are partitioned into groups so one partition doesn't share underlying hardware with another partition.
+
+Very similar to spread placement groups, but you can have multiple EC2 instances within a partition.
 
 Each partition has its own set of racks to supply its network and power source. 
 
@@ -161,12 +180,21 @@ Great for large distributed and replicated workloads
 
 A small group of instances is placed across distinct underlying hardware.
 
+Opposite from cluster.
+
 Used to reduce correlated failures.
+
+For apps with a small number of crtical instances that should be kept separate from each other. 
+
+You can have spread splacement groups inside different AZs, within one region.
+
+Think of individual instances. Each one is completely isolated from another instance. If one rack fails, with an instance per rack, the other instances won't be affected. Designed to protect instances from hardware failure. 
 
 ----------------
 ----------------
 
 # Provision an EC2 Instance 
+
 ...Using EC2's Amazon Linux 2 AMI 
 
 ![image of ec2 instance](/assets/ec2Instance.png)
@@ -357,10 +385,13 @@ Volumes will *always be in the same availability zone* as the EC2 instance.
 
 You can *move an EC2 instance from one AZ to another* by taking a snapshot of it, creating an AMI from the snapshot, and then using the AMI to launch the EC2 instance in a new AZ.
 
-You can *move an EC2 instance from one region to another* by taking a snapshot of it, creating an AMI from the snapshot, copying the AMI from one region to another, then using the copied AMI to launch the EC2 instance in the new region. 
+You can *move an EC2 instance from one region to another* by taking a snapshot of it, creating an AMI from the snapshot, copying the AMI from one region to another, then using the copied AMI to launch the EC2 instance in the new region.
 
+See more in section [How to copy an AMI](#Copy-and-Move)
 
 ## EBS Types
+
+You can change EBS volume sizes on the fly, including size and storage type.
 
 * General
 * Provisioned
@@ -368,26 +399,36 @@ You can *move an EC2 instance from one region to another* by taking a snapshot o
 * Cold Hard
 * Magnetic
 
-You can change EBS volume sizes on the fly, including size and storage type.
+Note that some EBS are SSD and some are HDD.
+
+| SSD | HDD |
+|-----|-----|
+|deliver consistent performance whether an I/O operation is **random or sequential**| deliver optimal performance only when I/O operations are **large and sequential**|
+|great for transactional workloads | great for large, streaming workloads |
+| moderate/high cost | low cost|
+
+
 
 ### General Purpose (SSD)
 
 * API Name: gp2
 * For wide variety of work loads, up to 16,000 IPS/volume
+* can handle small, random I/O operations
 
 ### Provisioned IPS (SSD)
 
 * API Name: io1
 * Highest performance SSD volume
 * Designed for mission critical 
-* Great for databases
+* Great for **databases**
 * Max IOPS is 64,000
 
 ### Throughput Optimised Hard Disk Drive (HDD)
 
 * API Name: st1
-* For big data and data warehousing
+* For **big data** and data warehousing
 * 500 IOPS per volume
+* suitable for workloads with large, sequential I/O operations
 
 ### Cold Hard Disk Drive 
 
@@ -396,6 +437,7 @@ You can change EBS volume sizes on the fly, including size and storage type.
 * Lowest cost
 * Designed for less frequently accessed work loads, like file servers
 * IOPS is 250.
+* suitable for workloads with large, sequential I/O operations
 
 ### EBS Magnetic
 
@@ -418,7 +460,6 @@ The point-in-time snapshot is created immediately, but the status of the snapsho
 
 having multiple pending snapshots of a volume may result in reduced volume performance until the snapshots complete.
 
-
 ## Deletion of Volumes
 
 After termination of an instance, the EBS volume will be automatically removed too, since delete on termination is automatically checked... since it's a root device volume. 
@@ -429,7 +470,10 @@ So, when you terminate an EC2 instance, by default the root device volume will b
 
 Additional volumes, attached to that EC2 instance, however, will *continue to persist.* You will have to manually click the radio buttons of each of the volumes, and click "Actions > Delete Volumes."
 
-## Modify Volumes, Make a SnapShot, Move regions / AZs
+## Copy and Move
+
+Modify Volumes, Make a SnapShot, Move regions / AZs
+
 ### Example: Instance with multiple EBS volumes added
 Amazon Linux AMI --> T2.micro instance
 
@@ -449,7 +493,7 @@ Configure Security Group:
 
 Review and launch. 
 
-Can modify a volume
+#### Can modify a volume
 
 * Click on volume's radio button, and up in Actions, click "Modify Volume." 
 * You can go in and change the size. 
@@ -457,9 +501,10 @@ Can modify a volume
 * You can go in and change the type
   * change the gp2 type to Provisioned IOPS SSD (io1)
 * It can change some time for the changes to take effect. May also need to extend the OS file system on the volume - you run a command to repartition the drive to see the full 1000 gigs (in sys ops course).
-* Note that you don't have to stop an instance to change things about volumes!
 
-**Move an instance and a volume from one availability zone to another:**
+Note that you don't have to stop an instance to change things about volumes!
+
+#### Move an instance and a volume from one availability zone to another
 
 -----
 
@@ -473,11 +518,16 @@ Create a snapshot --> turn the snapshot into an AMI --> Use the AMI to launch in
 * Go to "Snapshots" on the left, to see the newly created snapshot. 
 * Click on the snapshot's radio button, then "Actions > Create Image"
 * Give the image a name, and leave everything else as default
-  * Note there are two types of virtualization types in AWS - paravirtual (PV) or hardware virtual machine (HVM) - so you can choose which one. Make sure it's on HVM if you want to have many more instance types to launch from, later on.
+
+----------------
+
+Note there are two types of virtualization types in AWS - paravirtual (PV) or hardware virtual machine (HVM) - so you can choose which one. Make sure it's on HVM if you want to have many more instance types to launch from, later on.
+
+-----------
 
 Hit "Create"
 
-Once the image has been created, we can use that image to provision new EC2 instances. 
+> Once the image has been created, we can use that image to provision new EC2 instances. 
 
 On the left, go to "Images > AMIs" to view the newly created image, and click "Launch." 
 
@@ -485,7 +535,7 @@ Note how many EC2 instances are available, but you can just choose the t2.micro
 
 Click button, Configure Instance Details"
 
-Can now choose to launch it into a *completely different subnet* / Availability Zone.
+> Can now choose to launch it into a *completely different subnet* / Availability Zone.
 
 Click "Add Storage," where you have a Root volume. In this example, we're not adding more storage, so click "Next: Add Tags." 
 
@@ -493,7 +543,7 @@ In Configure Security Group, we use an existing security group, which has HTTP (
 
 Launch!
 
-**Can also copy the AMI into different regions** 
+#### Can also copy the AMI into different regions 
 
 > This lets us move across availability zones and/or across regions! The difference here is that we're copying the AMI from one region to another. Once the AMI is in a new region, we can choose whatever AZ that we wish. 
 
@@ -502,14 +552,16 @@ In the list of AMIs, with the AMI's radio button clicked, go up to "Actions > Co
 A window will pop up, and you can move the Amazon Machine Image from the existing region
 * Choose a destination region
 
-We can now use this image to launch our ec2 instances to the new destination region. 
+> We can now use this image to launch our ec2 instances to the new destination region. 
 
 # AMI Types
 
-An Amazon Machine Image (AMI) is a template that contains a software configuration (for example, an operating system, an application server, and applications). This pre-configured template save time and avoid errors when configuring settings to create new instances. You specify an AMI when you launch an instance, and you can launch as many instances from the AMI as you need. You can also launch instances from as many different AMIs as you need.
+An Amazon Machine Image (AMI) is a template that contains a software configuration (for example, an operating system, an application server, and applications). This pre-configured template save time and avoid errors when configuring settings to create new instances. 
+
+> You specify an AMI when you launch an instance, and you can launch as many instances from the AMI as you need. You can also launch instances from as many different AMIs as you need.
 
 * = you can create as many virtual servers as you need from a single template 
-* in contrast, an EBS snapshot is a point-in-time copy of your EBS volume)
+* in contrast, an EBS snapshot is a point-in-time copy of your EBS volume
 
 There are two different types of AMIs:
 
@@ -518,7 +570,7 @@ There are two different types of AMIs:
 
 When you select your AMI, you can select it based on:
 
-* Region (see Regions and AZs)
+* Region (see more in section [AZs and Regions](#AZs-and-Regions))
 * Operating System
 * Architecture (32-bit vs 64-bit)
 * Launch permissions

@@ -1,5 +1,9 @@
 # DNS
+
+See my notes when I set up Route 53 for my app, Music Central - scroll down in [the readme](https://github.com/SharinaS/music-central/blob/master/README.md).
+
 ## General Info About DNS
+
 DNS is on port 53, so that's where Route53 comes from. 
 
 Must understand dns back to front as a solutions architect. 
@@ -7,6 +11,7 @@ Must understand dns back to front as a solutions architect.
 DNS is like a phonebook. 
 
 DNS is a tree with 13 nameservers at the top. 
+
 * top level is the .com --> aws which maintains the records for the domain --> aws domain server provides the internal aws server --> www.1strategy.com is this ip address.
 
 > DNS is used to convert human friendly domain names into an internet protocol (IP). ie, catsareawesome.com --> http//82.124.91.1 <-- IPv4 address

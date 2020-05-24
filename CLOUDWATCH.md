@@ -1,3 +1,13 @@
+# CloudWatch
+
+## Index (in the works)
+
+[CloudWatch & EC2](#CloudWatch-&-EC2)
+
+[CloudWatch & Databases](#CloudWatch-&-Databases) 
+
+[Do Things with CloudWatch](#Do-Things-with-CloudWatch)
+
 # About CloudWatch
 
 A monitoring service for:
@@ -89,10 +99,19 @@ While CloudWatch is about *performance*, CloudTrail is about *auditing*.
 
 * "What's the performance of the EC2 instance?" <-- think CloudWatch
 
+# CloudWatch & Databases
+
+## RDS 
+
+you can use CloudWatch to monitor the CPU Utilization of your database instance, but it does not provide the percentage of the CPU bandwidth and total memory consumed by each database process in your RDS instance.
+
+* Use RDS Enhanced Monitoring instead. See more in [the databases file](https://github.com/SharinaS/Cloud-Engineering-Fundamentals/blob/master/databases.md)
+
+
 ---------
 ---------
 
-# Do Cool Things with CloudWatch
+# Do Things with CloudWatch
 
 ### Make the instance with CloudWatch turned on:
 Launch a new instance. Amazon Linux 2 AMI, t2.micro. 

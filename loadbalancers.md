@@ -1,4 +1,6 @@
-# About LoadBalancers
+# LoadBalancer
+
+## About LoadBalancers
 A physical or virtual device that helps you balance the load across web servers. Can also be used for applications. It doesn't need to be internet facing, though usually they are. 
 
 Instances monitored are reported as either:

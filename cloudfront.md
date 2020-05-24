@@ -1,5 +1,8 @@
 # CloudFront
 
+## Index (in the works)
+
+
 
 # About
 A Content Delivery Network (CDN) 
@@ -20,13 +23,42 @@ CloudFront can speed up the delivery of your static content (for example, images
 
 The Amazon CloudFront CDN offers multiple options for streaming your media – both pre-recorded files and live events – at sustained, high throughput required for 4K delivery to global viewers.
 
-## Security.
+# Security
 
 CloudFront integrates seamlessly with AWS Shield for Layer 3/4 DDoS mitigation and AWS WAF for Layer 7 protection.
 
-## Customizable content delivery with Lambda@Edge.
+# Lambda@Edge
+
+Customizable content delivery.
 
 Lambda@Edge is a feature of Amazon CloudFront that lets you run code closer to users of your application, which improves performance and reduces latency.
+
+## Functions Run Responsively to Events
+
+Lambda@Edge lets you run Lambda functions to customize the content that CloudFront delivers, executing the functions in AWS locations closer to the viewer. The functions run in response to CloudFront events, without provisioning or managing servers. 
+
+You can use Lambda functions to change CloudFront requests and responses at the following points:
+
+- After CloudFront receives a request from a viewer (viewer request)
+
+- Before CloudFront forwards the request to the origin (origin request)
+
+- After CloudFront receives the response from the origin (origin response)
+
+- Before CloudFront forwards the response to the viewer (viewer response)
+
+## Quicker Authentication
+
+you can use Lambda@Edge to allow your Lambda functions to customize the content that CloudFront delivers and to execute the authentication process in AWS locations closer to the users. 
+
+
+## Origin Failover for Performance Issues
+
+In addition, you can set up an origin failover by creating an **origin group** with two origins, with one as the primary origin and the other as the second origin which CloudFront automatically switches to when the primary origin fails. 
+
+This will alleviate occasional **HTTP 504 errors** users may experience.
+
+Much cheaper than if you use multiple regions and Route53, for example, if you deploy your application to multiple AWS regions to accommodate your users around the world, and if you also set up a Route 53 record with latency routing policy to route incoming traffic to the region that provides the best latency to the user.
 
 # Definitions
 
@@ -72,14 +104,16 @@ CloudFront signed URLs and signed cookies provide the same basic functionality: 
 ## Use signed URLs for the following cases:
 
 - You want to use an RTMP distribution. Signed cookies aren't supported for RTMP distributions.
+  * RTMP distributions stream media files using Adobe Media Server and the Adobe Real-Time Messaging Protocol (RTMP)
 
-- You want to restrict access to individual files, for example, an installation download for your application.
+- You want to restrict access to **individual files**, for example, an installation download for your application.
 
 - Your users are using a client (for example, a custom HTTP client) that doesn't support cookies.
 
 ## Use signed cookies for the following cases:
 
-- You want to provide access to multiple restricted files, for example, all of the files for a video in HLS format or all of the files in the subscribers' area of a website.
+- You want to provide access to **multiple restricted files**, for example, all of the files for a video in HLS format or all of the files in the subscribers' area of a website.
+  * HTTP Live Streaming (also known as HLS) is an HTTP-based adaptive bitrate streaming communications protocol (see more on [wikipedia](https://en.wikipedia.org/wiki/HTTP_Live_Streaming))
 
 - You don't want to change your current URLs.
 
