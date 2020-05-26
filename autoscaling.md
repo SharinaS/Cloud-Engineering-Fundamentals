@@ -4,6 +4,8 @@
 
 [Order of Termination](#Order-of-Termination)
 
+[Services that Scale Automatically](#Services-that-Scale-Automatically)
+
 # Three Components to Auto Scaling
 
 ## (1) Groups
@@ -93,8 +95,6 @@ The default termination policy is designed to help ensure that your network arch
 
 -- *AWS AWS Certified Solutions Architect Associate Practice Tests*
 
-----------
-----------
 
 # Make One - with the AWS Console
 ## Make a Configuration
@@ -161,7 +161,13 @@ If you max out the CPU, it will scale up the instance numbers to keep up with th
 
 Check the Activity History inside the Auto Scaling group to see the termination and launching of instances.
 
------------
+# Services that Scale Automatically
+
+Amazon S3 and Amazon EFS are storage services that scale automatically in storage capacity without any intervention to meet increased demand.
+
+Also, AWS Lambda dynamically scales function execution in response to increased traffic.
+
+(EMR *does not* not scale automatically.*
 
 # Resources
 * [AWS' What is Amazon EC2 Auto Scaling?](https://docs.aws.amazon.com/autoscaling/ec2/userguide/what-is-amazon-ec2-auto-scaling.html)

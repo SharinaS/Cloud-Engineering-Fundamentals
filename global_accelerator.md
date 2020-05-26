@@ -1,4 +1,5 @@
 # Global Accelerator
+
 A service in which you create accelerators to improve availability and performance of your app for local and global users. Global Accelerator directs traffic to optimal endpoints over the AWS global (backbone) network. Much more efficient. 
 
 GA gives you *two static IP addresses* that you associate with your accelerator. You can also bring your own IP addresses. 

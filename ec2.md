@@ -18,13 +18,19 @@
   * Allows for quickly scaling capacity as computing requirements change
 * EC2 is a compute based service; it's not serverless (it's a virtual server in the cloud). 
 
-## Termination
+# Scaling
+
+Amazon EC2 does scale automatically, *but first* you have to create an Auto Scaling system by creating a launch configuration, an auto scaling group, and determine the desired, minimum and maximum number of instances to provision.
+
+EBS definitely does not scale automatically.
+
+# Termination
 
 Termination protection is turned off by default, so you must turn it on if you want it. 
 
 The EBS-backed instance has a default action for the root EBS volume to be deleted when the instance is terminated, however non-root volumes will not be deleted.
 
-## Hibernation
+# Hibernation
 
 When you hibernate an instance, we signal the operating system to perform hibernation (suspend-to-disk). Hibernation saves the contents from the instance memory (RAM) to your Amazon EBS root volume. We persist the instance's Amazon EBS root volume and any attached Amazon EBS data volumes. When you start your instance:
 
@@ -45,13 +51,14 @@ Problem:  A solutions architect wants to design a solution to save costs for Ama
 Solution: Run the applications on instances enabled for hibernation. Hibernate the instances before the shutdown. 
 
 
-## Encryption
+# Encryption
 
 EBS Root volumes of your default AMI can be encrypted
-  * You can also use a third party tool (bit locker, etc) to encrypt the root volume, or this can be done when creating AMI's in the AWS console or using the API.
-* Added volumtes can be encrypted. 
 
-## Architecture Note 
+* You can also use a third party tool (bit locker, etc) to encrypt the root volume, or this can be done when creating AMI's in the AWS console or using the API.
+* Added volumes can be encrypted. 
+
+# Architecture Note 
 
 In case of failure, for production website, have at least two EC2 instances running in two separate availability zones. 
 
@@ -82,17 +89,22 @@ Per-second EC2 billing is available for instances launched in:
 
 ## Reserved
 
-* Provides a "capacity reservation"
-* 1 or 3 years term contracts
-* The more you pay upfront, the more you save - significant discount.
-* Good for apps with *steady state or predictable usage*, or for apps that require reserve capacity.
+Up to 75% off the on-demand price!
+
+Provides a "capacity reservation"
+
+Downside: Pay for a year!! 1-year or 3-year term contracts
+
+The more you pay upfront, the more you save - significant discount.
+
+Good for apps with *steady state or predictable usage*, or for apps that require reserve capacity.
 
 ### Reserved has 3  types of pricing
 
 * NURI - No upfront
   * No upfront payment is required. You are billed a discounted hourly rate  for every hour within the term, regardless of whether the Reserved Instance is being used. No Upfront Reserved Instances are based on a contractual obligation to pay monthly for the entire term of the reservation. A successful billing history is required before you can purchase No Upfront Reserved Instances.
 * PURI - Partial upfront
-  *  A portion of the cost must be paid up front and the remaining hours in the term are billed at a discounted hourly rate, regardless of whether you’re using the Reserved Instance.
+  * A portion of the cost must be paid up front and the remaining hours in the term are billed at a discounted hourly rate, regardless of whether you’re using the Reserved Instance.
 * AURI - All upfront
   * With the All Upfront option, you pay for the entire Reserved Instance term with one upfront payment. This option provides you with the largest discount compared to On-Demand instance pricing.
   * With AURI, there's nothing to pay monthly.
@@ -108,17 +120,29 @@ Per-second EC2 billing is available for instances launched in:
 
 ## Spot
 
+Up to 90% off the On-Demand price!
+
 * bid a price you want to pay; when the price hits the value you bid for, you get your instance. 
 * Amazon drops the price for an EC2 instance when they have excess capacity so people will use the capacity. So, the price moves around. 
 * Essentially Amazon is selling off its excess capacity at a certain rate --> supply and demand pricing.
 * Great for apps that are only feasible at very low compute prices and that have flexible start/stop times, and for users with urgent computing needs for large amounts of additional capacity.  
 * If it's terminated by AWS, you won't pay for the rest of the hour (unlike other instances, where you pay for the full hour if you terminate prior to the hour being up)
 
-## Dedicated hosts
+## Dedicated
 
-* **Physical** server(s)
-* For license terms/conditions requirements - sometimes there are requirements that may not support multi-tenant virtualization.
-* Can be purchased on-demand (hourly) and 70% off the on-demand price. 
+### Dedicated Instance
+
+Dedicated Instances are Amazon EC2 instances that run in a virtual private cloud (VPC) on hardware that's dedicated to a single customer. Dedicated Instances that belong to different AWS accounts are physically isolated at the hardware level. In addition, Dedicated Instances that belong to AWS accounts that are linked to a single payer account are also physically isolated at the hardware level.
+
+### Dedicated Host
+
+A physical server that's dedicated for your use. With a Dedicated Host, you have visibility and control over how instances are placed on the server.
+
+An Amazon EC2 Dedicated Host is a physical server with EC2 instance capacity fully dedicated to your use. Dedicated Hosts allow you to use your existing per-socket, per-core, or per-VM software licenses, including Windows Server, Microsoft SQL Server, SUSE, and Linux Enterprise Server.
+
+For license terms/conditions requirements - sometimes there are requirements that may not support multi-tenant virtualization. Dedicated Hosts allow you to use your existing per-socket, per-core, or per-VM software licenses, unlike Dedicated Instances.
+
+Can be purchased on-demand (hourly) and 70% off the on-demand price. 
 
 # Instance Types
 
@@ -258,18 +282,35 @@ Then click "Next: Configure Security Group."
 
 > Note that a security group is a virtual firewall (which enables the computer to communicate via its different ports) in the cloud, so you can specify if it's open to the entire world, or only to "My IP" (only you can SSH into the webserver). For web traffic, though, you want to set it up so it can respond to web requests.
 
-Remember:
+Rule changes on a security group will take place immediately
 
-* Rule changes on a security group will take place immediately
-* Security Grups are stateful
-  * When you create an inbound rule, an outbound rule is automatically created (when you come in, you're allowed out)
-  * In contrast, a network ACL is stateless, where you have to create an outbound rule intentionally.
-* Note you cannot block an individual port, or a particular IP address (you have to Network ACLs), as in you cannot create deny rules.
-* In a security group, all inbound traffic is blocked by default - you have to go in and manually allow traffic in, such as SSH or HTTP, or MS SQL
-* All outbound traffic is allowed (because security groups are stateful)
-  * In contrast, when you create a new security group all inbound traffic *is not* allowed by default.
-* You can attach mutiple security groups to one instance (so, one security group can interact with certain ports).
-* You can have any number of EC2 instances within a security group.
+### Security Groups are stateful
+
+When you create an inbound rule, an outbound rule is automatically created **when you come in, you're allowed out**.
+
+If you send a request from your instance, the response traffic for that request is allowed to flow in regardless of inbound security group rules. Responses to allowed inbound traffic are allowed to flow out, regardless of outbound rules.
+
+In contrast, a network access control list (ACL) is stateless, where you have to create an outbound rule intentionally.
+
+### Not for Specific Ports / IP Addresses
+
+Note you cannot block an individual port, or a particular IP address, as in you cannot create deny rules.
+
+Use Network ACLs to do this instead!!
+
+### Inbound Blocked by Default
+
+In a security group, all inbound traffic is blocked by default - you have to go in and manually allow traffic in, such as SSH or HTTP, or MS SQL
+
+All outbound traffic is allowed (because security groups are stateful)
+  
+### Many Security Groups to Many Servers
+
+You can attach mutiple security groups to one instance (so, one security group can interact with certain ports).
+
+You can have any number of EC2 instances within a security group.
+
+## Configure a Security Group
 
 To "Configure Security Group," (a virtual firewall) make sure "Create a new security group" is chosen (radio button up top) 
 
@@ -282,7 +323,7 @@ Then, "Add Rule," and choose Type "HTTP." For Source, choose "Custom," so it too
 Hit "Review and Launch."
 
 
-## Launch
+### Launch
 
 In "Step 7," hit "Launch." In the box that appears, "Select an existing key pair or create a new key pair," change the dropdown to read "Create a new key pair" and give the private key pair a name. Then click "Download Key Pair" into a safe location, and Launch Instance."
 
@@ -295,7 +336,7 @@ When you select an instance, it will reveal details about that instance, includi
 ![image of part of instance description](/assets/ec2InstanceInfo.png)
 
 
-### Status Checks
+## Status Checks
 This is a tab that appears when you click on the instance's radio button. 
 
 There's a system status check, which checks the underlying hypervisor, or the underlying machine. 
@@ -303,10 +344,12 @@ There's a system status check, which checks the underlying hypervisor, or the un
 
 There's an instance status check which checks the instance itself.
 
-### Monitoring
+## Monitoring
+
 Involves CloudWatch analysis. 
 
 # SSH into the Public Instance
+
 ### Via the Console:
 
 Make sure your instance's radio button is clicked. 
@@ -393,11 +436,12 @@ EBS = Elastic Block Storage
 
 (When creating an instance on the console, this is "Step 4: Add Storage")
 
-
 Essentially, EBS is a virtual hard disk drive in the cloud (used by EC2). Every server has a disk.
 
 * **One EBS Volume can be attached to one EC2 instance** at a time, hence, no other EC2 instance can connect to that EBS Provisioned IOPS Volume.
 * EBS provides persistent block storage volumes for EC2 instances.
+
+Databases and dynamic websites require block-level storage (such as EBS).
 
 ## AZs and Regions
 
@@ -496,9 +540,31 @@ Additional volumes, attached to that EC2 instance, however, will *continue to pe
 
 ## Copy and Move
 
-Modify Volumes, Make a SnapShot, Move regions / AZs
+Amazon EBS Snapshots are just backups for EBS volumes.
 
-### Example: Instance with multiple EBS volumes added
+(They are not what you need when you need identical configurations of an EC2 instance, by the way)
+
+You can back up the data on your Amazon EBS volumes to Amazon S3 by taking point-in-time snapshots. Snapshots are incremental backups, which means that only the blocks on the device that have changed after your most recent snapshot are saved. 
+
+#### Copy to another region
+
+You can copy EBS Snapshots from one AWS Region to another. 
+
+Here are some of the more common use cases:
+
+* Geographic Expansion – You want to be able to launch your application in a new Region.
+* Migration – You want to be able to migrate your application from one Region to another. 
+* Disaster Recovery – You want to back up your data and your log files across different geographical locations at regular intervals to minimize data loss and recovery time.
+
+EBS Snapshot Copy simplifies each of these use cases by simplifying the copy process.
+
+You can initiate multiple Snapshot Copy commands simultaneously either by selecting and copying multiple Snapshots to the same region, or by copying a snapshot to multiple regions in parallel.  The in-progress copies do not affect the performance of the associated EBS Volumes.
+
+
+
+### Demo in the Console --
+
+Instance with multiple EBS volumes added
 Amazon Linux AMI --> T2.micro instance
 
 Everything left as default in the Configure instance details. 
@@ -587,12 +653,18 @@ An Amazon Machine Image (AMI) is a template that contains a software configurati
 * = you can create as many virtual servers as you need from a single template 
 * in contrast, an EBS snapshot is a point-in-time copy of your EBS volume
 
-There are two different types of AMIs:
+## Can Create an AMI from an Old Instance 
+
+After workload increases, the customer decides to provision another EC2 instance with an identical configuration. How can the customer achieve this? Create an AMI from the old instance and launch a new instance from it!
+
+Reason for this is for when someone puts a lot of work onfiguring the original EC2 instance, and wants to continue using their work.
+
+## There are two different types of AMIs:
 
 * EBS (Elastic Block Store)
 * Instance Store
 
-When you select your AMI, you can select it based on:
+## When you select your AMI, you can select it based on:
 
 * Region (see more in section [AZs and Regions](#AZs-and-Regions))
 * Operating System

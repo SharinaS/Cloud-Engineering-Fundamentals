@@ -170,6 +170,14 @@ Hosted Zone is a key-value DB, which maps a domain name to an IP address.
 
 It's a container for records, and contains info about how traffic should be routed for a specific domain (bar.com) and its subdomains (foo.bar.com).
 
+# Route 53
+
+Amazon Route 53 is used to register domain names or use your own domain name to route your end users to Internet applications. 
+
+Amazon Route 53 can be used for registering domain names, routing end users to Internet applications, configuring DNS health checks to route traffic to healthy endpoints, managing traffic globally through a variety of routing types etc.
+
+Route 53 is not responsible for creating SSL certifications.
+
 # Routing Policies Available with Route53
 
 ## Simple Routing Policy
@@ -238,6 +246,7 @@ European customer does a DNS request --> Route53 routes the traffic to eu-west-1
 [Set up Geolocation Routing in the Console](#Set-up-Geolocation-Routing)
 
 ## Geoproximity Routing (Traffic Flow Only)
+
 Route53 traffic routes traffic to your resources based on the geographic location of your users *and* your resources. 
 * Based on *latitude and longitude*.
 
@@ -261,7 +270,6 @@ User connects into Route53 --> traffic sent to the first route, unless it is com
 
 [See below for more](#Set-up-Multivalue-Answer-Policy)
 
--------
 # Do the Things
 
 ## Register a Domain Name
@@ -465,8 +473,6 @@ Do this for your other Instances. You'll be able to associate each instance with
 * [AWS docs: routing policies ](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/routing-policy.html)
 
 
-
-------------
 
 # Certificates Manager
 

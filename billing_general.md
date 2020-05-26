@@ -1,8 +1,5 @@
 # Billing
 
-## Index (in the works)
-
-
 
 # About AWS Billing
 
@@ -30,45 +27,31 @@ Data *outbound*
 
 * data-in is (nearly?) always free-of-charge
 
-# Free Services 
+# Avoid Extra Charges by Deleting Certain Things
 
-CloudFormation 
+Once the user's work is completed she should:
 
-* underling provisioned resources incur costs
+1- Delete all Elastic Load Balancers.
 
-Elastic Beanstalk 
+2- Terminate all unused EC2 instances.
 
-* underling provisioned resources may incur costs though)
+3- Delete the attached EBS volumes that he doesn’t need.
 
-VPC
+4- Release any unused Elastic IPs.
 
-Auto-scaling 
+## Becareful of Auto-Restarts
 
-* EC2 instances it provisions incur costs
+Some services automatically restart resources after terminating them without notifying you, and as a result, you get unexpected charges on your bill.
 
-IAM
+Examples of these services:
 
-Opsworks 
+1- Elastic Beanstalk:
 
-* Similar to Elastic beanstalk
-* underling provisioned resources may incur costs though
+Elastic Beanstalk is designed to ensure that all the resources that you need are running, which means that it automatically relaunches any service that you stop. If you need to permanently delete those resources you must terminate your Elastic Beanstalk environment before you terminate resources that Elastic Beanstalk has created.
 
-Consolidated Billing
+2- AWS OpsWorks:
 
-## Free Tier
-
-12 months free up to a certain limit for:
-
-* EC2
-* S3
-* RDS
-* CloudFront
-
-Available for everyone - free tier up to a certain limit:
-
-* DynamoDB
-* Glacier
-* Lambda
+If you use the AWS OpsWorks environment to create AWS resources, you must use AWS OpsWorks to terminate those resources or AWS OpsWorks will restart them. For example, if you use AWS OpsWorks to create an Amazon EC2 instance, but then stop it by using the Amazon EC2 console, the AWS OpsWorks auto-healing feature categorizes the instance as failed and restarts it.
 
 # Billing
 The following includes services and the factors that lead to an increased bill for each service.
@@ -299,48 +282,7 @@ Deployed into an Organizations account. Lets folks set up multi-account environm
 
 Contrast with: QuickStart - lets you deploy environments quickly using pre-built CF templates.
 
-# Calculators
 
-A huge part of the Cloud Practitioner exam
 
-Two types:
 
-## Simple Monthly Calculator (hosted on S3)
 
-* Lets you build out your own environment and helps you estimate the cost.
-* Monthly cost
-* A no-frills calculator, kinda reminiscent of if CraigsList had a calculator ....
-
-## Total Cost of Ownership Calculator (TCO)
-
-* Compares costs between if you do something on premises versus the cost of putting your business on AWS
-* You versus AWS services
-* AKA TCO calculator
-* Pretty graphs and tables of values, with a report your can download (You could save 69% a year by moving infrastructure to AWS.... )
-* Evaluates:
-  * Server costs
-  * Storage costs
-  * Network costs
-  * IT Labor costs
-
-The AWS TCO tool at minimum only needs to ask you about server and storage configuration details
-
-* may be phrased as how many "on-premises virtual machines" there are.
-
-# AWS Budgets
-
-AWS Budgets gives you the ability to set custom budgets that alert you when your costs or usage exceed (or are forecasted to exceed) your budgeted amount.
-
-Budgets can be tracked at the monthly, quarterly, or yearly level, and you can customize the start and end dates. You can further refine your budget to track costs associated with multiple dimensions, such as AWS service, linked account, tag, and others. Budget alerts can be sent via email and/or Amazon Simple Notification Service (SNS) topic.
-
-You can also use AWS Budgets to set a custom reservation utilization target and receive alerts when your utilization drops below the threshold you define. RI utilization alerts support Amazon EC2, Amazon RDS, Amazon Redshift, and Amazon ElastiCache reservations.
-
-Budgets can be created and tracked from the AWS Budgets dashboard or via the Budgets API.
-
---Udemy AWS Certified Solutions Architect Associate Practice Tests 
-
-# Cost Explorer
-
- helps you visualize and manage your AWS costs and usages over time. It offers a set of reports you can view data with for up to the last 13 months, forecast how much you're likely to spend for the next three months. You use Cost Explorer to identify areas that need further inquiry and see trends to understand your costs.
-
-* get recommendations for what Reserved Instances to purchase.
