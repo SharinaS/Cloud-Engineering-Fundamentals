@@ -59,6 +59,14 @@ When running a DB on an EC2 instance, use EBS for storage.
 
 Relational databases have been around since the '70s.
 
+## Benefits to RDS
+
+Amazon Relational Database Service (Amazon RDS) makes it easy to set up, operate, and scale a relational database in the cloud. It provides cost-efficient and resizable Compute (and\or Storage) capacity while automating time-consuming administration tasks such as hardware provisioning, operating system maintenance, database setup, patching and backups. It frees you to focus on your applications so you can give them the fast performance, high availability, security and compatibility they need.
+
+Choose RDS because of its resizable compute capacity and its lower administrative burden.
+
+## Nature of the Queries
+
 RDS uses online transaction processing - [OLTP](#OLTP-vs-OLAP).
 
 ## RDS runs on virtual machines
@@ -93,12 +101,32 @@ There are relational databases, and then there is the service called RDS.
 * Aurora
 * MariaDB
 
+## RDS Scales Up and/or Out
+
+You can scale vertically to address the growing demands of an application that uses a roughly equal number of reads and writes. Or you can scale horizontally for read-heavy applications.
+
+> Note that the only RDS database that can scale instances **automatically** is Amazon Aurora. All others require **manual scaling**.
+
+### Scale Vertically
+
+To handle a higher load in your database, you can vertically scale up your master database.  The wide selection of instance types allows you to choose the best resource and cost for your database server. 
+
+There is minimal downtime when you are scaling up on a Multi-AZ environment because the standby database gets upgraded first, then a failover will occur to the newly sized database. 
+
+A Single-AZ instance will be unavailable during the scale operation.
+
+### Scale Horizontally
+
+You can also improve the performance of a read-heavy database by using read replicas to horizontally scale your database. 
+
+Read replicas are not a replacement for the high availability and automatic failover capabilities that Multi-AZ provides.
+
 ## Two Features of RDS
 
 * Multi-AZ
 * Read Replicas
 
-### (1) Multi AZ
+## (1) Multi AZ
 
 For *disaster recovery* (not for improving performance).
 
@@ -126,28 +154,39 @@ Failover:
 * If the primary DB fails, the DNS address will automatically point to the secondary DB.
 * *You can force a failover from one AZ to another by using "Reboot" of the RDS instance.*
 
-
-### (2) Read Replicas
+## (2) Read Replicas
 
 You must have *automatic backups* turned *on* in order to deploy a read replica.
 
 > For performance. *For scaling*. For security.... NOT for disaster recovery. 
 
-Regarding Security:
+#### How It Works
 
-* **public key encryption** is used when RDS sets up communication between read replicas and the source DB instance.
+When you create a read replica, you first specify an existing DB instance as the source. Then Amazon RDS takes a snapshot of the source instance and creates a read-only instance from the snapshot. 
+
+Amazon RDS then uses the asynchronous replication method for the DB engine to update the read replica whenever there is a change to the source DB instance. The read replica operates as a DB instance that allows only read-only connections. Applications connect to a read replica the same way they do to any DB instance. Amazon RDS replicates all databases in the source DB instance.
+
+#### Reduce the load and increase elasticity
+
+You can reduce the load on your source DB instance by routing read queries from your applications to the read replica. Using read replicas, you can elastically scale out beyond the capacity constraints of a single DB instance for read-heavy database workloads.
 
 Use read replicas for very read-heavy DB workloads.
 
-Read replicas can be in the same or in different regions.
-
-EC2 instance <---> DNS record <----> Primary DB <---> Read Replica
-
 Every time you do a write to the DB, you'll have a perfect replica that is created, which is the Read Replica.
 
-Benefit: Say you have a popular word press site, and you get a huge boost in requests after a particularly popular blog post. You can scale by pointing half of the requests to the primary DB and the other half to read from the read replica. This allows you to scale *out*.
+#### Add Security:
 
-You can have:
+public key encryption is used when RDS sets up communication between read replicas and the source DB instance.
+
+#### Regions
+
+Read replicas can be in the same or in different regions.
+
+#### Benefit
+
+Say you have a popular word press site, and you get a huge boost in requests after a particularly popular blog post. You can scale by pointing half of the requests to the primary DB and the other half to read from the read replica. This allows you to scale *out*.
+
+#### You can have
 
 * up to 5 copies of Read Replicas of any DB.
 * read replicas of read replicas... but careful... latency will start increasing.
@@ -160,6 +199,8 @@ You can also have read replicas *from* read replicas, giving you multiple copies
 
 * So, read replicas allow you to have a read-only copy of your production DB.
 * Do this by using asynchronous replication from the primary RDS instance to the read replica.
+
+#### Databases
 
 Available for all the following RDS DB's *except for SQL Server*:
 
@@ -178,20 +219,30 @@ Aurora read replica:
 * Under actions for a DB, you can choose to "Create Aurora read replica"
   * This is a good way to migrate a MySQL DB over to Aurora, by creating a replica of the DB.
 
-DNS Endpoints
+#### DNS Endpoints
 
 * If the primary DB fails, you *must to update your DNS address to point to the Read Replica*, instead of to the primary DB.
 * Each read replica will have its own DNS end point.
 
-Multi-AZ
+#### Multi-AZ
 
 * *Read replicas can have multi-AZ turned on*, so multiple availability zones are used to house replicas.
 * You can create read replicas of Multi-AZ source DBs.
 
-Regions
+#### Regions
 
 * You can have a read replica in a second region.
   * As in, you can have a read replica in a region completely different from your primary DB.
+
+#### Use Cases
+
+Scaling beyond the compute or I/O capacity of a single DB instance for read-heavy database workloads. You can direct this excess read traffic to one or more read replicas.
+
+Serving read traffic while the source DB instance is unavailable. In some cases, your source DB instance might not be able to take I/O requests, for example due to I/O suspension for backups or scheduled maintenance. In these cases, you can direct read traffic to your read replicas. For this use case, keep in mind that the data on the read replica might be "stale" because the source DB instance is unavailable.
+
+Business reporting or data warehousing scenarios where you might want business reporting queries to run against a read replica, rather than your primary, production DB instance.
+
+Implementing disaster recovery. You can promote a read replica to a standalone instance as a disaster recovery solution if the source DB instance fails.
 
 **Example**: You've got an overworked DB with very heavy read traffic. How to increase performance? Add read replicas and point the EC2 instances to those read replicas.
 
@@ -253,7 +304,7 @@ Supported for all 6 [AWS RDS databases](#Types-of-Relational-Databases)
 
 Encryption is done with the **AWS Key Management Service (KMS)**.
 
-RDS instance is encrypted --> (data stored at rest in the underlying storage is encrypted) +  (automated backups, read replicas & snapshots are encrypted).
+> RDS instance is encrypted --> (data stored at rest in the underlying storage is encrypted) +  (automated backups, read replicas & snapshots are encrypted).
 
 ## Enhanced Monitoring
 
@@ -411,7 +462,7 @@ OLTP = Online Transaction Processing
 
 OLAP = Online Analytics Processing
 
-OLTP differs from OLAP in regards to the types of queries you run.
+OLTP differs from OLAP in regards to the **types of queries you run**. This means that the types of queries you need to run are associated with a particular workload... which will help determine what type of database technology you need to choose!
 
 ## OLTP Example
 
@@ -560,12 +611,11 @@ A **MySQL**- and **PostgreSQL**-compatible relational DB.
 
 It's fast, highly available, but has the simplicity and cost-effectiveness of open source DBs. 
 
-Performance comparisons:
+> Performance comparisons:
+> * 5x better than MySQL
+> * 3x better than PostgreSQL
 
-* 5x better than MySQL
-* 3x better than PostgreSQL
-
-    ^--- Aurora has a much lower price point than either of these DBs, given these comparisons.
+  ^--- Aurora has a much lower price point than either of these DBs, given these comparisons.
 
 ## Storage Autoscaling
 

@@ -27,7 +27,9 @@ A virtual data center in the cloud.
 
 A VPC is a *collection* of internet gateways, route tables, network access control lists (ACLs), security groups, EC2 instances, private and public subnets.
 
-> Amazon Virtual Private Cloud (Amazon VPC) lets you provision a logically isolated section of the AWS Cloud where you can launch AWS resources in a virtual network that you define. You have complete control over your virtual networking environment. --*AWS Certified Cloud Practitioner Practice Exam Course*
+> Amazon Virtual Private Cloud (Amazon VPC) lets you provision a logically isolated section of the AWS Cloud where you can launch AWS resources in a **virtual network** that you define. You have complete control over your virtual networking environment.
+
+Amazon Virtual Private Cloud (Amazon VPC) is the service that allows a customer to create a virtual network for their resources in an isolated section of the AWS cloud.
 
 ## A VPC consists of:
 
@@ -57,7 +59,7 @@ Amazon VPC lets you provision a virtual networking environment. You can fully co
 
 In a default VPC, all Amazon EC2 instances are assigned two IP addresses at launch - a public IP address and a private IP address.
 
-## Examples
+## Use Cases
 
 Example: A public-facing subnet for your webservers, with backend systems like a DB placed in a private-facing subnet. 
 
@@ -78,13 +80,16 @@ You can't have 1 subnet spread across multiple availability zones.
 
 ## VPC Peering
 
-Allows you to connect one VPC with another via a direct network route using **private IP addresses**. 
+Allows you to connect one VPC with another via a direct network route using **private IP addresses**.
 
 Instances act as though they are on the same private network.
 
 Can peer VPCs with other AWS accounts, and with other VPCs in the same account.
+
 * Peering is in a star configuration (1 central VPC peers with 4 others).
 * Can peer across regions
+
+Alternative to peering: Use a Transit Gateway.
 
 ## No Transitive Peering
 
@@ -568,26 +573,26 @@ After you've created a NAT gateway, you must update the route table associated w
 
 You must also specify an Elastic IP address to associate with the NAT gateway when you create it. The Elastic IP address cannot be changed after you associate it with the NAT Gateway.
 
-An Elastic IP address is a property of network interfaces.
+An Elastic IP address is a property of network interfaces. An Elastic IP address is a reserved public IP address that you can assign to any EC2 instance in a particular region, until you choose to release it. 
 
-More info on elastic IP addresses:
+When you associate an Elastic IP address with an EC2 instance, it replaces the default public IP address.
 
 Associate an Elastic IP address with any instance or network interface for any VPC in your account. With an Elastic IP address, you can mask the failure of an instance by rapidly remapping the address to another instance in your VPC. 
 
-Note that the advantage of associating the Elastic IP address with the network interface instead of directly with the instance is that you can move all the attributes of the network interface from one instance to another in a single step.
+Note that the advantage of associating the Elastic IP address with the network interface instead of directly with the instance is that **you can move all the attributes of the network interface from one instance to another in a single step**.
 
-Billing:
+Elastic IP Address Billing: 
 
 * To ensure efficient use of Elastic IP addresses, we impose a small hourly charge when they aren't associated with a running instance, or when they are associated with a stopped instance or an unattached network interface. While your instance is running, you aren't charged for one Elastic IP address associated with the instance, but you are charged for any additional Elastic IP addresses associated with the instance.
 
-### Example
+### Nat Gateway Example
 Your instance is in the private subnet, it has a route in the Route Table to the NAT Gateway in the public instance. When your instance runs a yum update, it goes to the Nat Gateway, then traverses out.
 
-### Billing
+### Nat Gateway Billing
 
 NAT gateway hourly usage and data processing rates apply. Amazon EC2 charges for data transfer also apply
 
-### Make a Gateway
+## Make a Nat Gateway
 
 Go to VPC > Vitual Private Cloud > NAT Gateways.
 
@@ -600,6 +605,7 @@ Click the button that says "Allocate Elastic IP Address," which will create an I
 Create the Gateway.
 
 ### Edit route tables
+
 A window will pop up saying you'll need to edit your route tables. Click on the "Edit route tables" button.
 
 You'll find yourself at the list of Route Tables.
@@ -613,6 +619,8 @@ Click the "save" and "close" button.
 ---------------
 
 # Network Access Control Lists 
+
+Network Access Control List = Network ACL
 
 > Use a network ACL to block specific IP Addresses.
 

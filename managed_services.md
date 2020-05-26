@@ -1,7 +1,6 @@
 # Managed Services
 
 * DynamoDB
-* EMR
 * CloudFront
 * Redshift
 * Lambda
