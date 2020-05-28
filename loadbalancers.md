@@ -1,47 +1,111 @@
 # LoadBalancer
 
-## About LoadBalancers
-A physical or virtual device that helps you balance the load across web servers. Can also be used for applications. It doesn't need to be internet facing, though usually they are. 
+## Index 
+
+[3 Types of Elastic Load Balancers](#3-Types-of-Elastic-Load-Balancers)
+
+[About Load Balancers](#About-Load-Balancers)
+
+[Cross Zone Load Balancing](#Cross-Zone-Load-Balancing)
+
+[Errors One May See](#Errors-One-May-See)
+
+[Path Patterns](#Path-Patterns)
+
+[Sticky Sessions](#Sticky-Sessions)
+
+[X-Forwarded-For Header](#X-Forwarded-For-Header)
+
+# About Load Balancers
+
+Elastic Load Balancing distributes incoming application or network traffic across multiple targets, such as Amazon EC2 instances, containers, and IP addresses, in multiple Availability Zones. Elastic Load Balancing scales your load balancer as traffic to your application changes over time. It can automatically scale to the vast majority of workloads.
+
+A physical or virtual device that helps you balance the load across web servers. Can also be used for applications. It doesn't need to be internet facing, though usually they are.
 
 Instances monitored are reported as either:
+
 * InService
 * OutofService
 
 Health Checks of an Instance:
+
 * Performed by "talking" to the instance
 
 Load balancers don't have an IP address; you are supplied a DNS name for the load balancer.
 
-## 3 Types of Load Balancers
-### Application Load Balancer
-* Operates at Layer 7 - Evaluates the code, so it can make intelligent routing decisions ("application-aware).
-  * Could have a group of servers that are just for the payment gateway. Traffic would be sent to this group when there is a payment being made, otherwise traffic could be routed to another group of EC2 instances if a person was just browsing. 
-  * Load balancer can see that language is changed to French, and load balance across all the French servers. 
-  * It can see requests you're making and inside the HTML, etc, so it can make advanced routing, so specific requests can be made to specific web servers. 
-* Best suited for load balancing of HTTP and HTTPS traffic. 
-* Has a listener. After creation, you can view/edit rules with conditional logic, such as target group, condition and/or priority.
+## Benefits
 
-See the course on Application Load Balancers in A Cloud Guru for more info! 
+A load balancer distributes workloads across multiple compute resources, such as virtual servers. Using a load balancer **increases the availability and fault tolerance of your applications.**
 
-### Network Load Balancer
-* For ultra high performance 
-* For cases of using static or fixed IP addresses.
-* Best suited for load balancing of TCP traffic where *extreme performance* is required.
-  * Can handle millions of requests per second, while maintaining ultra-low latencies
-  * Like a Tesla Roadster
-* Operates at the connection level (Layer 4). 
-* Expensive
+You can **add and remove compute resources** from your load balancer as your needs change, without disrupting the overall flow of requests to your applications.
 
-### Classic Load Balancer
-* Slowly getting phased out - legacy Elastic Load Balancers
-* Cheaper.
-* Can load balance HTTP/HTTPS applications, and layer 7-specific features 
-  * such as X-Forwarded and sticky sessions
-  * Not application aware, since it doesn't do stuff at the layer 7 level; not very intelligent of a load balancer.
-* Can use strict Layer 4 load balancing for applications that rely soley on the TCP protocol
-* Can use some CloudWatch metrics.
+You can **configure health checks**, which monitor the health of the compute resources, so that the load balancer sends requests only to the healthy ones. 
+
+You can also offload the work of **encryption and decryption** to your load balancer so that your compute resources can focus on their main work.
+
+See also [ELB features on AWS](https://aws.amazon.com/elasticloadbalancing/features/#compare).
+
+## AZs, Not Regions
+
+Elastic Load Balancers distribute traffic among EC2 instances across multiple Availability Zones but not across AWS regions. 
+
+* Use Route53 Geolocation Routing to send queries from a particular region to a particular region, instead, if you need cross-region traffic.
+
+# 3 Types of Elastic Load Balancers
+
+See also [Product comparisons on this AWS doc](https://aws.amazon.com/elasticloadbalancing/features/#compare)
+
+## Application Load Balancer
+
+Operates at Layer 7 - Evaluates the code, so it can make intelligent routing decisions ("application-aware).
+  
+* Could have a group of servers that are just for the payment gateway. Traffic would be sent to this group when there is a payment being made, otherwise traffic could be routed to another group of EC2 instances if a person was just browsing. 
+* Load balancer can see that language is changed to French, and load balance across all the French servers. 
+* It can see requests you're making and inside the HTML, etc, so it can make advanced routing, so specific requests can be made to specific web servers. 
+
+Best suited for load balancing of HTTP and HTTPS traffic. 
+
+Has a listener. After creation, you can view/edit rules with conditional logic, such as target group, condition and/or priority.
+
+## Network Load Balancer
+
+For ultra high performance 
+
+For cases of using static or fixed IP addresses.
+
+Best suited for load balancing of TCP traffic where *extreme performance* is required.
+
+* Can handle millions of requests per second, while maintaining ultra-low latencies
+* Like a Tesla Roadster
+
+Operates at the connection level (Layer 4).
+
+Expensive
+
+## Classic Load Balancer
+
+Slowly getting phased out - legacy Elastic Load Balancers
+
+Cheaper.
+
+Can load balance HTTP/HTTPS applications, and layer 7-specific features 
+* such as X-Forwarded and sticky sessions
+* Not application aware, since it doesn't do stuff at the layer 7 level; not very intelligent of a load balancer.
+
+Can use strict Layer 4 load balancing for applications that rely soley on the TCP protocol
+
+Can use some CloudWatch metrics.
+
+# Security Features
+
+## Perfect Forward Secrecy
+
+Perfect Forward Secrecy is a feature that provides additional safeguards against the eavesdropping of encrypted data, through the use of a unique random session key. This prevents the decoding of captured data, even if the secret long-term key is compromised.
+
+CloudFront and Elastic Load Balancing are the two AWS services that support Perfect Forward Secrecy.
 
 # Errors One May See
+
 ### Error 504
 App stops responding and the Classic Load Balancer responds with a 504 error. 
 
@@ -52,18 +116,21 @@ This means the the *application* is having problems, maybe at the Web Server lay
 Solution: Identify where the application is failing - Web Server layer or the Database Server layer. Scale it up or out, where possible. 
 
 
-# X-Forwarded-For Header
-The client's IP address gets forwarded to the load balancer; the load balancer's IP address gets sent over to the EC2 instance. The EC2 instance then logs the load balancer's IP address as the client's IP address.
+# X Forwarded For Header
 
-### If you need the IPv4 address of your end user: 
+If you need the IPv4 address of your end user: 
 Can get the client's public IP address, by looking for the X-Forwarded-For header. 
 
+The client's IP address gets forwarded to the load balancer; the load balancer's IP address gets sent over to the EC2 instance. The EC2 instance then logs the load balancer's IP address as the client's IP address.
+
 # Sticky Sessions
-Lets you bind a user's session to a specific EC2 instance (in a classic load balancer) or to a Target Group Level (in a application load balancer).
+
+Lets you bind a user's session to a specific EC2 instance (in a **classic load balancer**) or to a Target Group Level (in a **application load balancer**).
 
 All requests from the user during the session wil thus be sent to the same instance (or target group level). 
 
-### Helpful for situations where...
+## Use Cases
+
 ... a file is being uploaded or downloaded, for example, and the instance needs to stay the same. 
 
 ... you're writing to an EC2 instance, like a local disk, where you are storing information locally to that instance.
@@ -74,7 +141,8 @@ User visits a website that's behind a classic load balancer. You notice that the
 
 # Cross Zone Load Balancing
 
-### No Cross Zone load balancing:
+## Cross Zone Load Balancing Disabled
+
 > A load balancer cannot normally send traffic from one AZ to another AZ.
 
 user --> Route53, which is splitting traffic 50:50 to two AZs --> Each AZ has a classic load balancer.
@@ -83,19 +151,24 @@ One AZ has 4 instances,so each instance will get 12.5% of traffic.
 
 The other AZ has a single instance. That instance will get 50% of traffic.
 
-### Cross Zone Load Balancing:
-user - Route53, which splits the traffic 50:50 into two AZs - each AZ has a class load balancer.
+## Cross Zone Load Balancing Enabled
 
-One AZ has 4 instances. 
+### Classic Load Balancer
 
-The other AZ has a single instance. With cross zone load balancing, the load balancer here can send traffic not only to the single instance, but also to the instances in the other AZ. 
+With cross-zone load balancing, each load balancer node for your Classic Load Balancer distributes requests evenly across the** registered instances** in all enabled Availability Zones. If cross-zone load balancing is disabled, each load balancer node distributes requests evenly across the registered instances in its Availability Zone only.
 
-The 5 instances in total, will therefore get 20% of the traffic.
+#### Examples: 
 
-### Scenario
-Traffic from users are going from Route53 to a single load balancer, which is sending hte traffic onto its 4 instances. You notice that your other AZ is not getting any traffic at all. Solution: Enable cross zone load balancing.
+(1) User sends traffic to Route53, which splits the traffic 50:50 into two AZs - each AZ has a class load balancer. One AZ has 4 instances. The other AZ has a single instance. With cross zone load balancing, the load balancer here can send traffic not only to the single instance, but also to the instances in the other AZ. The 5 instances in total, will therefore get 20% of the traffic.
+
+(2) Problem: Traffic from users are going from Route53 to a single load balancer, which is sending traffic onto its 4 instances. You notice that your other AZ is not getting any traffic at all. Solution: Enable cross zone load balancing.
+
+### Elastic Load Balancing
+
+The nodes for your load balancer distribute requests from clients to registered targets. When cross-zone load balancing is enabled, each load balancer node distributes traffic across the **registered targets** in all enabled Availability Zones. When cross-zone load balancing is disabled, each load balancer node distributes traffic only across the registered targets in its Availability Zone.
 
 # Path Patterns
+
 Path-based routing means creating a listener that has rules to forward requests (direct traffic) based on the URL path.
 
 Perks:
@@ -108,10 +181,9 @@ traffic from users --> route53 --> a single AZ's application load balancer
 You want to have the home url sent to one AZ, and the url with, say, /images/ will be sent to a separate AZ. You have the load balancer take care of the Path Patterns that will organize the traffic destinations, re: AZs. 
 
 
--------------------
--------------------
+# Build a Simple One in the AWS Console
 
-# Provision a New Load Balancer via the Console - Super Basic Example
+Provision a New Load Balancer via the Console - Super Basic Example
 Notes inspired by the Certified Cloud Practitioner course with A Cloud Guru.
 
 ## Launch an instance
@@ -182,7 +254,9 @@ Can Add another instance by clicking on `Edit`, just above "Registered targets."
 
 ------------------------
 
-# Set up a Classic Load Balancer Via the Console - Another Example
+# Second Example Demo in the AWS Console
+
+Set up a Classic Load Balancer Via the Console 
 Includes Bootstrap script with user data to create webservers using Apache. 
 
 ## Set up Instance 1
@@ -238,9 +312,10 @@ Configure the Security Group - use a self-created security group (which has HTTP
 Launch the thing.
 
 ## Set up Instance 2
+
 Do the same as above, except make sure to put your new instance into its *own* availability zone. 
 
-And, Change the user data to have an <h1> tag of Hello World Again!, or something of the sort. 
+And, Change the user data to have an `<h1>` tag of Hello World Again!, or something of the sort. 
 
 Change the tags to show the unique instance's name
 
@@ -300,10 +375,12 @@ In the Load Balancer service, the instance that was stopped will be marked as "O
 
 
 ## Delete the load balancer
-... if you don't need it, so you don't incur excessive fees. 
---------------------
 
-# Set up an Application Load Balancer via the AWS Console
+... if you don't need it, so you don't incur excessive fees. 
+
+# 3rd Example in the AWS Console - ALB
+
+Set up an Application Load Balancer via the AWS Console
 Set up two instances (see above in the section about setting up a classic load balancer). 
 
 ## Set up a Target Group
@@ -352,10 +429,6 @@ Now, wait for status to update from initial to healthy. Once that happens, the t
 In the load balancer list, go down to the tab, "Description" for your load balancer, and copy the DNS name. 
 
 Paste the DNS name into a browser window. Refresh it several times to see the two different web sites :) 
-
-
-
---------------------
 
 # If Load Balancer is Setup After Route 53...
 From [AWS route 53 faqs](https://aws.amazon.com/route53/faqs/):

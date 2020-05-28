@@ -4,11 +4,13 @@ ECS = Elastic Container Service
 
 Amazon Elastic Container Service (ECS) is **used to run containerized applications** either using Amazon EC2 (server-based) or AWS Fargate (serverless).
 
-* In contrast, store Docker container images in the AWS Cloud with ECR - [See below](#ECR).
+* In contrast, **store** Docker container images in the AWS Cloud with ECR - [See below](#ECR).
 
 [About ECS on AWS](https://aws.amazon.com/ecs/)
 
 AWS Fargate is serverless compute for containers.
+
+* Fargate is a serverless compute engine for containers that work with both Amazon Elastic Container Service (ECS) and Amazon Elastic Kubernetes Service (EKS)
 
 Amazon Elastic Container Service (Amazon ECS) is a highly scalable, fast, container management service that makes it easy to run, stop, and manage Docker containers on a cluster.
 
