@@ -2,22 +2,23 @@
 
 * [About API Gateway](#About)
 * [API Caching](#API-Caching)
+* [Billing](#Billing)
 * [Configure and Deploy](#Configure-and-Deploy)
+* [Performance Considerations](#Performance-Considerations)
+* [Security](#Security)
 * [What the API Gateway Can Do](#What-it-Can-Do)
 
+[AWS Developer Guide here](https://docs.aws.amazon.com/apigateway/latest/developerguide/welcome.html).
 
-# About
+## About
 
-> Comes up a lot in the Solutions Architect exam
+> Amazon API Gateway is a fully managed service that makes it easy for developers to create, publish, maintain, monitor, and secure APIs at any scale. 
 
-A fully managed service that works with APIs
+With a few clicks in the AWS Management Console, you can create an API that acts as a “front door” for applications to access data, business logic, or functionality from your back-end services, such as workloads running on Amazon Elastic Compute Cloud (Amazon EC2), code running on AWS Lambda, or any web application. 
 
-* Developers can:
-  * publish
-  * maintain
-  * monitor
-  * secure APIs.
-* Acts as a *doorway* into your AWS environment to access from your back-end services (EC2, Lambda, web application(s)):
+Since it can use AWS Lambda, you can run your APIs without servers (which would probably be cheaper and more scaleable).
+
+Acts as a *doorway* into your AWS environment, into your back-end services (EC2, Lambda, web apps), to access:
   * data
   * business logic
   * functionality
@@ -25,43 +26,82 @@ A fully managed service that works with APIs
 
 It will distribute traffic. 
 
-Typical usage: Lambda functions
+Typical usage: API Gateway + Lambda functions
 
-> Increase performance of the API Gateway:
-> * Enable caching
-> * Set throttling limits
+## Services API Gateway Works Well With
+
+EC2
+
+Lambda
+
+Any web app
 
 ## How it Works
 
 * Users make a call to the API Gateway from a mobile or desktop, etc source.
 * Depending on the call, traffic is passed to:
-  * lambda
+  * Lambda
   * EC2
-  * writing to DynamoDB
+  * DynamoDB
+  * Kinesis
+  * etc
 
-## What it Can Do
+## API Types
 
-* Define a RESTful API
-  * Exposes HTTPS endpoints
-* Connect to services like Lambda & DynamoDB - serverless connection!
-* Send each API endpoint to a different target
-* Runs efficiently w/low cost
-* Scales effortlessly 
-  * No need for autoscaling groups
-* Track and control usage by API key
-* Connect to CloudWatch to log all requests for monitoring
-* Maintain multiple version of your API
-  * Ie, test and dev version versus production API
+### RESTful APIs
 
-## Prevent Attacks
+Build RESTful APIs optimized for serverless workloads and HTTP backends using HTTP APIs. HTTP APIs are the best choice for building APIs that only require API proxy functionality. If your APIs require API proxy functionality and API management features in a single solution, API Gateway also offers REST APIs.
+
+### Websocket APIs
+
+Build real-time two-way communication applications, such as chat apps and streaming dashboards, with WebSocket APIs. API Gateway maintains a persistent connection to handle message transfer between your backend service and your clients.
+
+## Use Cases
+
+> Amazon API Gateway handles all the tasks involved in accepting and processing up to hundreds of thousands of concurrent API calls, including traffic management, authorization and access control, monitoring, and API version management. 
+
+Build RESTful APIs
+
+* Exposes HTTPS endpoints
+
+Enables you to build RESTful APIs and WebSocket APIs that are optimized for serverless workloads
+
+Connect to services like Lambda & DynamoDB - serverless connection!
+
+Traffic control: Send each API endpoint to a different target
+
+Lets you bypass needing autoscaling groups - it scales effortlessly 
+
+Track and control usage by API key
+
+Maintain multiple version of your API
+
+* Ie, test and dev version versus production API
+
+## Billing
+
+Runs efficiently w/low cost.
+
+Amazon API Gateway has no minimum fees or startup costs. You pay only for the API calls you receive and the amount of data transferred out.
+
+## Security
 
 You can throttle API Gateway requests to prevent attacks
 
+API Gateway supports AWS Certificate Manager, so you can get free SSL/TSL certs
+
 ## CloudWatch
 
-You can log results to CloudWatch
+You can log results to CloudWatch 
 
-## Configure and Deploy
+## Performance Considerations
+
+To Increase performance of the API Gateway:
+
+> * Enable caching
+> * Set throttling limits
+
+# Configure and Deploy
 
 ### How to Configure an API Gateway 
 
@@ -85,24 +125,24 @@ Deploy API to a "stage"
 
 >API Gateway supports AWS Certificate Manager, so you can get free SSL/TSL certs.
 
-## API Caching
+# API Caching
 
 Enable API caching in API Gateway to cache your endpoint's responses.
 
 API Gateway responds to a request by looking up the endpoint response from the cache, instead of making a request to your endpoint.
 
-### Benefit
+## Benefit
 
 * reduce the number of calls made to your endpoint
 * improve latency of the requests to your API
 
-### TTL
+## TTL
 
 Responses are cached from your endpont when you enable caching for a stage.
 
 Caching occurs for a specified time-to-live (TTL) period in seconds.
 
-### The Flow of It
+## The Flow of It
 
 * User makes a request
 * API Gateway receives the request

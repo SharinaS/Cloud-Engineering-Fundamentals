@@ -24,6 +24,8 @@
 
 * [Enhanced Monitoring](#Enhanced-Monitoring)
 
+* [Failover](#Failover)
+
 * [Multi AZ and Read Replicas](#Two-Features-of-Relational-DBs)
 
 * [Set up RDS Database](#Set-up-RDS-Database)
@@ -160,13 +162,15 @@ You must have *automatic backups* turned *on* in order to deploy a read replica.
 
 > For performance. *For scaling*. For security.... NOT for disaster recovery. 
 
-#### How It Works
+### How It Works
 
 When you create a read replica, you first specify an existing DB instance as the source. Then Amazon RDS takes a snapshot of the source instance and creates a read-only instance from the snapshot. 
 
-Amazon RDS then uses the asynchronous replication method for the DB engine to update the read replica whenever there is a change to the source DB instance. The read replica operates as a DB instance that allows only read-only connections. Applications connect to a read replica the same way they do to any DB instance. Amazon RDS replicates all databases in the source DB instance.
+Amazon RDS then uses the asynchronous replication method for the DB engine to **update the read replica whenever there is a change to the source DB instance.** 
 
-#### Reduce the load and increase elasticity
+**The read replica operates as a DB instance that allows only read-only connections.** Applications connect to a read replica the same way they do to any DB instance. Amazon RDS replicates all databases in the source DB instance.
+
+### Reduce the load and increase elasticity
 
 You can reduce the load on your source DB instance by routing read queries from your applications to the read replica. Using read replicas, you can elastically scale out beyond the capacity constraints of a single DB instance for read-heavy database workloads.
 
@@ -174,33 +178,24 @@ Use read replicas for very read-heavy DB workloads.
 
 Every time you do a write to the DB, you'll have a perfect replica that is created, which is the Read Replica.
 
-#### Add Security:
+### Add Security
 
 public key encryption is used when RDS sets up communication between read replicas and the source DB instance.
 
-#### Regions
+### Regions
 
 Read replicas can be in the same or in different regions.
 
-#### Benefit
+### Benefit
 
 Say you have a popular word press site, and you get a huge boost in requests after a particularly popular blog post. You can scale by pointing half of the requests to the primary DB and the other half to read from the read replica. This allows you to scale *out*.
 
-#### You can have
+### You can have
 
 * up to 5 copies of Read Replicas of any DB.
-* read replicas of read replicas... but careful... latency will start increasing.
+* read replicas of read replicas... giving you multiple copies of your production DB... but careful... latency will start increasing.
 
-**Example**: You have an elastic load balancer with 4 EC2 instances behind it. They connect to a production DB. The production DB is *asynchronously* replicating to multiple copies. All the EC2 instances are reading/writng to the primary DBs. 
-
-**Example**: You can also architect it so each instance will read from different read replicas, and only write to a single DB. Those writes will then be replicated out. 
-
-You can also have read replicas *from* read replicas, giving you multiple copies of your production DB.
-
-* So, read replicas allow you to have a read-only copy of your production DB.
-* Do this by using asynchronous replication from the primary RDS instance to the read replica.
-
-#### Databases
+### Databases
 
 Available for all the following RDS DB's *except for SQL Server*:
 
@@ -214,27 +209,27 @@ Read replicas can be promoted to "Master", to be their *own* DBs
 
 * ... note that this *breaks* the replication, and thus replication will no longer work.
 
-Aurora read replica:
+#### Aurora read replica
 
 * Under actions for a DB, you can choose to "Create Aurora read replica"
   * This is a good way to migrate a MySQL DB over to Aurora, by creating a replica of the DB.
 
-#### DNS Endpoints
+### DNS Endpoints
 
 * If the primary DB fails, you *must to update your DNS address to point to the Read Replica*, instead of to the primary DB.
 * Each read replica will have its own DNS end point.
 
-#### Multi-AZ
+### Multi-AZ
 
 * *Read replicas can have multi-AZ turned on*, so multiple availability zones are used to house replicas.
 * You can create read replicas of Multi-AZ source DBs.
 
-#### Regions
+### Regions
 
 * You can have a read replica in a second region.
   * As in, you can have a read replica in a region completely different from your primary DB.
 
-#### Use Cases
+### Use Cases
 
 Scaling beyond the compute or I/O capacity of a single DB instance for read-heavy database workloads. You can direct this excess read traffic to one or more read replicas.
 
@@ -245,6 +240,35 @@ Business reporting or data warehousing scenarios where you might want business r
 Implementing disaster recovery. You can promote a read replica to a standalone instance as a disaster recovery solution if the source DB instance fails.
 
 **Example**: You've got an overworked DB with very heavy read traffic. How to increase performance? Add read replicas and point the EC2 instances to those read replicas.
+
+**Example**: You have an elastic load balancer with 4 EC2 instances behind it. They connect to a production DB. The production DB is *asynchronously* replicating to multiple copies. All the EC2 instances are reading/writng to the primary DBs. 
+
+**Example**: You can also architect it so each instance will read from different read replicas, and only write to a single DB. Those writes will then be replicated out. 
+
+## Failover
+
+Failover involves shifting work to the standby replica.
+
+### Automatic Failover
+
+Amazon RDS automatically performs a failover in the event of any of the following:
+
+* Loss of availability in primary Availability Zone
+* Loss of network connectivity to primary
+* Compute unit failure on primary
+* Storage failure on primary
+
+Automatic failover only occurs if the primary database is the one that is affected.
+
+Amazon RDS detects and automatically recovers from the most common failure scenarios for Multi-AZ deployments so that you can resume database operations as quickly as possible without administrative intervention.
+
+### Standby Replica
+
+In a Multi-AZ deployment, Amazon RDS automatically provisions and maintains a synchronous **standby replica** in a different Availability Zone. 
+
+The primary DB instance is synchronously replicated across Availability Zones to a standby replica to **provide data redundancy, eliminate I/O freezes, and minimize latency spikes during system backups.** 
+
+The high-availability feature is not a scaling solution for read-only scenarios; you cannot use a standby replica to serve read traffic. To service read-only traffic, you should use a [Read Replica](#(2)-Read-Replicas).
 
 ## Backups for RDS
 
@@ -382,7 +406,7 @@ Overview:
 * Flexible
 * Reliable performance
 * Fully managed DB
-* Supports key-value data models
+* Supports **key-value** data models
 * Stored on SSD storage (this is why it's so fast)
 * Spread across **3** geographically distinct data centres (multiple AZs) (redundancy)
 
@@ -441,6 +465,10 @@ DynamoDB evenly distributes provisioned throughput but only up to a limit. Readi
 To avoid request throttling, design your DynamoDB table with the right partition key to meet your access requirements and provide even distribution of data.
 
 **Warning**: Don't mix up partition key with partition group, regarding EC2 instances and placement types!
+
+### Weakness
+
+If you need to scan large amounts of data (ie a lot of keys all in one query), the performance will not be optimal (Think Redshift, intsead). DynamoDB is a NoSQL database which is based on key-value pairs used for **fast processing of small data** that dynamically grows and changes.
 
 # Data Warehousing
 
@@ -513,6 +541,16 @@ Used for online analytics processing - [OLAP](#OLTP-vs-OLAP)
 * fully managed
 * petabyte-scale
 * data warehouse service - *the* one to use in the AWS world.
+
+## Use Cases
+
+### Queries on tons of data to get reports
+
+Redshift makes it simple and cost effective to run high performance queries on petabytes of structured data so that you can build powerful reports and dashboards using your existing business intelligence tools.
+
+### Get operational insights
+
+Bring together structured data from your data warehouse and semi-structured data such as application logs from your S3 data lake to get real-time operational insights on your applications and systems.
 
 ## Cost
 
@@ -672,7 +710,7 @@ Replica location - in-region (cannot be cross-region).
 
 Automated failover - yes!
 
-* Automated failover is only available with Aurora Replicas.
+> Automated failover is only available with Aurora Replicas.
 
 Support for user-defined replication delay - none
 
@@ -740,6 +778,8 @@ Hence, creating a custom endpoint in Aurora based on the specified criteria for 
 
 # ElastiCache
 
+See the [FAQS page here](https://aws.amazon.com/elasticache/faqs/)
+
 > Used to *speed up the performance* of existing databases by caching frequently used identical queries.
 
 A web service that lets you retrieve info from caches
@@ -751,6 +791,10 @@ A web service that lets you retrieve info from caches
   * *in-memory*
 
 Lets you deploy, operate and scale an in-memory cache in the cloud to improve the performance of your web app.
+
+## Use Cases
+
+Caching, Session Stores, Gaming, Geospatial Services, Real-Time Analytics, and Queuing.
 
 Example:
 
@@ -764,14 +808,15 @@ Example:
 
 * Your DB is overloaded. You can add a read replica, and then point your reads to your read replicas. And, you can use elasticache!
 
-## Two caching engines supported by ElastiCache
-
-* These are:
-  * open-source
-  * in-memory
+## Two caching engines offered by ElastiCache
 
 1. Memcached
 2. Redis
+
+These are:
+* open-source
+* in-memory
+* fully managed
 
 ### Memcached ("mem-cache-d")
 
@@ -780,8 +825,6 @@ If you want a simple cache to offload your DB, use memcached.
 It is able to scale horizontally.
 
 You get multi-threaded performance.
-
-... and that's pretty much it.
 
 ### Redis
 

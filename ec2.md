@@ -472,8 +472,10 @@ Note that some EBS are SSD and some are HDD.
 | SSD | HDD |
 |-----|-----|
 |deliver consistent performance whether an I/O operation is **random or sequential**| deliver optimal performance only when I/O operations are **large and sequential**|
+| Keywords: small, random I/O operations| Keywords: large, sequential I/O operations |
 |great for transactional workloads | great for large, streaming workloads |
 | moderate/high cost | low cost|
+| Performance attribute: IOPS| Performance attribute: Throughput|
 
 
 
@@ -498,7 +500,7 @@ Note that some EBS are SSD and some are HDD.
 * 500 IOPS per volume
 * suitable for workloads with large, sequential I/O operations
 
-### Cold Hard Disk Drive 
+### Cold Hard Disk Drive (HDD) 
 
 * API Name: sc1
 * Magnetic
@@ -506,6 +508,8 @@ Note that some EBS are SSD and some are HDD.
 * Designed for less frequently accessed work loads, like file servers
 * IOPS is 250.
 * suitable for workloads with large, sequential I/O operations
+
+> Cold HDD volumes provide low-cost magnetic storage that defines performance in terms of throughput rather than IOPS. With a lower throughput limit than Throughput Optimized HDD, this is a good fit ideal for **large, sequential** cold-data workloads. If you require **infrequent access** to your data and are looking to save costs, Cold HDD provides inexpensive block storage. Take note that bootable Cold HDD volumes are not supported.
 
 ### EBS Magnetic
 

@@ -219,6 +219,7 @@ User makes request --> Route53 analyzes the different response times for each of
 [Set up Latency Routing](#Set-up-Latency-Routing)
 
 ## Failover Routing Policy
+
 > Used for when you want an active-passive setup, where you have a primary site and a secondary site.
 
 One site could be eu-west-2 and the secondary disaster recovery (DR) site in us-west-2.
@@ -230,7 +231,9 @@ User does a DNS request --> Route53 will send traffic to the active region, vs t
 [Set up Failover Routing in the AWS Console](#Set-up-Failover-Routing)
 
 ## Geolocation Routing Policy
+
 Lets you choose where your traffic will be sent based on the geographic locations of your users.
+
 * The location from which DNS queries originate
 * Has nothing to do with latency.
 * Based on *national boundaries*
