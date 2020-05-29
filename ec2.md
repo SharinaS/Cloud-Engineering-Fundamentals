@@ -522,13 +522,15 @@ Note that some EBS are SSD and some are HDD.
 Think of snapshots as a photograph of the disk, and that photo is **stored on S3**.
 
 * Snapshots are point in time copies of volumes.
-* Snapshots are incremental, so only the blocks that have changed since your last snapshot are moved to S3. So, only the changes in the blocks are moved to S3. 
+* Snapshots are incremental, so only the blocks that have changed since your last snapshot are moved to S3. So, ***only the changes*** in the blocks are moved to S3. 
 * It can take some time for snapshots to be created. 
-* You can create AMI's from Snapshots
+* You can **create AMI**'s from Snapshots
+
+ Snapshots being incremental backups minimizes the time required to create the snapshot and saves on storage costs by not duplicating data. When you delete a snapshot, only the data unique to that snapshot is removed. 
 
 ### Snapshots are asynchronous
 
-The point-in-time snapshot is created immediately, but the status of the snapshot is pending until the snapshot is complete (when all of the modified blocks have been transferred to Amazon S3), which can take several hours for large initial snapshots or subsequent snapshots where many blocks have changed. While it is completing, an in-progress snapshot is not affected by ongoing reads and writes to the volume hence, you can still use the volume.
+The point-in-time snapshot is created immediately, but the status of the snapshot is pending until the snapshot is complete (when all of the modified blocks have been transferred to Amazon S3), which can take several hours for large initial snapshots or subsequent snapshots where many blocks have changed. While it is completing, an in-progress snapshot is not affected by ongoing reads and writes to the volume hence, you **can still use the volume**.
 
 having multiple pending snapshots of a volume may result in reduced volume performance until the snapshots complete.
 
@@ -544,17 +546,17 @@ Additional volumes, attached to that EC2 instance, however, will *continue to pe
 
 ## Copy and Move
 
-Amazon EBS Snapshots are just backups for EBS volumes.
+Amazon EBS Snapshots are backups for EBS volumes.
 
 (They are not what you need when you need identical configurations of an EC2 instance, by the way)
 
 You can back up the data on your Amazon EBS volumes to Amazon S3 by taking point-in-time snapshots. Snapshots are incremental backups, which means that only the blocks on the device that have changed after your most recent snapshot are saved. 
 
-#### Copy to another region
+### Copy to another region
 
 You can copy EBS Snapshots from one AWS Region to another. 
 
-Here are some of the more common use cases:
+Use Cases:
 
 * Geographic Expansion – You want to be able to launch your application in a new Region.
 * Migration – You want to be able to migrate your application from one Region to another. 
@@ -564,7 +566,9 @@ EBS Snapshot Copy simplifies each of these use cases by simplifying the copy pro
 
 You can initiate multiple Snapshot Copy commands simultaneously either by selecting and copying multiple Snapshots to the same region, or by copying a snapshot to multiple regions in parallel.  The in-progress copies do not affect the performance of the associated EBS Volumes.
 
+### Virtualization Types
 
+Note there are two types of virtualization types in AWS - paravirtual (PV) or hardware virtual machine (HVM) - so you can choose which one. Make sure it's on HVM if you want to have many more instance types to launch from, later on.
 
 ### Demo in the Console --
 
@@ -613,12 +617,6 @@ Create a snapshot --> turn the snapshot into an AMI --> Use the AMI to launch in
 * Click on the snapshot's radio button, then "Actions > Create Image"
 * Give the image a name, and leave everything else as default
 
-----------------
-
-Note there are two types of virtualization types in AWS - paravirtual (PV) or hardware virtual machine (HVM) - so you can choose which one. Make sure it's on HVM if you want to have many more instance types to launch from, later on.
-
------------
-
 Hit "Create"
 
 > Once the image has been created, we can use that image to provision new EC2 instances. 
@@ -644,6 +642,7 @@ Launch!
 In the list of AMIs, with the AMI's radio button clicked, go up to "Actions > Copy AMI."
 
 A window will pop up, and you can move the Amazon Machine Image from the existing region
+
 * Choose a destination region
 
 > We can now use this image to launch our ec2 instances to the new destination region. 

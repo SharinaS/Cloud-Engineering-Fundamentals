@@ -30,15 +30,7 @@ Synchronizes user data from multiple devices
 
 Recommended for all mobile applications with AWS services.
 
-### Recommended Approach
-
-Say you have a website with:
-
-* Lambda
-* DynamoDB
-* S3
-
-Series of events:
+Say you have a website with Lambda, DynamoDB, S3... Series of events:
 
 * User will authenticate with FB (for example). 
 * FB gives the user an authentication token
@@ -46,29 +38,34 @@ Series of events:
 * Cognito responds and grants access to the AWS env't (depending on the access yout permit)
 * User can start lambda functions, store data in the DB or store images in S3, etc
 
-### Benefits of Cognito
+## Benefits of Cognito
 
 * No need for the app to imbed or store AWS credentials on the device
 * Users get a seamless experience across all mobile devices
 
-### User Pools
+## User Pools
 
-> Takes care of the user side of authentication - usernames, passwords, registration
+A user pool is a user directory in Amazon Cognito. With a user pool, your users can sign in to your web or mobile app through Amazon Cognito. Your users can also sign in through social identity providers like Google, Facebook, Amazon, or Apple, and through SAML identity providers. Whether your users sign in directly or through a third party, all members of the user pool have a directory profile that you can access through a Software Development Kit (SDK).
 
-They are directories that manage sign-up and sign-in functionality for mobile and web apps.
+User pools provide:
 
-Users can sign-in directly to the User Pool - username/password is stored within Cognito itself.
+* Sign-up and sign-in services.
+* A built-in, customizable web UI to sign in users.
+* Social sign-in with Facebook, Google, Login with Amazon, and Sign in with Apple, as well as sign-in with SAML identity providers from your user pool.
+* User directory management and user profiles.
+* Security features such as multi-factor authentication (MFA), checks for compromised credentials, account takeover protection, and phone and email verification.
+* Customized workflows and user migration through AWS Lambda triggers.
 
-Or, users can sign-in using FB, Amazon or Google - third party.
+After successfully authenticating a user, Amazon Cognito issues **JSON web tokens (JWT)** that you can use to secure and authorize access to your own APIs, or exchange for AWS credentials.
 
-* Cognito acts as an *Identity Broker* between the identity provider and AWS. 
-* Successful authentication generates a JSON Web token (JWT). 
+## Identity Pools
 
-### Identity Pools
+Lets you retrive an Amazon Cognito identity from an identity pool.
 
-> Takes care of authorizing access to AWS resources - the actual granting of authentication
+Amazon Cognito identity pools enable you to create unique identities for your users and authenticate them with identity providers. With an identity, you can obtain temporary, limited-privilege AWS credentials to access other AWS services. Amazon Cognito identity pools support public identity providers—Amazon, Apple, Facebook, and Google—as well as unauthenticated identities. It also supports developer authenticated identities, which let you register and authenticate users via your own back-end authentication process.
 
-Provide *temporary* AWS credentials to access AWS services like S3 or DynamoDB.
+* deliver temporary, limited-privilege credentials to your application so that your users can access AWS resources. 
+* You can retrieve a unique Amazon Cognito identifier (identity ID) for your end user immediately if you're allowing unauthenticated users or after you've set the login tokens in the credentials provider if you're authenticating users. 
 
 ### Step-by-Step
 
@@ -77,9 +74,17 @@ Provide *temporary* AWS credentials to access AWS services like S3 or DynamoDB.
 * Cognito converts that token to a JSON Web Token (JWT)
 * User sends the JWT to an Identity Pool
 * Identity Pool grants the user credentials in the form of an IAM role
-* User can access AWS resources
+* User can access AWS resources with an identity ID
 
-### Cognito Synchronisation
+### Example
+
+Your mobile app authenticates with the Identity Provider (IdP) using the provider's SDK and Amazon Cognito. Once the end user is authenticated with the IdP, the OAuth or OpenID Connect token returned from the IdP is passed by your app to Amazon Cognito.
+
+Which of the following is returned for the user to provide a set of temporary, limited-privilege AWS credentials? 
+
+--> Cognito ID
+
+## Cognito Synchronisation
 
 Cognito uses Push Synchronization to push updates and synchronize user data across multiple devices.
 

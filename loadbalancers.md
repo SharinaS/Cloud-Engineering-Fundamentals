@@ -57,38 +57,73 @@ See also [Product comparisons on this AWS doc](https://aws.amazon.com/elasticloa
 
 ## Application Load Balancer
 
-Operates at Layer 7 - Evaluates the code, so it can make intelligent routing decisions ("application-aware).
-  
+An Application Load Balancer functions at the application layer, the seventh layer of the Open Systems Interconnection (OSI) model - application-aware.
+
+After the load balancer receives a request, it evaluates the listener rules in priority order to determine which rule to apply, and then selects a target from the target group for the rule action. You can configure listener rules to route requests to different target groups based on the content of the application traffic. Routing is performed independently for each target group, even when a target is registered with multiple target groups.
+
+* It can see requests you're making and inside the HTML, etc, so it can make advanced routing, so specific requests can be made to specific web servers.
+
+### Use Cases
+
 * Could have a group of servers that are just for the payment gateway. Traffic would be sent to this group when there is a payment being made, otherwise traffic could be routed to another group of EC2 instances if a person was just browsing. 
-* Load balancer can see that language is changed to French, and load balance across all the French servers. 
-* It can see requests you're making and inside the HTML, etc, so it can make advanced routing, so specific requests can be made to specific web servers. 
+* Load balancer can see that language is changed to French, and load balance across all the French servers.  
+* The need for a load balancer used by an online application which requires path-based routing, host-based routing, and bi-directional communication channels using WebSockets.
 
-Best suited for load balancing of HTTP and HTTPS traffic. 
+Best suited for 
 
-Has a listener. After creation, you can view/edit rules with conditional logic, such as target group, condition and/or priority.
+* load balancing of HTTP and HTTPS traffic
+* flexible application management
+* TLS termination
+* path-based routing, host-based routing 
+* support for containerized applications
+
+### Path-based routing
+
+The only type to support path-based and host-based routing!
 
 ## Network Load Balancer
 
-For ultra high performance 
+For ultra high performance.
 
-For cases of using static or fixed IP addresses.
+Best suited for 
 
-Best suited for load balancing of TCP traffic where *extreme performance* is required.
+* load balancing of TCP traffic where *extreme performance* is required.
+* using static or fixed IP addresses
 
-* Can handle millions of requests per second, while maintaining ultra-low latencies
+Can handle millions of requests per second, while maintaining ultra-low latencies
+
 * Like a Tesla Roadster
 
 Operates at the connection level (Layer 4).
 
 Expensive
 
+### Benefits
+
+Ability to handle volatile workloads and scale to millions of requests per second.
+
+Support for static IP addresses for the load balancer. You can also assign one Elastic IP address per subnet enabled for the load balancer.
+
+Support for registering targets by IP address, including targets outside the VPC for the load balancer.
+
+Support for routing requests to multiple applications on a single EC2 instance. You can register each instance or IP address with the same target group using multiple ports.
+
+Support for containerized applications. Amazon Elastic Container Service (Amazon ECS) can select an unused port when scheduling a task and register the task with a target group using this port. This enables you to make efficient use of your clusters.
+
+Support for monitoring the health of each service independently, as health checks are defined at the target group level and many Amazon CloudWatch metrics are reported at the target group level. Attaching a target group to an Auto Scaling group enables you to scale each service dynamically based on demand.
+
 ## Classic Load Balancer
 
 Slowly getting phased out - legacy Elastic Load Balancers
 
+Best suited for:
+
+* an application built within the EC2 Classic network
+
 Cheaper.
 
 Can load balance HTTP/HTTPS applications, and layer 7-specific features 
+
 * such as X-Forwarded and sticky sessions
 * Not application aware, since it doesn't do stuff at the layer 7 level; not very intelligent of a load balancer.
 

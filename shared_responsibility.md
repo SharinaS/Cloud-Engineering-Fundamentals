@@ -21,17 +21,28 @@ Customer retains control of what security they choose to implement.
 |Networking | Customer data
 |Database
 |Software
-|Hardware and infrastructure
+|Hardware and infrastructure |
+|||
 
-### EC2
+## Security Responsiblities
+
+| AWS | Customer |
+|-----|-----|
+|Facilities| AMIs|
+| Physical Security of hardware | Operating systems|
+| Network infrastructure| Applications|
+|Virtualization infrastructure| Data in transit|
+||Data at rest|
+||Data stores|
+||Credentials|
+||Policies|
+||Configurations|
+
+## Notes on Services
 
 You do patches on EC2. 
 
-### S3 and RDS
-
 AWS is responsible for the OS on which S3 or RDS runs on.
-
-### RDS
 
 Installing the database software is AWS’ responsibility.
 

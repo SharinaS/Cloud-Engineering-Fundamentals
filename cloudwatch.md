@@ -2,7 +2,7 @@
 
 ## Index (in the works)
 
-[CloudWatch & EC2](#CloudWatch-&-EC2)
+[CloudWatch & EC2](#EC2)
 
 [CloudWatch & Databases](#CloudWatch-&-Databases) 
 
@@ -33,9 +33,11 @@ CloudWatch with EC2 will by default monitor events *every 5 minutes*
 
 * You can have 1 minute intervals by turning on *detailed monitoring*.
 
-## CloudWatch & EC2
+## EC2
 
-### Available EC2 Metrics
+Using Amazon CloudWatch alarm actions, you can create alarms that automatically **stop, terminate, reboot, or recover** your EC2 instances. You can use the stop or terminate actions to help you save money when you no longer need an instance to be running. You can use the reboot and recover actions to automatically reboot those instances or recover them onto new hardware if a system impairment occurs.
+
+### Available Metrics
 
 CloudWatch can monitor at a **host level**. This includes metrics such as:
 
@@ -47,7 +49,7 @@ CloudWatch can monitor at a **host level**. This includes metrics such as:
   * hypervisor
   * EC2 instance
 
-### Other EC2 Metrics
+### Custom Metrics
 
 To monitor other items you need to prepare a custom metric using a Perl or other shell script, as there are no ready to use metrics for these:
 
@@ -57,7 +59,7 @@ To monitor other items you need to prepare a custom metric using a Perl or other
 * page file utilization
 * log collection
 
-Or, 
+### CloudWatch Agent
 
  there is a multi-platform *CloudWatch agent* which can be installed on both Linux and Windows-based instances. You can use a single agent to collect both system metrics and log files from Amazon EC2 instances and on-premises servers. 
 
