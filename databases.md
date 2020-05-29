@@ -348,7 +348,7 @@ There are differences between CloudWatch and Enhanced Monitoring Metrics re CPU 
 |-----|-----|
 | gathers metrics from the hypervisor for a DB instance | gathers metrics from an agent on the instance |
 | the hypervisor layer performs a small amount of work| useful when you want to see how different processes or threads on a DB instance use the CPU|
-| b/c of the work from the hypervisor, you might find differences between the measurements (more so if your DB instances use smaller instance classes) ||
+| ^-- b/c of the work from the hypervisor, you might find differences between the measurements (more so if your DB instances use smaller instance classes) ||
 |Does not provide the percentage of the CPU bandwidth and total memory consumed by each database process in your RDS instance|Can check the percentage of the CPU bandwidth and total memory consumed by each process |
 | Can monitor the CPU Utilization of your database instance ||
 

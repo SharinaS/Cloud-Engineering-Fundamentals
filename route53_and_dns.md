@@ -1,4 +1,12 @@
-# DNS
+# Route53 and DNS
+
+## Index
+
+[Routing Policies](#Routing-Policies)
+
+[]()
+
+## Project
 
 See my notes when I set up Route 53 for my app, Music Central - scroll down in [the readme](https://github.com/SharinaS/music-central/blob/master/README.md).
 
@@ -178,7 +186,15 @@ Amazon Route 53 can be used for registering domain names, routing end users to I
 
 Route 53 is not responsible for creating SSL certifications.
 
-# Routing Policies Available with Route53
+# Routing Policies
+
+* Simple
+* Weighted
+* Latency-based
+* Failover
+* Geolocation
+* Geoproximity
+* Multivalue Answer
 
 ## Simple Routing Policy
 
@@ -194,15 +210,17 @@ Can change the TTL (lower it) to have increased speed of randomization.
 
 [Set up Simple Routing](#Set-up-Simple-Routing)
 
-## Weight Routing Policy
+## Weighted Routing Policy
 
-Allows you to split your traffic based on different weights assigned. 
-
-It adds up all the weights in the record set, and apportions them off appropriately.
+Allows you to split your traffic based on different weights assigned. It adds up all the weights in the record set, and apportions them off appropriately.
 
 * You can have 10% of your traffic go to us-east-1, and 90% of traffic go to eu-west-1.
 
 User types domain name into browser --> DNS request to Route53 --> Route53 sends 30% traffic to us-east-1 **+** Route53 sends 70% traffic to us-west-2. 
+
+Weighted routing lets you associate multiple resources with a single domain name (tutorialsdojo.com) or subdomain name (blog.tutorialsdojo.com) and choose how much traffic is routed to each resource. This can be useful for a variety of purposes, including load balancing and testing new versions of software.
+
+Weighted routing is not for a failover configuration.
 
 [Set up Weighted Routing](#Set-up-Weighted-Routing)
 
@@ -228,6 +246,18 @@ Route53 will monitor the health of the primary site with a health check of its e
 
 User does a DNS request --> Route53 will send traffic to the active region, vs the passive region... unless the active region fails, and then traffic is automatically routed to the passive region. 
 
+### Active-Passive Failover
+
+Use an active-passive failover configuration when you want a primary resource or group of resources to be available majority of the time and you want a secondary resource or group of resources to be on standby in case all the primary resources become unavailable. 
+
+You can configure a health check that monitors an endpoint that you specify either by IP address or by domain name. At regular intervals that you specify, Route 53 submits automated requests over the Internet to your application, server, or other resource to verify that it's reachable, available, and functional. 
+
+Optionally, you can configure the health check to make requests similar to those that your users make, such as requesting a web page from a specific URL.
+
+In short:
+
+> Set up a failover routing policy configuration in Route 53 by adding a health check on the primary service endpoint. Configure Route 53 to direct the DNS queries to the secondary record when the primary resource is unhealthy. Configure the network access control list and the route table to allow Route 53 to send requests to the endpoints specified in the health checks. Enable the Evaluate Target Health option by setting it to Yes.
+
 [Set up Failover Routing in the AWS Console](#Set-up-Failover-Routing)
 
 ## Geolocation Routing Policy
@@ -245,6 +275,14 @@ US customer does a DNS request --> Route53 routes the traffic to us-west-2.
 European customer does a DNS request --> Route53 routes the traffic to eu-west-1
 
 **Example:** All queries from Europe get routed to an ELB in Frankfurt. 
+
+> Geolocation routing lets you choose the resources that serve your traffic based on the geographic location of your users, meaning the location that DNS queries originate from. For example, you might want all queries from Europe to be routed to an ELB load balancer in the Frankfurt region.
+
+### Use Cases 
+
+* localize your content and present some or all of your website in the language of your users. 
+* restrict distribution of content to only the locations in which you have distribution rights. 
+* balance load across endpoints in a predictable, easy-to-manage way, so that each user location is consistently routed to the same endpoint.
 
 [Set up Geolocation Routing in the Console](#Set-up-Geolocation-Routing)
 

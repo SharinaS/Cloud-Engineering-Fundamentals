@@ -107,6 +107,10 @@ Security groups...
 * operate at the instance level
 * support "allow" rules only.
 
+### Security groups vs NACLs
+
+Security Groups usually control the list of ports that are allowed to be used by your EC2 instances and the NACLs control which network or list of IP addresses can connect to your whole VPC.
+
 ## Availability Zones... when it comes to this stuff:
 
 An availability zone in my AWS account can be a totally different availability zone from the one found in another AWS account, even though they may be called the same (ie, US-East-1A). This is because they are randomized when you choose them in the following steps.
@@ -432,6 +436,9 @@ ping private-ip-address-of-private-instance
 -------------
 
 # NAT Instances and Nat Gateways
+
+## Nat Gateway
+
 NAT = network address translation
 
 > **Problem**: EC2 instances for the application tier running in private subnets need to download software patches from the internet. However, the instances cannot be directly accessible from the internet. 
@@ -443,13 +450,13 @@ private subnets for the application tier.
 
 When you're in a private subnet, how do you install updates? Install updates? Download software? Download software patches? 
 
-Must use NAT Instances or Nat Gateways, since there is no route set up to the Internet from the private subnet. These things make it possible to communicate with our Internet Gateway, without making our private subnet public.
+Must use NAT Instances or Nat Gateways, since there is no route set up to the Internet from the private subnet. These things make it possible to **communicate with our Internet Gateway, without making our private subnet public.**
 
 In other words, when our instances in our private subnets need to access the internet, they do so via either a NAT Instance or a NAT gateway. 
 
 Nat Gateways are used 99% of the time. Gateways are *highly available, spread across multiple AZ's*. 
 
-Jump down to more about [Nat Gateways](#Create-a-NAT-Gateway)...
+Jump down to more about [Nat Gateways](#NAT-Gateways)...
 
 ## Nat Instances
 
@@ -462,7 +469,8 @@ Problems with NAT Instance architecture:
   * Solution: increase the instance size to deal with bottle-necking.
 * It's got a single point of failure. 
 
-## How to Create a NAT *Instance*:
+## How to Create a NAT *Instance*
+
 [See Amazon docs about NAT Instances](https://docs.aws.amazon.com/vpc/latest/userguide/VPC_NAT_Instance.html). Essentially, the instance will act like a bridge to our private subnet, through our public subnet, to our internet gateway. 
 
 Things to Note:
@@ -573,7 +581,7 @@ After you've created a NAT gateway, you must update the route table associated w
 
 You must also specify an Elastic IP address to associate with the NAT gateway when you create it. The Elastic IP address cannot be changed after you associate it with the NAT Gateway.
 
-An Elastic IP address is a property of network interfaces. An Elastic IP address is a reserved public IP address that you can assign to any EC2 instance in a particular region, until you choose to release it. 
+An Elastic IP address is a **property of network interfaces**. An Elastic IP address is a reserved public IP address that you can assign to any EC2 instance in a particular region, until you choose to release it. 
 
 When you associate an Elastic IP address with an EC2 instance, it replaces the default public IP address.
 
@@ -616,23 +624,20 @@ We need to give the main route table a route out into the internet. Click "Add r
 
 Click the "save" and "close" button.
 
----------------
 
 # Network Access Control Lists 
 
-Network Access Control List = Network ACL
+Network Access Control List = Network ACL = NACL
 
 > Use a network ACL to block specific IP Addresses.
 
 "A network ACL is an optional layer of security that acts as a firewall for controlling traffic in and out of a subnet," says AWS.
 
-These are *stateless*. 
-
-You can add deny and allow rules. When you open a port on inbound, it doesn't mean a port opens on outbound. 
-
 VPC > Security (to the left) > Network ACLs.
 
 * You'll see a list of Access Control Lists. Two were created at some point along the journey - one with 2 subnets (sits inside our custom VPC), and one with 3 subnets (sits within the default VPC). 
+
+### Default NACL
 
 When we created the custom VPC, a network ACL was created by default. By default, it allows all outbound and inbound traffic. 
 
@@ -644,14 +649,24 @@ Note, we can associate a subnet with a new NACL, but *a subnet itself can only b
 
 The Default NACL has Inbound Rules. Each rule is incremented by 100. (see more below).
 
+### Custom NACLs
+
 You can create custom network ACLs. By default each custom network ACL *denies* all inbound and outbound traffic until you add rules. 
+
+### Stateless
+
+*Network ACLs are stateless*. So responses to allowed inbound traffic are subject to the rules for outbound traffic (and vice versa). 
+
+You can add deny and allow rules. When you open a port on inbound, it doesn't mean a port opens on outbound. 
+
+### NACLs vs Security groups
+
+Security Groups usually control the list of ports that are allowed to be used by your EC2 instances and the NACLs control which network or list of IP addresses can connect to your whole VPC.
 
 *if you're using network ACLs, they will always be evaluated before security groups.* So if you **deny** a specific port on your ACL, it will never reach your security group. So, **NACls will always act first before security groups.** 
 
 ... So, you can use a network ACL to block specific IP Addresses.
 * You can't block specific IP addresses using security groups.
-
-*Network ACLs are stateless*. So responses to allowed inbound traffic are subject to the rules for outbound traffic (and vice versa). 
 
 ## Create a Network ACL 
 Click the Create button up top. 
@@ -719,13 +734,23 @@ Used to securely administer EC2 instances.
 A special purpose computer set up to resist attacks. It's usually on the outside of a firewall or in a public subnet. Usually involves access from untrusted networks or computers. It is used to securely administer EC2 instances (using SSH or RDP).
 * So, if we want to SSH into our instances in our private subnet, we do that via a bastion host. 
 
-Note that a NAT Gateway or NAT Instance is used to provide internet traffic to EC2 instances in a private subnet. 
 
+## NAT Gateway / NAT Instance
+
+A NAT Gateway or NAT Instance is used to provide internet traffic to EC2 instances in a private subnet. 
+
+* Note that you can't use a NAT Gateway as a Bastion host; you have to go ahead and configure a bastion host. 
+
+## Public Subnet
 If we have a public subnet, the bastion host can go inside the public subnet. This means you can SSH or RDP through the Internet Gateway, through our Route Tables, through the Network ACLs, through Security Groups, onto the Bastion server. The Bastion server would then forward the connection through SSH or through RDP to our private instances. So, we just "harden" the Bastion host (since this is what will be hacked). That way we don't need to harden our private instances. 
 
-Note that you can't use a NAT Gateway as a Bastion host; you have to go ahead and configure a bastion host. 
+> A bastion host is a special purpose computer on a network specifically designed and configured to withstand attacks. If you have a bastion host in AWS, it is basically just an EC2 instance. It should be in a public subnet with either a public or Elastic IP address with sufficient RDP or SSH access defined in the security group. Users log on to the bastion host via SSH or RDP and then use that session to manage other hosts in the private subnets.
 
------------------
+## Scenario
+
+You have added a bastion host with Microsoft Remote Desktop Protocol (RDP) access to the application instance security groups (instances are in both public and private subnets), but the company wants to further limit administrative access to all of the instances in the VPC.
+
+The correct answer is to deploy a Windows Bastion host with an Elastic IP address in the public subnet and allow RDP access to bastion only from the corporate IP addresses.
 
 # VPC Endpoint
 

@@ -45,7 +45,9 @@ Always set this up on your root account.
 You can set up rotation policies.
 
 # Roles
+
 ## About
+
 Roles are a way for one AWS service to use another AWS service.
 
 Used to secure the AWS environment. Always use roles, since there is no access into the AWS environment, rather than saving credentials on an EC2 instance.
@@ -54,7 +56,10 @@ Roles are also easier to manage - can update policies easily, such as being able
 
 Roles are universal - don't need to specify what region they're in. 
 
+> IAM roles are designed so that your applications can securely make API requests from your instances, without requiring you to manage the security credentials that the applications use. Instead of creating and distributing your AWS credentials, you can delegate permission to make API requests using IAM roles.
+
 ## Roles and AWS CLI
+
 Roles are more secure than storing your access key and secret access key on individual EC2 instances (ie, SSH into an instance, and then do `aws configure`)
 
 Roles can be assigned to an EC2 instance after it's created, using both the console and the CLI. 

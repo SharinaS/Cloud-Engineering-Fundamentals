@@ -21,7 +21,7 @@ The oldest service in AWS
 
 * SQS comes up a lot in the Solutions Architect exam.
 
-> Amazon Simple Queue Service (SQS) is a fully managed message queuing service that enables you to send, store, and receive messages between software components at any volume, without losing messages or requiring other services to be available. SQS lets you decouple application components so that they run independently, increasing the overall fault tolerance of the system. Multiple copies of every message are stored redundantly across multiple availability zones so that they are available whenever needed. *- Udemy AWS Certified Cloud Practitioner Practice Exam Course*
+> Amazon Simple Queue Service (SQS) is a fully managed message queuing service that enables you to send, store, and receive messages between software components at any volume, without losing messages or requiring other services to be available. SQS lets you decouple application components so that they run independently, increasing the overall fault tolerance of the system. Multiple copies of every message are stored redundantly across multiple availability zones so that they are available whenever needed. 
 
 ### SQS is a web service that gives you access to a message queue
 
@@ -74,7 +74,7 @@ Messages can be kept in the queue from 1 minute - 14 days.
 > Invisibility time for the message that prevents **duplicate messages**.
 
 
-The amount of time the message is invisible in the SQS queue **after a reader picks up** that message. 
+The amount of time the message is invisible in the SQS queue **after a reader picks up** that message.
 
 If the jobs is processed before the visibility timeout expires, the message will be *deleted* from the queue.
 
