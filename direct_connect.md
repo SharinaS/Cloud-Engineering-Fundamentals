@@ -14,12 +14,9 @@ Useful for high throughput workloads (ie lots of network traffic).
 
 Useful for when you need a stable and reliable and secure connection. For example, if you have situation where you're trying to use a VPN connection but it keeps dropping out b/c of the amount of throughput, you can use a direct connect to solve those issues.
 
-* VPN connectivity utilizes the public Internet, which can have unpredictable performance and despite being encrypted, can present security concerns
+VPN connectivity utilizes the public Internet, which can have unpredictable performance and despite being encrypted, can present security concerns
 
-## Components of a VPN Connection
-
-1. Virtual Private Gateway
-2. Customer Gateway
+--> See more about VPNs in my [vpn doc](https://github.com/SharinaS/Cloud-Engineering-Fundamentals/blob/master/vpn.md).
 
 ## Steps for Direct Connect Setup
 

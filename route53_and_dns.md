@@ -2,15 +2,24 @@
 
 ## Index
 
-[Routing Policies](#Routing-Policies)
+[About DNS](#About-DNS)
 
-[]()
+* [Domain Registrars](#Domain-Registrars)
+* [DNS Records](#DNS-Records)
+* [DNS Types](#DNS-Types)
+* [IPv4 and IPv6 Addresses](#IPv4-and-IPv6-Addresses)
+* [Routing Policies](#Routing-Policies)
+* [Top Level Domains](#Top-Level-Domains)
+
+[Route 53](#Route-53)
+
+* [Routing Policies](#Routing-Policies)
 
 ## Project
 
 See my notes when I set up Route 53 for my app, Music Central - scroll down in [the readme](https://github.com/SharinaS/music-central/blob/master/README.md).
 
-## General Info About DNS
+# About DNS
 
 DNS is on port 53, so that's where Route53 comes from. 
 
@@ -26,7 +35,8 @@ DNS is a tree with 13 nameservers at the top.
 
 IP addresses are used by computers to identify each other on a network. They come in two types: IPv4 and IPv6. 
 
-## DNS Types (see below for most):
+## DNS Types
+
 * SOA Records
 * NS Records
 * A Records
@@ -43,22 +53,27 @@ Key points:
 * You can set SNS notifications to alert you if a health check has failed. 
 
 ## IPv4 and IPv6 Addresses
-### IPv4:
+
+### IPv4
+
 A 32-bit field, giving > 4 bill different addresses
 
 Can fill up a dumptruck with sand, if each sand grandule is an address. 
 
-### IPv6: 
+### IPv6 
+
 Created to deal with running out of IPv4 addresses
 
 Has an address space of 128 bits, which is (theoretically) = 340 undecillion addresses. Can fill up the sun with all the sand granules (a cloud guru).
 
-## ELBs & DNS
+### ELBs & DNS
+
 Elastic Load Balancers do not have pre-defined IPv4 addresses.
 
 You resolve to them using a *DNS name*. 
 
 ## Top Level Domains
+
 bbc.co.uk
 * Top level domain - the last word in a domain name - the .uk
 * Second level domain - the second word in a domain name - the .co.
@@ -70,6 +85,7 @@ Controlled by IANA - Internet Assigned Numbers Authority
 All words in the domain name have to be unique
 
 ## Domain Registrars
+
 An authority that can assign domain names directly under 1+ top-level domains.
 * *Duplication prevention* overseen by registrars. 
 * Domains are registered with InterNIC
@@ -115,7 +131,7 @@ A record used by the computer to translate the name of the domain to an IP addre
 
 The A record is a phonebook. 
 
-## Example: 
+### Example: 
 1. user types into browser, google.com. 
 
 2. The browser goes to the top level domain server and queries it for the authoritative DNS records for the domain.
@@ -128,7 +144,7 @@ The A record is a phonebook.
 
 > user --> top level domain server (authoritative DNS records queried for a name server record) --> Name Server Records (queried for the Start of Authority) --> SOA (queried for DNS records).
 
-## TTL
+### TTL
 TTL = Time To Live (in seconds)
 
 The length that a DNS record is cached either... 
@@ -139,7 +155,7 @@ Smaller TTL : Faster the DNS records changes propogate through the internet.
 
 48 hours is the default TTL. If you change the IP address, it will take 48 hours approx to take effect. 
 
-## CNAME Records
+### CNAME Records
 
 CName = Canonical Name
 
@@ -152,7 +168,7 @@ Helpful when running multiple services from a single IP address
 
 > CNAME records must point to another domain name (not to an IP address).
 
-### Examples
+## Examples
 
 #### Subdomain
 
@@ -229,9 +245,15 @@ Allows you to split your traffic based on different weights assigned. It adds up
 
 User types domain name into browser --> DNS request to Route53 --> Route53 sends 30% traffic to us-east-1 **+** Route53 sends 70% traffic to us-west-2. 
 
-Weighted routing lets you associate multiple resources with a single domain name (tutorialsdojo.com) or subdomain name (blog.tutorialsdojo.com) and choose how much traffic is routed to each resource. This can be useful for a variety of purposes, including load balancing and testing new versions of software.
-
 Weighted routing is not for a failover configuration.
+
+### Multiple Resources and a Single Domain Name
+
+Weighted routing lets you **associate multiple resources with a single domain** name (tutorialsdojo.com) or subdomain name (blog.tutorialsdojo.com) and choose how much traffic is routed to each resource. This can be useful for a variety of purposes, including load balancing and testing new versions of software.
+
+### Increase Elasticity
+
+Using an Elastic Load Balancer is an ideal solution for adding elasticity to your application. Alternatively, you can also create a policy in Route 53, such as a Weighted routing policy, to evenly distribute the traffic to 2 or more EC2 instances. 
 
 [Set up Weighted Routing](#Set-up-Weighted-Routing)
 

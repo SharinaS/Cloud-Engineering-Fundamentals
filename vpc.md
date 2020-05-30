@@ -93,7 +93,29 @@ Can peer VPCs with other AWS accounts, and with other VPCs in the same account.
 
 Alternative to peering: Use a Transit Gateway.
 
-## No Transitive Peering
+### Limitations to VPC Peering
+
+ A VPC peering connection does not support edge to edge routing. This means that if either VPC in a peering relationship has one of the following connections, you cannot extend the peering relationship to that connection:
+
+* A VPN connection or an AWS Direct Connect connection to a corporate network
+* An Internet connection through an Internet gateway
+* An Internet connection in a private subnet through a NAT device
+* A gateway VPC endpoint to an AWS service; for example, an endpoint to Amazon S3.
+* (IPv6) A ClassicLink connection. You can enable IPv4 communication between a linked EC2-Classic instance and instances in a VPC on the other side of a VPC peering connection. However, IPv6 is not supported in EC2-Classic, so you cannot extend this connection for IPv6 communication.
+
+For example, if VPC A and VPC B are peered, and VPC A has any of these connections, then instances in VPC B cannot use the connection to access resources on the other side of the connection. Similarly, resources on the other side of a connection cannot use the connection to access VPC B.
+
+### Increase Fault Tolerance
+
+A media company has two VPCs: VPC-1 and VPC-2 with peering connection between each other. VPC-1 only contains private subnets while VPC-2 only contains public subnets. The company uses a single AWS Direct Connect connection and a virtual interface to connect their on-premises network with VPC-1.
+
+Which of the following options increase the fault tolerance of the connection to VPC-1?
+
+--> Establish a hardware VPN over the Internet between VPC-1 and the on-premises network.
+
+--> Establish another AWS Direct Connect connection and private virtural interface in the same AWS region as VPC-1.
+
+### No Transitive Peering
 
 Instances within one VPC can talk to the instances within a connected VPC. For instances to talk to each other, you have to directly connect a VPC to another VPC. You can't talk to an instance in secondarily connected VPCs. 
 
@@ -552,6 +574,8 @@ Go to "Edit routes," and click on the "x" to the right of the route, then click 
 NAT =  network address translation
 
 > Purpose in Life: enable instances in a private subnet to connect to the internet or other AWS services, but prevent the internet from initiating a connection with those instances.
+
+(Other option to connect without public IP addresses: For VPCs with a hardware VPN connection or Direct Connect connection, instances can route their Internet traffic down the virtual private gateway to your existing datacenter. From there, it can access the Internet via your existing egress points and network security/monitoring devices.)
 
 * No need to patch the OS 
 * Not associated with any security groups! (Doesn't need to be behind one)

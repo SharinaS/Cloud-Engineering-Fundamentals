@@ -63,11 +63,21 @@ Messages can be *<= 256 KB* of text in any format.
 
 Anything above 256 KB will be stored in S3, versus SQS, up to about 2 gigs in size.
 
+A single Amazon SQS message queue can contain an unlimited number of messages. However, there is a 120,000 limit for the number of inflight messages for a standard queue and 20,000 for a FIFO queue. Messages are inflight after they have been received from the queue by a consuming component, but have not yet been deleted from the queue.
+
 ## Time-Frame
 
 Messages can be kept in the queue from 1 minute - 14 days.
 
 *Default* retention period: 4 days.
+
+Once the message retention limit is reached, your messages are automatically deleted.
+
+### Scenario
+
+You developed a web application and deployed it on a fleet of EC2 instances, which is using Amazon SQS. The requests are saved as messages in the SQS queue which is configured with the **maximum message retention period.**  However, after thirteen days of operation, the web application suddenly crashed and there are 10,000 unprocessed messages that are still waiting in the queue. Since you developed the application, you can easily resolve the issue but you need to send a communication to the users on the issue. 
+
+--> Tell the users that the application will be operational shortly and all received requests will be processed after the web application is restarted.
 
 ## Visibility Timeout
 
@@ -227,3 +237,13 @@ The Thing|SQS|SWF|
 |API|message-oriented|*task*-oriented|
 |Duplication|Need to handle duplicated messages (default type)|A task is assigned only once and is never duplicated|
 |Tracking|Need to implement your own app-level tracking (esp w/multiple queues)|Keeps track of all tasks and events in an app|
+
+## Delete is Not Automatic
+
+After a message is added to an SQS queue, SQS does not automatically delete the messages.
+
+### Scenario
+
+You have built a web application that checks for new items in an S3 bucket once every hour. If new items exist, a message is added to an SQS queue. You have a fleet of EC2 instances which retrieve messages from the SQS queue, process the file, and finally, send you and the user an email confirmation that the item has been successfully processed. Your officemate uploaded one test file to the S3 bucket and after a couple of hours, you noticed that you and your officemate have 50 emails from your application with the same message.
+
+--> In this scenario, the main culprit is that your application does not issue a delete command to the SQS queue after processing the message, which is why this message went back to the queue and was processed multiple times.
