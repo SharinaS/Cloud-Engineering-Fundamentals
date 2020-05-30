@@ -8,6 +8,16 @@
 
 # Snowball
 
+Q: What happened with the original 50 TB and 80 TB AWS Snowball devices?
+
+The original Snowball devices were transitioned out of service and Snowball Edge Storage Optimized are now the primary devices used for data transfer.
+
+Q: Can I still order the original Snowball 50 TB and 80 TB devices?
+
+No. For data transfer needs now, please select the Snowball Edge Storage Optimized devices.
+
+--------
+
 Can import to S3 and export from S3.
 
 * Must set up an S3 bucket before using Snowball.
@@ -43,7 +53,16 @@ To use it, you just copy your files over to the `s3://your-address-from-snowball
 
 Amazon then picks it up, and they transfer your stuff over to an S3 bucket.
 
+
 # Snowball Edge
+
+AWS Snowball Edge is a type of Snowball device with on-board storage and compute power for select AWS capabilities. Snowball Edge can undertake local processing and edge-computing workloads in addition to transferring data between your local environment and the AWS Cloud.
+
+Each Snowball Edge device can transport data at speeds faster than the internet. This transport is done by shipping the data in the appliances through a regional carrier. The appliances are rugged shipping containers, complete with E Ink shipping labels. The AWS Snowball Edge device differs from the standard Snowball because it can bring the power of the AWS Cloud to your on-premises location, with local storage and compute functionality.
+
+Snowball Edge devices have three options for device configurations – storage optimized, compute optimized, and with GPU.
+
+
 
 There is also a Snowball Edge, which is *100TB* of storage and computer abilities. 
 

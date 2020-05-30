@@ -17,3 +17,7 @@
 |**Cost**|||$$$|$$$$|
 
 See more on [tutorialsdojo](https://tutorialsdojo.com/backup-and-restore-vs-pilot-light-vs-warm-standby-vs-multi-site/)
+
+## Route53 Routing
+
+To automatically route the live traffic to the disaster recovery (DR) environment only in the event that the primary application stack experiences an outage. [See Route53 doc](https://github.com/SharinaS/Cloud-Engineering-Fundamentals/blob/master/route53_and_dns.md).

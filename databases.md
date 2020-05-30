@@ -9,6 +9,9 @@
 [Non Relational Databases](#Non-Relational-Databases) - NoSQL
 
 * [DynamoDB](#DynamoDB)
+* [DynamoDB Accelerator](#Make-It-Even-Faster)
+* [Improve Performance](#Improve-Performance)
+* [Types of Reads](#DynamoDB-has-two-types-of-reads)
 
 [Redshift DB](#Redshift)
 
@@ -426,7 +429,7 @@ NoSQL DB service.
 
 > DynamoDB is serverless with no servers to provision, patch, or manage and no software to install, maintain, or operate. DynamoDB automatically scales tables up and down to adjust for capacity and maintain performance. Availability and fault tolerance are built in, eliminating the need to architect your applications for these capabilities. -- *Certified Cloud Practitioner Practice Exam Course*
 
-Overview:
+### Overview
 
 * Fast
   * latency is consistent and single-digit at any scale
@@ -437,14 +440,41 @@ Overview:
 * Stored on SSD storage (this is why it's so fast)
 * Spread across **3** geographically distinct data centres (multiple AZs) (redundancy)
 
-Used for:
+### Used for
 
 * mobile
 * web
 * gaming (see my app, [JavaTag](https://github.com/SharinaS/JavaTag))
 * ad-tech
 * IoT
-* etc
+
+### Use Cases
+
+Note that Dynamo is not good for BLOB data - it is too large a chunk of data to be put into a NoSQL database such as DynamoDB.
+
+#### Store metadata for S3 objects
+
+the Amazon DynamoDB stores structured data indexed by primary key and allow low latency read and write access to items ranging from 1 byte up to 400KB. Amazon S3 stores unstructured blobs and is suited for storing large objects up to 5 TB. In order to optimize your costs across AWS services, large objects or infrequently accessed data sets should be stored in Amazon S3, while smaller data elements or file pointers (possibly to Amazon S3 objects) are best saved in Amazon DynamoDB.
+
+To speed up access to relevant data, you can pair Amazon S3 with a search engine such as Amazon CloudSearch or a database such as Amazon DynamoDB or Amazon RDS. In these scenarios, Amazon S3 stores the actual information, and the search engine or database serves as the repository for associated metadata such as the object name, size, keywords, and so on. Metadata in the database can easily be indexed and queried, making it very efficient to locate an object’s reference by using a search engine or a database query. This result can be used to pinpoint and retrieve the object itself from Amazon S3.
+
+#### Managing web sessions
+
+the DynamoDB Time-to-Live (TTL) mechanism enables you to manage web sessions of your application easily. It lets you set a specific timestamp to delete expired items from your tables. Once the timestamp expires, the corresponding item is marked as expired and is subsequently deleted from the table. By using this functionality, you do not have to track expired data and delete it manually. TTL can help you reduce storage usage and reduce the cost of storing data that is no longer relevant.
+
+#### Use with Kinesis to store data
+
+Scenario
+
+You have a data analytics application that updates a real-time, foreign exchange dashboard and another separate application that archives data to Amazon Redshift. Both applications are configured to consume data from the same stream concurrently and independently by using Amazon Kinesis Data Streams. However, you noticed that there are a lot of occurrences where a shard iterator expires unexpectedly. Upon checking, you found out that the DynamoDB table used by Kinesis does not have enough capacity to store the lease data. 
+
+If the shard iterator expires immediately before you can use it, this might indicate that the DynamoDB table used by Kinesis does not have enough capacity to store the lease data.
+
+--> Increase the write capacity assigned to the shard table.
+
+### Compare to RDS
+
+RDS is more suitable for a relational model that normalizes data into tables that are composed of rows and columns. An RDS database enforces referential integrity in relationships between tables, unlike a DynamoDB table.
 
 ### Storage Amount
 
@@ -475,7 +505,7 @@ Strongly Consistent Reads:
   * An app writes to a DynamoDB table. You want to read the data in <= 1 second.
 * Returns a result that reflects all writes that received a successful response prior to the read.
 
-### How to Improve Performance
+### Improve Performance
 
 **Goal**: Distribute workload evenly and use the provisioned throughput efficiently.
 
