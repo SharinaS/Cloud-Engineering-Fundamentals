@@ -2,7 +2,12 @@
 
 ## Index (in the works)
 
-
+* [Edge Location](#Edge-Location)
+* [Lambda@Edge](#Lambda@Edge)
+* [Origin Failover](#Origin-Failover)
+* [Perfect Forward Secrecy](#Perfect-Forward-Secrecy)
+* [Signed URLS and Signed Cookies](#Signed-URLS-and-Signed-Cookies)
+* [SNI](#SNI)
 
 # About
 
@@ -10,7 +15,7 @@ A Content Delivery Network (CDN).
 
 Amazon CloudFront is a fast content delivery network (CDN) service that securely delivers **data, videos, applications, and APIs** to customers globally with low latency, high transfer speeds, all within a developer-friendly environment.
 
-* The end result is that the application origins don’t need to scale to meet demands for static content.
+> Thus, application origins don’t need to scale to meet demands for static content.
 
 Delivers webpages and other webcontent based on the geographical location of the user, content and the server.
 
@@ -18,27 +23,13 @@ When the user goes to the website, the user will pull the content down directly 
 
 # Use Cases
 
-From *AWS Certified Cloud Practitioner Practice Exam Course*:
-
 ## Accelerate static website content delivery.
 
 CloudFront can speed up the delivery of your static content (for example, images, style sheets, JavaScript, and so on) to viewers across the globe. By using CloudFront, you can take advantage of the AWS backbone network and CloudFront edge servers to give your viewers a fast, safe, and reliable experience when they visit your website.
 
 ## Live & on-demand video streaming.
 
-The Amazon CloudFront CDN offers multiple options for streaming your media – both pre-recorded files and live events – at sustained, high throughput required for 4K delivery to global viewers.
-
-# Security
-
-CloudFront integrates seamlessly with AWS Shield for Layer 3/4 DDoS mitigation and AWS WAF for Layer 7 protection.
-
-## Perfect Forward Secrecy
-
-Perfect Forward Secrecy is a feature that provides additional safeguards against the eavesdropping of encrypted data, through the use of a unique random session key. This prevents the decoding of captured data, even if the secret long-term key is compromised.
-
-Perfect Forward Secrecy is used to offer SSL/TLS cipher suites.
-
-CloudFront and Elastic Load Balancing are the two AWS services that support Perfect Forward Secrecy.
+The Amazon CloudFront CDN offers multiple options for streaming your **media** – both pre-recorded files and live events – at sustained, high throughput required for 4K delivery to global viewers.
 
 # CloudFront Origin
 
@@ -59,7 +50,7 @@ Lambda@Edge is a feature of Amazon CloudFront that lets you run code closer to u
 
 ## Functions Run Responsively to Events
 
-Lambda@Edge lets you run Lambda functions to customize the content that CloudFront delivers, executing the functions in AWS locations closer to the viewer. The functions run in response to CloudFront events, without provisioning or managing servers. 
+Lambda@Edge lets you run **Lambda functions** to customize the content that CloudFront delivers, executing the functions in AWS locations closer to the viewer. The functions run in response to CloudFront events, without provisioning or managing servers. 
 
 You can use Lambda functions to change CloudFront requests and responses at the following points:
 
@@ -74,15 +65,6 @@ You can use Lambda functions to change CloudFront requests and responses at the 
 ## Quicker Authentication
 
 you can use Lambda@Edge to allow your Lambda functions to customize the content that CloudFront delivers and to execute the authentication process in AWS locations closer to the users. 
-
-
-## Origin Failover for Performance Issues
-
-In addition, you can set up an origin failover by creating an **origin group** with two origins, with one as the primary origin and the other as the second origin which CloudFront automatically switches to when the primary origin fails. 
-
-This will alleviate occasional **HTTP 504 errors** users may experience.
-
-Much cheaper than if you use multiple regions and Route53, for example, if you deploy your application to multiple AWS regions to accommodate your users around the world, and if you also set up a Route 53 record with latency routing policy to route incoming traffic to the region that provides the best latency to the user.
 
 # Edge Location
 
@@ -108,14 +90,45 @@ Distributions can be either Web Distribution (typically used for websites) or RT
 
 CloudFont is a global service - you don't choose a region.
 
+# Origin Failover 
+
+...for Performance.
+
+Set up an **origin failover** by creating an **origin group** with two origins, with one as the primary origin and the other as the second origin which CloudFront automatically switches to when the primary origin fails. To set up origin failover, you must have a distribution with at least two origins.
+
+This will alleviate occasional **HTTP 504 errors** users may experience.
+
+## Cheaper
+
+Much cheaper than if you use multiple regions and Route53 if you deploy your application to multiple AWS regions to accommodate your users around the world, and if you also set up a Route 53 record with latency routing policy to route incoming traffic to the region that provides the best latency to the user.
+
+## Use with Lambda@Edge Functions
+
+The Lambda function is triggered for the primary origin when CloudFront routes a request to it on a cache miss. If the primary origin returns an HTTP status code that you’ve configured for failover, the Lambda function is triggered again, when CloudFront re-routes the request to the second origin.
+
+[More in the Developers Guide](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/high_availability_origin_failover.html).
+
+# Security
+
+CloudFront integrates seamlessly with AWS Shield for Layer 3/4 DDoS mitigation and AWS WAF for Layer 7 protection.
+
+## Perfect Forward Secrecy
+
+Perfect Forward Secrecy is a feature that provides additional safeguards against the **eavesdropping of encrypted data**, through the use of a unique **random session key**. This prevents the decoding of captured data, even if the secret long-term key is compromised.
+
+Perfect Forward Secrecy is used to offer SSL/TLS cipher suites.
+
+CloudFront and Elastic Load Balancing are the two AWS services that support Perfect Forward Secrecy.
+
 # Signed URLS and Signed Cookies
 
-CloudFront signed URLs and signed cookies provide the same basic functionality: they allow you to control who can access your content. If you want to serve private content through CloudFront and you're trying to decide whether to use signed URLs or signed cookies, consider the following:
+CloudFront signed URLs and signed cookies provide the same basic functionality: they allow you to **control who can access your content**. For if you want to serve private content through CloudFront. 
 
 ## Use signed URLs for the following cases:
 
-- You want to use an RTMP distribution. Signed cookies aren't supported for RTMP distributions.
+* You want to use an RTMP distribution. 
   * RTMP distributions stream media files using Adobe Media Server and the Adobe Real-Time Messaging Protocol (RTMP)
+  * Signed cookies aren't supported for RTMP distributions.
 
 - You want to **restrict access to individual files**, for example, an installation download for your application.
 
@@ -123,10 +136,35 @@ CloudFront signed URLs and signed cookies provide the same basic functionality: 
 
 ## Use signed cookies for the following cases:
 
-- You want to **provide access to multiple restricted files**, for example, all of the files for a video in HLS format or all of the files in the subscribers' area of a website.
-  * HTTP Live Streaming (also known as HLS) is an HTTP-based adaptive bitrate streaming communications protocol (see more on [wikipedia](https://en.wikipedia.org/wiki/HTTP_Live_Streaming))
+* You want to **provide access to multiple restricted files**, for example, all of the files for a video in HLS format or all of the files in the subscribers' area of a website.
+  * HLS, aka HTTP Live Streaming, is an HTTP-based adaptive bitrate streaming communications protocol (see more on [wikipedia](https://en.wikipedia.org/wiki/HTTP_Live_Streaming))
+* You don't want to change your current URLs.
 
-- You don't want to change your current URLs.
+# SNI
+
+## Transport Layer Security protocol
+
+"Transport Layer Security (TLS), and its now-deprecated predecessor, Secure Sockets Layer (SSL), are cryptographic protocols designed to provide communications security over a computer network." - Wikipedia
+
+## Server Name Indication
+
+SNI = Server Name Indication
+
+SNI Custom SSL relies on the SNI extension of the Transport Layer Security protocol, which allows multiple domains to serve SSL traffic over the **same IP address** by including the hostname which the viewers are trying to connect to.
+
+Amazon CloudFront delivers your content from each edge location and offers the same security as the Dedicated IP Custom SSL feature. 
+
+### Browsers
+
+SNI Custom SSL works with most modern browsers, including Chrome version 6 and later (running on Windows XP and later or OS X 10.5.7 and later), Safari version 3 and later (running on Windows Vista and later or Mac OS X 10.5.6. and later), Firefox 2.0 and later, and Internet Explorer 7 and later (running on Windows Vista and later).
+
+### Downside
+
+Some users may not be able to access your content because some older browsers do not support SNI and will not be able to establish a connection with CloudFront to load the HTTPS version of your content. If you need to support non-SNI compliant browsers for HTTPS content, it is recommended to use the Dedicated IP Custom SSL feature.
+
+### Fees
+
+There are no additional certificate management fees to SNI; you simply pay normal Amazon CloudFront rates for data transfer and HTTPS requests.
 
 # Console Demo
 

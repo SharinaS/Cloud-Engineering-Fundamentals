@@ -1,9 +1,10 @@
 # EC2
 
-## Index (not complete)
+## Index 
 
 * [AMI Types](#AMI-Types)
 * [EBS](#EBS-Volumes)
+  * [EBS and SnapShots](#EBS-and-SnapShots)
   * [EBS Types](#EBS-Types)
 * [Encryption](#Encrypted-Root-Device-Volumes-&-Snapshots)
 * [Placement Groups](#Types-of-Placement-Groups)
@@ -438,24 +439,43 @@ EBS = Elastic Block Storage
 
 Essentially, EBS is a virtual hard disk drive in the cloud (used by EC2). Every server has a disk.
 
-* **One EBS Volume can be attached to one EC2 instance** at a time, hence, no other EC2 instance can connect to that EBS Provisioned IOPS Volume.
-* EBS provides persistent block storage volumes for EC2 instances.
+## Key (Summarized) Facts
+
+- When you create an EBS volume in an Availability Zone, it is automatically replicated within that zone to prevent data loss due to a failure of any single hardware component.
+
+- An EBS volume can only be attached to one EC2 instance at a time.
+
+- After you create a volume, you can attach it to any EC2 instance in the same Availability Zone
+
+- An EBS volume is off-instance storage that can persist independently from the life of an instance. You can specify not to terminate the EBS volume when you terminate the EC2 instance during instance creation.
+
+- EBS volumes support live configuration changes while in production which means that you can modify the volume type, volume size, and IOPS capacity without service interruptions.
+
+- Amazon EBS encryption uses 256-bit Advanced Encryption Standard algorithms (AES-256)
+
+- EBS Volumes offer 99.999% SLA. (<--- service level agreement?)
 
 Databases and dynamic websites require block-level storage (such as EBS).
 
 ## AZs and Regions
 
+### Automatic Replication
+
 Each EBS volume is *automatically replicated* within its Availability Zone (providing availability and durability in case of component failure).
+
+### EBS in Same AZ as Instance
 
 Volumes will *always be in the same availability zone* as the EC2 instance. 
 
 * Paraphrased from A Cloud Guru: Whereever the EC2 instance is, the volume will be in the same availability zone. In a physical computer, you want the hard disk drive to be as close to the motherboard as possible. In a virtual machine, and a virtual hard disk drive, you want them in the same availability zone, otherwise there will be too much lag. 
 
+### Move Instances
+
 You can *move an EC2 instance from one AZ to another* by taking a snapshot of it, creating an AMI from the snapshot, and then using the AMI to launch the EC2 instance in a new AZ.
 
 You can *move an EC2 instance from one region to another* by taking a snapshot of it, creating an AMI from the snapshot, copying the AMI from one region to another, then using the copied AMI to launch the EC2 instance in the new region.
 
-See more in section [How to copy an AMI](#Copy-and-Move)
+See more in section [Copy and Move](#Copy-and-Move)
 
 ## EBS Types
 

@@ -1,7 +1,8 @@
 # SWF
 
 * [About SWF](#About-SWF)
-* [SQS vs SWF](#SQS-vs-SWF)
+* [SWF and SQS](#SWF-and-SQS)
+* [SWF vs SQSF](#SQS-vs-SWF)
 
 ------------
 
@@ -17,12 +18,18 @@ A way of coordinating work across distributed application components... or a way
 
 SWF is a way of coordinating both your applications as well with human beings / manual processes
 
+Amazon SWF is a web service that makes it easy to coordinate work across distributed application components.
+
+### Use Cases
+
 Task coordination use cases:
 
 * media processing
 * web application backends
 * busines process workflows
 * analysis piopeslines
+
+### Tasks Invocations
 
 Tasks are invocations of various processing steps in an application, which are preformed by:
 
@@ -60,7 +67,15 @@ These carry out the activity tasks
 
 A collection of related workflows.
 
-## SQS vs SWF
+## SWF and SQS
+
+ The services that you can use for creating a decoupled architecture in AWS. Decoupled architecture is a type of computing architecture that enables computing components or layers to execute independently while still interfacing with each other.
+
+Amazon SQS offers reliable, highly-scalable hosted queues for storing messages while they travel between applications or microservices. Amazon SQS lets you move data between distributed application components and helps you decouple these components. 
+
+Amazon SWF is a web service that makes it easy to coordinate work across distributed application components.
+
+## SWF vs SQS
 
 The Thing|SQS|SWF|
 |-----|-----|-----|

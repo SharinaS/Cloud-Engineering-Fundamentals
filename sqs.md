@@ -210,3 +210,20 @@ Problem: You need to ensure that the premium users of a site who paid for the se
 Solution: Create an SQS queue for free members and anothe one for premium members. Configure your EC2 instances to consume messages from the premium queue first, and if it's empty, poll from the free members' SQS queue. 
 
 The reason for this is that you cannot set a priority to individual items in an SQS queue.
+
+## SQS and SWF
+
+ The services that you can use for creating a decoupled architecture in AWS. Decoupled architecture is a type of computing architecture that enables computing components or layers to execute independently while still interfacing with each other.
+
+Amazon SQS offers reliable, highly-scalable hosted queues for storing messages while they travel between applications or microservices. Amazon SQS lets you move data between distributed application components and helps you decouple these components. 
+
+Amazon SWF is a web service that makes it easy to coordinate work across distributed application components.
+
+## SQS vs SWF
+
+The Thing|SQS|SWF|
+|-----|-----|-----|
+|Timing|Retention period up to 14 days| workflow executions up to 1 year|
+|API|message-oriented|*task*-oriented|
+|Duplication|Need to handle duplicated messages (default type)|A task is assigned only once and is never duplicated|
+|Tracking|Need to implement your own app-level tracking (esp w/multiple queues)|Keeps track of all tasks and events in an app|

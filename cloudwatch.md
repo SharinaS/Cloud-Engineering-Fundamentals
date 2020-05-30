@@ -8,6 +8,8 @@
 
 [Do Things with CloudWatch](#Do-Things-with-CloudWatch)
 
+[Metrics Available](#Available-Metrics)
+
 # About CloudWatch
 
 A monitoring service for:
@@ -53,7 +55,7 @@ CloudWatch can monitor at a **host level**. This includes metrics such as:
 
 To monitor other items you need to prepare a custom metric using a Perl or other shell script, as there are no ready to use metrics for these:
 
-* memory utilization
+* memory usage
 * disk swap utilization
 * disk space utilization
 * page file utilization

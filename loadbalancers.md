@@ -73,7 +73,7 @@ Best suited for
 
 * load balancing of HTTP and HTTPS traffic
 * flexible application management
-* TLS termination
+* TLS termination <-- (Transport Layer Security)
 * path-based routing, host-based routing 
 * support for containerized applications
 
