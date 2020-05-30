@@ -1,6 +1,8 @@
 # AutoScaling
 
-## Index (in the works)
+## Index 
+
+[Cooldown Period](#Cooldown-Period)
 
 [Order of Termination](#Order-of-Termination)
 
@@ -95,6 +97,15 @@ The default termination policy is designed to help ensure that your network arch
 
 -- *AWS AWS Certified Solutions Architect Associate Practice Tests*
 
+# Cooldown Period
+
+Summary
+
+* It ensures that the Auto Scaling group does not launch or terminate additional EC2 instances before the previous scaling activity takes effect.
+* Its default value is 300 seconds.
+* It is a configurable setting for your Auto Scaling group.
+
+The cooldown period is a configurable setting for your Auto Scaling group that helps to ensure that it doesn't launch or terminate additional instances before the previous scaling activity takes effect. After the Auto Scaling group dynamically scales using a simple scaling policy, it waits for the cooldown period to complete before resuming scaling activities.
 
 # Make One - with the AWS Console
 ## Make a Configuration

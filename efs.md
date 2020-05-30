@@ -2,7 +2,7 @@
 
 EFS = Elastic File System
 
-EFS is a file storage service for Elastic Compute Cloud or EC2 intances. It provides a (simple) interface for creating and configuring *file systems*.
+EFS is a file storage service **for EC2 intances** (Elastic Compute Cloud). It provides a (simple) interface for creating and configuring *file systems*.
 
 * Has Read after Write Consistency
 

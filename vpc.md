@@ -1,6 +1,6 @@
 # VPC
 
-## Index (in the works)
+## Index
 
 [Bastion Host](#Bastion-Host)
 
@@ -8,6 +8,8 @@
 
 * [NAT Gateway](#NAT-Gateways)
 * [Elastic IP Address](#Elastic-IP-Address)
+
+[NACLs vs Security Groups](#NACLs-vs-Security-Groups)
 
 [Network Access Control Lists](#Network-Access-Control-Lists)
 
@@ -433,7 +435,7 @@ sudo su
 ```
 ping private-ip-address-of-private-instance
 ```
--------------
+
 
 # NAT Instances and Nat Gateways
 
@@ -633,40 +635,35 @@ Network Access Control List = Network ACL = NACL
 
 "A network ACL is an optional layer of security that acts as a firewall for controlling traffic in and out of a subnet," says AWS.
 
-VPC > Security (to the left) > Network ACLs.
+VPC > Security (to the left) > Network ACLs
 
-* You'll see a list of Access Control Lists. Two were created at some point along the journey - one with 2 subnets (sits inside our custom VPC), and one with 3 subnets (sits within the default VPC). 
+## Default NACL
 
-### Default NACL
+When we create a custom VPC, a network ACL is created by default. **By default, it allows all outbound and inbound traffic**. 
 
-When we created the custom VPC, a network ACL was created by default. By default, it allows all outbound and inbound traffic. 
+Every time we add a subnet to our VPC, it will be associated with our default Network ACL. In fact, it *must* be associated with a network ACL - if you don't explicitly associate a subnet with a network ACL, the subnet will be automatically associated with the default network ACL. 
 
-Everytime we add a subnet to our VPC, it will be associated with our default Network ACL. In fact, it *must* be associated with a network ACL - if you don't explicitly associate a subnet with a netowrk ACL, the subnet will be automatically associated with the default network ACL. 
-
-Note, we can associate a subnet with a new NACL, but *a subnet itself can only be associated with one network ACL at a given time*. Network ACLs can have multiple subnets on them, however. 
+We can associate a subnet with a new NACL, but *a subnet itself can only be associated with one network ACL at a given time*. Network ACLs can have multiple subnets associated with them, however. 
 
 * When you associate a network ACL with a subnet, the previous association is removed.
 
-The Default NACL has Inbound Rules. Each rule is incremented by 100. (see more below).
+The Default NACL has Inbound Rules. Each rule is incremented by 100. 
 
-### Custom NACLs
+## Custom NACLs
 
 You can create custom network ACLs. By default each custom network ACL *denies* all inbound and outbound traffic until you add rules. 
 
-### Stateless
+## Order of Rules
+
+Network ACL Rules are evaluated by rule number, from lowest to highest, and executed immediately when a matching allow/deny rule is found.
+
+The rules are evaluated in order - 100 (HTTP), 200 (HTTPS), 300 (SSH) for inbound rules. 
+
+## Stateless
 
 *Network ACLs are stateless*. So responses to allowed inbound traffic are subject to the rules for outbound traffic (and vice versa). 
 
 You can add deny and allow rules. When you open a port on inbound, it doesn't mean a port opens on outbound. 
-
-### NACLs vs Security groups
-
-Security Groups usually control the list of ports that are allowed to be used by your EC2 instances and the NACLs control which network or list of IP addresses can connect to your whole VPC.
-
-*if you're using network ACLs, they will always be evaluated before security groups.* So if you **deny** a specific port on your ACL, it will never reach your security group. So, **NACls will always act first before security groups.** 
-
-... So, you can use a network ACL to block specific IP Addresses.
-* You can't block specific IP addresses using security groups.
 
 ## Create a Network ACL 
 Click the Create button up top. 
@@ -696,10 +693,16 @@ Edit Outbound rules
 * connect on port 80, 443, 1024-65535 (ephemoral ports for NAT Gateway)
   * short lived transport protrocol port is an ephemeral port. They may be used on the server side of communication. Port only available during the communication, then times out. NAT gateway uses the emphemoral port of the type noted above. 
 
-### About the Order of Rules:
-The rules are evaluated in order - 100 (HTTP), 200 (HTTPS), 300 (SSH) for inbound rules. So, if there's a deny rule setup as rule 400, the deny won't activate till everything else is done. If you set up a deny rule for a specific IP address, the deny rule needs to be numbered 99, in this case, so it's before the allow rules. 
+# NACLs vs Security Groups
 
+Security Groups usually control the list of ports that are allowed to be used by your EC2 instances and the NACLs control which network or list of IP addresses can connect to your whole VPC.
 
+*if you're using network ACLs, they will always be evaluated before security groups.* So if you **deny** a specific port on your ACL, it will never reach your security group. So, **NACls will always act first before security groups.** 
+
+... So, you can use a network ACL to block specific IP Addresses.
+* You can't block specific IP addresses using security groups.
+
+[Sweet comparison chart on AWS](https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Security.html#VPC_Security_Comparison).
 
 # VPC Flow Logs
 

@@ -140,16 +140,27 @@ Smaller TTL : Faster the DNS records changes propogate through the internet.
 48 hours is the default TTL. If you change the IP address, it will take 48 hours approx to take effect. 
 
 ## CNAME Records
+
 CName = Canonical Name
 
 Found in the Domain Name System (DNS), which is used to map one domain name (an alias) to another (the CName).  
 
 Helpful when running multiple services from a single IP address
-* An FTP server and a web server, for eample. 
+
+* An FTP server and a web server, for example. 
+  * FTP = File Transfer Protocol =  a standard network protocol used for the transfer of computer files between a client and server on a computer network.
 
 > CNAME records must point to another domain name (not to an IP address).
 
-**Example** You have created a new subdomain for your website. You want it to point to an ELB using Route53. Use a CNAME record set (not A record set).
+### Examples
+
+#### Subdomain
+
+You have created a new subdomain for your website. You want it to point to an ELB using Route53. Use a CNAME record set (not A record set).
+
+#### RDS Database
+
+Amazon RDS simply flips the canonical name record (CNAME) for your DB instance to point at the standby when there's a failover (multi-AZ deployment scenario).
 
 ## Alias Records
 Used to map resource record sets in your hosted zone to:

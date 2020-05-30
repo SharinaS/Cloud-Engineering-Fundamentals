@@ -58,14 +58,20 @@ Run your code in response to HTTP requests using API Gateway or API calls made u
 
 * "SDKs take the complexity out of coding by providing language-specific APIs for AWS services" - AWS
 
-## Example
-
-### Meme
+### Memes
 
 * User uploads meme to an S3 bucket
 * Lambda triggered
 * Lambda takes the meme and metadata and adds words to the picture
 * Lambdas can trigger lambdas
+
+### Images Sent to Kinesis then S3
+
+There is an internal application that serves as a repository for images uploaded by a couple of users. Whenever a user uploads an image, it is sent to Kinesis for processing before it is stored in an S3 bucket. Afterwards, if the upload is successful, the application will return a prompt telling the user that the upload is successful. The entire processing typically takes about 5 minutes to finish.
+
+To asynchronously process the request to the application in the most cost-effective manner, create a Lambda function that will asynchronously process the requests. 
+
+Note that using Step Functions with Lambda is excessive in this situation and is not cost-effective: AWS Step Functions service lets you coordinate multiple AWS services into serverless workflows so you can build and update apps quickly. Although this can be a valid solution, it is not cost-effective since the application does not have a lot of components to orchestrate. Lambda functions can effectively meet the requirements in this scenario without using Step Functions. This service is not as cost-effective as Lambda.
 
 ## Scaling
 
@@ -173,3 +179,4 @@ Traffic is shifted in **equal increments** with an **equal number of minutes** b
 ### All-at-once
 
 All traffic is shifted from the original Lambda function to the updated Lambda function version at once.
+

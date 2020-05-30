@@ -26,12 +26,18 @@
 
 * [Failover](#Failover)
 
-* [Multi AZ and Read Replicas](#Two-Features-of-Relational-DBs)
+* [Multi AZ](#(1)-Multi-AZ)
+
+* [Read Replicas](#(2)-Read-Replicas)
 
 * [Set up RDS Database](#Set-up-RDS-Database)
 
+* [Two Features of RDS](#Two-Features-of-RDS)
+
 
 [OLTP vs OLAP](#OLTP-vs-OLAP)
+
+[Write Throughput](#How-to-Increase-Write-Throughput)
 
 # AWS Databases
 
@@ -123,16 +129,20 @@ You can also improve the performance of a read-heavy database by using read repl
 
 Read replicas are not a replacement for the high availability and automatic failover capabilities that Multi-AZ provides.
 
-## Two Features of RDS
+# Two Features of RDS
 
 * Multi-AZ
-* Read Replicas
+* Read replicas
+
+See cool AWS chart for [Multi-AZ vs. Read replicas](https://aws.amazon.com/rds/features/multi-az/).
+
+You can combine Multi-AZ with creating a read replica: 
+
+For example, you can configure a source database as Multi-AZ for high availability and create a read replica (in Single-AZ) for read scalability.
 
 ## (1) Multi AZ
 
-For *disaster recovery* (not for improving performance).
-
-EC2 instance <---> DB DNS record <---> primary DB + Secondary DB
+***--> Main purpose is disaster recovery and local performance <--***
 
 **Example**: We have a load balancer with 3 EC2 instances behind it. They connect into the RDS DB, all within us-east-1a.
 
@@ -152,15 +162,17 @@ Multi-AZ available for all the RDS databases except for Aurora (Aurora by its ow
 
 Failover:
 
-* Failover is automatic with multi-AZ. 
+* Failover is automatic with multi-AZ. [See failover section](#Failover).
 * If the primary DB fails, the DNS address will automatically point to the secondary DB.
 * *You can force a failover from one AZ to another by using "Reboot" of the RDS instance.*
 
 ## (2) Read Replicas
 
-You must have *automatic backups* turned *on* in order to deploy a read replica.
+***--> Main purpose is scalability <--***
 
-> For performance. *For scaling*. For security.... NOT for disaster recovery. 
+> For performance... for security.... for increased scalability and to maintain database availability in the case of an AZ failure... NOT for disaster recovery. 
+
+You must have *automatic backups* turned *on* in order to deploy a read replica.
 
 ### How It Works
 
@@ -178,15 +190,11 @@ Use read replicas for very read-heavy DB workloads.
 
 Every time you do a write to the DB, you'll have a perfect replica that is created, which is the Read Replica.
 
-### Add Security
+### Adds Security
 
 public key encryption is used when RDS sets up communication between read replicas and the source DB instance.
 
-### Regions
-
-Read replicas can be in the same or in different regions.
-
-### Benefit
+### Scaling
 
 Say you have a popular word press site, and you get a huge boost in requests after a particularly popular blog post. You can scale by pointing half of the requests to the primary DB and the other half to read from the read replica. This allows you to scale *out*.
 
@@ -209,7 +217,7 @@ Read replicas can be promoted to "Master", to be their *own* DBs
 
 * ... note that this *breaks* the replication, and thus replication will no longer work.
 
-#### Aurora read replica
+### Aurora read replica
 
 * Under actions for a DB, you can choose to "Create Aurora read replica"
   * This is a good way to migrate a MySQL DB over to Aurora, by creating a replica of the DB.
@@ -224,10 +232,13 @@ Read replicas can be promoted to "Master", to be their *own* DBs
 * *Read replicas can have multi-AZ turned on*, so multiple availability zones are used to house replicas.
 * You can create read replicas of Multi-AZ source DBs.
 
+Amazon RDS read replicas can be set up with their own standby instances in a different AZ. 
+
+In the case of Aurora, you can choose to place read replicas across multiple availability zones.
+
 ### Regions
 
-* You can have a read replica in a second region.
-  * As in, you can have a read replica in a region completely different from your primary DB.
+Read replicas can be in the same or in different regions.
 
 ### Use Cases
 
@@ -247,9 +258,33 @@ Implementing disaster recovery. You can promote a read replica to a standalone i
 
 ## Failover
 
+To deal with infrastructure failure. Part of a Multi-AZ deployment ([go to multi-az section](#(1)-Multi-AZ)).
+
+* Loss of availability in primary Availability Zone
+* Loss of network connectivity to primary
+* Compute unit failure on primary
+* Storage failure on primary
+
+Amazon RDS Multi-AZ deployments do not failover automatically in response to database operations such as long running queries, deadlocks or database corruption errors.
+
+### Standby Replica
+
+In a Multi-AZ deployment, Amazon RDS automatically provisions and maintains a synchronous **standby replica** in a different Availability Zone. 
+
+The primary DB instance is synchronously replicated across Availability Zones to a standby replica to **provide data redundancy, eliminate I/O freezes, and minimize latency spikes during system backups.** 
+
+A Standby Replica is not a scaling solution for read-only scenarios; you cannot use a standby replica to serve read traffic. To service read-only traffic, you should use a [Read Replica - see above](#(2)-Read-Replicas).
+
+### Failover is Automatic
+
 Failover involves shifting work to the standby replica.
 
-### Automatic Failover
+In Amazon RDS, failover is automatically handled -  the endpoint for your DB Instance remains the same - so that you can resume database operations without administrative intervention in the event that your primary database instance went down. 
+
+> When failing over, Amazon RDS simply flips the canonical name record (CNAME) for your DB instance to point at the standby, which is in turn promoted to become the new primary.
+
+* RDS: Failover to the standby
+* Aurora: Failover to the read replica
 
 Amazon RDS automatically performs a failover in the event of any of the following:
 
@@ -262,22 +297,14 @@ Automatic failover only occurs if the primary database is the one that is affect
 
 Amazon RDS detects and automatically recovers from the most common failure scenarios for Multi-AZ deployments so that you can resume database operations as quickly as possible without administrative intervention.
 
-### Standby Replica
-
-In a Multi-AZ deployment, Amazon RDS automatically provisions and maintains a synchronous **standby replica** in a different Availability Zone. 
-
-The primary DB instance is synchronously replicated across Availability Zones to a standby replica to **provide data redundancy, eliminate I/O freezes, and minimize latency spikes during system backups.** 
-
-The high-availability feature is not a scaling solution for read-only scenarios; you cannot use a standby replica to serve read traffic. To service read-only traffic, you should use a [Read Replica](#(2)-Read-Replicas).
-
-## Backups for RDS
+# Backups for RDS
 
 Two types of backups for RDS:
 
 * Automated Backups
 * Database Snapshots
 
-### (1) Automated Backups
+## (1) Automated Backups
 
 These are automated, and are done in a scheduled maintenance window.
 
@@ -303,7 +330,7 @@ Backups are taken within a defined window (the *backup window*). Storage I/O may
 
 When you delete the instance, the automated backups are removed too.
 
-### (2) Database Snapshots
+## (2) Database Snapshots
 
 Done *manually* ... aka user initiated.
 
@@ -311,11 +338,11 @@ Done *manually* ... aka user initiated.
 
 They are not deleted when you delete the RDS instance (contrast with the automated backups).
 
-### Restoring Backups
+## Restoring Backups
 
 For both of the types noted above, the restored version of the DB will be a *new RDS instance with a new DNS endpoint*.
 
-## Encryption at Rest
+# Encryption at Rest
 
 Supported for all 6 [AWS RDS databases](#Types-of-Relational-Databases)
 
@@ -330,7 +357,7 @@ Encryption is done with the **AWS Key Management Service (KMS)**.
 
 > RDS instance is encrypted --> (data stored at rest in the underlying storage is encrypted) +  (automated backups, read replicas & snapshots are encrypted).
 
-## Enhanced Monitoring
+# Enhanced Monitoring
 
 Amazon RDS provides metrics in real time for the operating system (OS) that your DB instance runs on. 
 
@@ -340,7 +367,7 @@ By default, Enhanced Monitoring metrics are stored in the CloudWatch Logs for 30
 
 * To modify the amount of time the metrics are stored in the CloudWatch Logs, change the retention for the RDSOSMetrics log group in the CloudWatch console.
 
-### CPU Utilization Metrics
+## CPU Utilization Metrics
 
 There are differences between CloudWatch and Enhanced Monitoring Metrics re CPU utilization:
 
@@ -354,7 +381,7 @@ There are differences between CloudWatch and Enhanced Monitoring Metrics re CPU 
 
 -- *Udemy Certified Solutions Architect Associate Practice Tests*
 
-## How to Increase Write Throughput 
+# How to Increase Write Throughput 
 
 Scenario: You are using a large EC2 Instance with one 500 GB EBS volume to host a relational database.
 
@@ -377,7 +404,7 @@ for on-instance redundancy, RAID 1 can mirror two volumes together, so if you lo
 
 More info in this [YouTube video](https://youtu.be/eE7Bfw9lFfs)
 
-### HVM AMIs
+## HVM AMIs
 
 Take note that HVM AMIs are required to take advantage of enhanced networking and GPU processing. In order to pass through instructions to specialized network and GPU devices, the OS needs to be able to have access to the native hardware platform which the HVM virtualization provides.
 

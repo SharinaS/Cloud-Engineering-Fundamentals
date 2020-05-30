@@ -89,3 +89,7 @@ Which of the following is returned for the user to provide a set of temporary, l
 Cognito uses Push Synchronization to push updates and synchronize user data across multiple devices.
 
 Uses *SNS* to send a notification to all devices associated with a given user identity whenever data stored in the cloud changes.
+
+## Manage Identity Providers
+
+You can manage identity providers using IAM Dashboard instead of creating IAM users in your AWS account. With an identity provider (IdP), you can manage your user identities outside of AWS and give these external user identities permission to use AWS resources in your account.
