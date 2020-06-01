@@ -70,7 +70,7 @@ For each endpoint, you can configure weights (weights are numbers that you use t
 
 ### Associate IP addresses with regional resources
 
-Associate the static IP addresses provided by AWS Global Accelerator to regional AWS resources or endpoints, such as Network Load Balancers, Application Load Balancers, EC2 Instances, and Elastic IP addresses. The IP addresses are anycast from AWS edge locations so they provide onboarding to the AWS global network close to your users.
+Associate the **static IP addresses** provided by AWS Global Accelerator to regional AWS resources or endpoints, such as Network Load Balancers, Application Load Balancers, EC2 Instances, and Elastic IP addresses. The IP addresses are anycast from AWS edge locations so they provide onboarding to the AWS global network close to your users.
 
 ### Move endpoints
 
@@ -81,7 +81,18 @@ Easily move endpoints between Availability Zones or AWS Regions without needing 
 Dial traffic up or down for a specific AWS Region by configuring a traffic dial percentage for your endpoint groups. This is especially useful for testing performance and releasing updates.
 
 ### Control traffic direction
+
 Control the proportion of traffic directed to each endpoint within an endpoint group by assigning weights across the endpoints.
 
-### How to Build One
+## How to Build One
+
 See A Cloud Guru's AWS Certified Solutions Architect, Chapter 7.11 for a demo
+
+## Compare with CloudFront
+
+AWS Global Accelerator and Amazon CloudFront are separate services that use the AWS global network and its edge locations around the world. Both services integrate with AWS Shield for DDoS protection.
+
+CloudFront improves performance for both cacheable content (such as images and videos) and dynamic content (such as API acceleration and dynamic site delivery). 
+
+Global Accelerator improves performance for a wide range of applications over TCP or UDP by proxying packets at the edge to applications running in one or more AWS Regions. Global Accelerator is a good fit for non-HTTP use cases, such as gaming (UDP), IoT (MQTT), or Voice over IP, as well as for HTTP use cases that specifically require static IP addresses or deterministic, fast regional failover. 
+
