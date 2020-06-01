@@ -166,6 +166,12 @@ Some users may not be able to access your content because some older browsers do
 
 There are no additional certificate management fees to SNI; you simply pay normal Amazon CloudFront rates for data transfer and HTTPS requests.
 
+### Scenario
+
+A web application is hosted in an Auto Scaling group of EC2 instances behind a Classic Load Balancer. You need to secure your application by allowing multiple domains to serve SSL traffic over the same IP address.
+
+Solution: Generate an SSL certificate with AWS Certificate Manager and create a CloudFront web distribution. Associate the certificate with your web distribution and enable the support for Server Name Indication (SNI).
+
 # Console Demo
 
 To set it up, you create a 'Distribution.'

@@ -4,6 +4,8 @@
 
 [Bastion Host](#Bastion-Host)
 
+[Create a VPC on the AWS Console](#Create-a-VPC-on-the-AWS-Console)
+
 [NAT Instances and Nat Gateways](#NAT-Instances-and-Nat-Gateways)
 
 * [NAT Gateway](#NAT-Gateways)
@@ -12,6 +14,10 @@
 [NACLs vs Security Groups](#NACLs-vs-Security-Groups)
 
 [Network Access Control Lists](#Network-Access-Control-Lists)
+
+[Peering](#VPC-Peering)
+
+[Route Tables](#Route-Tables)
 
 [Security Groups](#Security-Groups)
 
@@ -27,9 +33,9 @@ VPC = "Virtual Private Cloud"
 
 A virtual data center in the cloud.
 
-A VPC is a *collection* of internet gateways, route tables, network access control lists (ACLs), security groups, EC2 instances, private and public subnets.
+> A VPC is a *collection* of internet gateways, route tables, network access control lists (ACLs), security groups, EC2 instances, private and public subnets.
 
-> Amazon Virtual Private Cloud (Amazon VPC) lets you provision a logically isolated section of the AWS Cloud where you can launch AWS resources in a **virtual network** that you define. You have complete control over your virtual networking environment.
+Amazon Virtual Private Cloud (Amazon VPC) lets you provision a logically isolated section of the AWS Cloud where you can launch AWS resources in a **virtual network** that you define. You have complete control over your virtual networking environment.
 
 Amazon Virtual Private Cloud (Amazon VPC) is the service that allows a customer to create a virtual network for their resources in an isolated section of the AWS cloud.
 
@@ -80,7 +86,7 @@ You can't have 1 subnet spread across multiple availability zones.
 10.0.0.0/28
 * This is the smallest subnet you can use within a VPC. 
 
-## VPC Peering
+# VPC Peering
 
 Allows you to connect one VPC with another via a direct network route using **private IP addresses**.
 
@@ -93,7 +99,11 @@ Can peer VPCs with other AWS accounts, and with other VPCs in the same account.
 
 Alternative to peering: Use a Transit Gateway.
 
-### Limitations to VPC Peering
+A VPC peering connection is a networking connection between two VPCs that enables you to route traffic between them privately. Instances in either VPC can communicate with each other as if they are within the same network. You can create a VPC peering connection between your own VPCs, with a VPC in another AWS account, or with a VPC in a different AWS Region.
+
+AWS uses the existing infrastructure of a VPC to create a VPC peering connection; it is neither a gateway nor a VPN connection and does not rely on a separate piece of physical hardware. There is no single point of failure for communication or a bandwidth bottleneck.
+
+## Limitations to VPC Peering
 
  A VPC peering connection does not support edge to edge routing. This means that if either VPC in a peering relationship has one of the following connections, you cannot extend the peering relationship to that connection:
 
@@ -105,7 +115,7 @@ Alternative to peering: Use a Transit Gateway.
 
 For example, if VPC A and VPC B are peered, and VPC A has any of these connections, then instances in VPC B cannot use the connection to access resources on the other side of the connection. Similarly, resources on the other side of a connection cannot use the connection to access VPC B.
 
-### Increase Fault Tolerance
+## Increase Fault Tolerance
 
 A media company has two VPCs: VPC-1 and VPC-2 with peering connection between each other. VPC-1 only contains private subnets while VPC-2 only contains public subnets. The company uses a single AWS Direct Connect connection and a virtual interface to connect their on-premises network with VPC-1.
 
@@ -115,13 +125,40 @@ Which of the following options increase the fault tolerance of the connection to
 
 --> Establish another AWS Direct Connect connection and private virtural interface in the same AWS region as VPC-1.
 
+## Invalid Configurations
+
 ### No Transitive Peering
 
-Instances within one VPC can talk to the instances within a connected VPC. For instances to talk to each other, you have to directly connect a VPC to another VPC. You can't talk to an instance in secondarily connected VPCs. 
+For instances to talk to each other, you have to directly connect a VPC to another VPC. You can't talk to an instance in secondarily connected VPCs. 
 
-In other words, there is *no transitive peering!*
+You cannot route packets directly from VPC B to VPC C *through* VPC A.
 
-## Security Groups
+### No Edge to Edge routing
+
+Edge to edge routing via a gateway or private connection is an invalid VPC peering configuration.
+
+If either VPC in a peering relationship has one of the following connections, you cannot extend the peering relationship to that connection:
+
+* A VPN connection or an AWS Direct Connect connection to a corporate network
+* An internet connection through an internet gateway
+* An internet connection in a private subnet through a NAT device
+* A gateway VPC endpoint to an AWS service; for example, an endpoint to Amazon S3.
+* (IPv6) A ClassicLink connection. You can enable IPv4 communication between a linked EC2-Classic instance and instances in a VPC on the other side of a VPC peering connection. However, IPv6 is not supported in EC2-Classic, so you cannot extend this connection for IPv6 communication.
+
+
+### No Overlap of CIDR Blocks
+
+If the VPCs have multiple IPv4 CIDR blocks, you cannot create a VPC peering connection if any of the CIDR blocks overlap (regardless of whether you intend to use the VPC peering connection for communication between the non-overlapping CIDR blocks only).
+
+## Scenario with 3 VPCs
+
+A large insurance company has an AWS account that contains three VPCs (DEV, UAT and PROD) in the same region. UAT is peered to both PROD and DEV using a VPC peering connection. All VPCs have non-overlapping CIDR blocks. The company wants to push minor code releases from Dev to Prod to speed up time to market.
+
+--> Create a new VPC peering connection between PROD and DEV with the appropriate roles.
+
+Note that you have to create a new connection, because even though DEV and PROD are both connected via UAT, these two VPCs do not have a direct connection to each other. This is because transitive peering is not allowed.
+
+# Security Groups
 
 These are *stateful*.
 
@@ -152,8 +189,374 @@ An availability zone in my AWS account can be a totally different availability z
 * an Internet Gateway
 * Subnet(s)
 
+# NAT Instances and Nat Gateways
 
-# Create a Custom VPC - VPC with Public & Private Subnets
+## Nat Gateway
+
+NAT = network address translation
+
+> **Problem**: EC2 instances for the application tier running in private subnets need to download software patches from the internet. However, the instances cannot be directly accessible from the internet. 
+
+> **Solution**: 
+> * Configure a NAT gateway in a public subnet. 
+> * Define a custom route table with a route to the NAT gateway for internet traffic and associate it with the
+private subnets for the application tier. 
+
+When you're in a private subnet, how do you install updates? Install updates? Download software? Download software patches? 
+
+Must use NAT Instances or Nat Gateways, since there is no route set up to the Internet from the private subnet. These things make it possible to **communicate with our Internet Gateway, without making our private subnet public.**
+
+In other words, when our instances in our private subnets need to access the internet, they do so via either a NAT Instance or a NAT gateway. 
+
+Nat Gateways are used 99% of the time. Gateways are *highly available, spread across multiple AZ's*. 
+
+Jump down to more about [Nat Gateways](#NAT-Gateways)...
+
+## Nat Instances
+
+Nat Instances are *individual EC2 instances* that do this. Instances are on their way out... but they're still on the exam.
+
+Problems with NAT Instance architecture:
+* It is a single virtual machine
+  * Can create high availability using Autoscaling groups, multiple subnets in different AZs, and a script to automate failover... but ouch, lots of work. 
+* It's a small virtual machine, so it can easily get overwhelmed - it's a massive bottleneck.
+  * Solution: increase the instance size to deal with bottle-necking.
+* It's got a single point of failure. 
+
+## How to Create a NAT *Instance*
+
+[See Amazon docs about NAT Instances](https://docs.aws.amazon.com/vpc/latest/userguide/VPC_NAT_Instance.html). Essentially, the instance will act like a bridge to our private subnet, through our public subnet, to our internet gateway. 
+
+Things to Note:
+* When you create a NAT instance, you have to disable source/destination check on the instance.
+* NAT instances must be a in a public subnet.
+* There must be a route out of the private subnet *to* the NAT instance 
+* A NAT instance is always *behind* a security gruop.
+
+### Set up the NAT instance
+In EC2, launch an instance.
+
+On the left of the list of AMIs, under "Quick Start," choose "Communicty AMIs." In the search bar, type in "nat" and hit return/enter. This gives us our nat instances. 
+
+This is the one I chose, which is an Amazon Community AMI:
+```
+amzn-ami-vpc-nat-hvm-2018.03.0.20181116-x86_64-ebs - ami-0b840e8a1ce4cdf15
+Amazon Linux AMI 2018.03.0.20181116 x86_64 VPC HVM ebs
+```
+
+It's set as a t2.micro, which is great. 
+
+In the configure instance details page:
+* Change the vpc to your custom vpc.
+* Change the subnet to the public subnet (want to launch into the public one), which will give us a public ip address, regarding the "Auto-assign Public IP" - it will say "Enable"
+* Leave everything else the way it is. 
+
+Click the button that says "Add Storage," where you do nothing, just click the button to "Add tags."
+
+Add a few descriptive tags, definitely at least a name. 
+
+Click "Configure security group."
+
+Choose the "Select an existing security group" radio button so we can put this instance inside the security group that also holds the *public* instance we created earlier.
+
+Click "Review and launch."
+
+A window might pop up that asks where to boot from, re SSD. Choose the radio button that says, "Make General Purpose (SSD) the boot volume for this instance." If you don't get this window, don't panic - it's probably b/c of the AMI you're using, and just move on. 
+
+Review the instance, and click "Launch"
+
+A window will pop up asking about key pairs - choose the key pair you've used above. ... and click "Launch instances"
+
+### Make it a "Gateway" of sorts by Disabling Source/Destination checks
+
+Click on the NAT instance radio button. Go to the Actions tab, and choose "Networking > Enable Source/Destination Check." Go ahead and disable it. 
+
+### Make the Database Server "talk" to the NAT Instance
+To do this, we need to create a route out to the internet. The route needs to be created in the default route table, which is the main route table. 
+
+Go to VPC (within network and content delivery), and go to "Route Tables," on the left, within the Virtual Private Cloud section. 
+
+Click the radio button of the route table that is associated with your VPC, and says "Yes," in the "Main" column. This is the main route table associated with your VPC. 
+
+In the tabs below, click "Routes." 
+
+Click "Edit routes," and then "Add route." 
+
+If we want to go out to the internet, we can add something like, "0.0.0.0/0," as our Destination. We then add our NAT instance as the Target, by clicking "Instance" on the pulldown menu and then choosing the NAT instance we created above.
+* You should only allow 0.0.0.0/0 on port 80 or 443 to to connect to your public facing Web Servers, or preferably only to an ELB, says A Cloud Guru.
+
+Click "Save routes."
+
+Now we have a route within our main route table, which says, go over this elastic network interface (eni-).
+
+### Terminate the Instance, since, seriously, so many issues with this architecture!
+
+Click the radio button for the nat instance. Click the Actions pulldown menu above. Choose "Instance State > Terminate"
+
+Remember to remove the route associated with this instance, too. Go to VPC > Route Tables.
+
+Click on your main route table, click the tab below that says "Routes." You'll see one that says, blackhole! This is because the instance no longer exists. 
+
+Go to "Edit routes," and click on the "x" to the right of the route, then click "Save routes."
+
+## NAT Gateways
+
+NAT =  network address translation
+
+> Purpose in Life: enable instances in a private subnet to connect to the internet or other AWS services, but prevent the internet from initiating a connection with those instances.
+
+(Other option to connect without public IP addresses: For VPCs with a hardware VPN connection or Direct Connect connection, instances can route their Internet traffic down the virtual private gateway to your existing datacenter. From there, it can access the Internet via your existing egress points and network security/monitoring devices.)
+
+* No need to patch the OS 
+* Not associated with any security groups! (Doesn't need to be behind one)
+* Automatically assigned a public ip address
+* No need to disable source/destination checks
+
+### Scaleable and highly available
+
+* It scales automatically
+
+### Location
+
+To create a NAT gateway, you must specify the public subnet in which the NAT gateway should reside.
+
+### Availability Zones
+
+You can only have one NAT gateway in an AZ.
+  
+To create AZ-independant architecture, you must create a NAT gateway in *each* availability zone, and configure your routing to ensure that resources use the NAT gateway in the same AZ that they're in (otherwise when a gateway goes down, things stop working)
+
+Each NAT gateway is created in a specific Availability Zone and implemented with redundancy in that zone. You have a quota on the number of NAT gateways you can create in an Availability Zone.
+
+
+### Update the Route Table
+
+After you've created a NAT gateway, you must update the route table associated with one or more of your private subnets to point internet-bound traffic to the NAT gateway. This enables instances in your private subnets to communicate with the internet.
+
+### Elastic IP Address
+
+You must also specify an Elastic IP address to associate with the NAT gateway when you create it. The Elastic IP address cannot be changed after you associate it with the NAT Gateway.
+
+An Elastic IP address is a **property of network interfaces**. An Elastic IP address is a reserved public IP address that you can assign to any EC2 instance in a particular region, until you choose to release it. 
+
+When you associate an Elastic IP address with an EC2 instance, it replaces the default public IP address.
+
+Associate an Elastic IP address with any instance or network interface for any VPC in your account. With an Elastic IP address, you can mask the failure of an instance by rapidly remapping the address to another instance in your VPC. 
+
+Note that the advantage of associating the Elastic IP address with the network interface instead of directly with the instance is that **you can move all the attributes of the network interface from one instance to another in a single step**.
+
+Elastic IP Address Billing: 
+
+* To ensure efficient use of Elastic IP addresses, we impose a small hourly charge when they aren't associated with a running instance, or when they are associated with a stopped instance or an unattached network interface. While your instance is running, you aren't charged for one Elastic IP address associated with the instance, but you are charged for any additional Elastic IP addresses associated with the instance.
+
+### Nat Gateway Example
+Your instance is in the private subnet, it has a route in the Route Table to the NAT Gateway in the public instance. When your instance runs a yum update, it goes to the Nat Gateway, then traverses out.
+
+### Nat Gateway Billing
+
+NAT gateway hourly usage and data processing rates apply. Amazon EC2 charges for data transfer also apply
+
+## Make a Nat Gateway
+
+Go to VPC > Vitual Private Cloud > NAT Gateways.
+
+Click the button, "Create NAT Gateway."
+
+You'll want to choose the *public* subnet you created way back when. 
+
+Click the button that says "Allocate Elastic IP Address," which will create an IP address and attach it to the new Gateway. 
+
+Create the Gateway.
+
+### Edit route tables
+
+A window will pop up saying you'll need to edit your route tables. Click on the "Edit route tables" button.
+
+You'll find yourself at the list of Route Tables.
+
+Click the radio button for your *main* route table inside your VPC. Click the tab called "Routes" and then the button "Edit routes."
+
+We need to give the main route table a route out into the internet. Click "Add route," put the destination perhaps as "0.0.0.0/0," change the "Target" to "NAT_gateway," and then choose the one you created. 
+
+Click the "save" and "close" button.
+
+
+# Network Access Control Lists 
+
+Network Access Control List = Network ACL = NACL
+
+> Use a network ACL to block specific IP Addresses.
+
+"A network ACL is an optional layer of security that acts as a firewall for controlling traffic in and out of a subnet," says AWS.
+
+VPC > Security (to the left) > Network ACLs
+
+## Default NACL
+
+When we create a custom VPC, a network ACL is created by default. **By default, it allows all outbound and inbound traffic**. 
+
+Every time we add a subnet to our VPC, it will be associated with our default Network ACL. In fact, it *must* be associated with a network ACL - if you don't explicitly associate a subnet with a network ACL, the subnet will be automatically associated with the default network ACL. 
+
+We can associate a subnet with a new NACL, but *a subnet itself can only be associated with one network ACL at a given time*. Network ACLs can have multiple subnets associated with them, however. 
+
+* When you associate a network ACL with a subnet, the previous association is removed.
+
+The Default NACL has Inbound Rules. Each rule is incremented by 100. 
+
+## Custom NACLs
+
+You can create custom network ACLs. By default each custom network ACL *denies* all inbound and outbound traffic until you add rules. 
+
+## Order of Rules
+
+Network ACL Rules are evaluated by rule number, from lowest to highest, and executed immediately when a matching allow/deny rule is found.
+
+The rules are evaluated in order - 100 (HTTP), 200 (HTTPS), 300 (SSH) for inbound rules. 
+
+## Stateless
+
+*Network ACLs are stateless*. So responses to allowed inbound traffic are subject to the rules for outbound traffic (and vice versa). 
+
+You can add deny and allow rules. When you open a port on inbound, it doesn't mean a port opens on outbound. 
+
+## Create a Network ACL 
+Click the Create button up top. 
+
+Create a descriptive name.
+
+Select the VPC it should go inside. 
+
+*Once a new Network ACL is created, note that all inbound and outbound rules are automatically set to deny everything*.
+
+### Change Subnet Associations
+Click on the new NACL's radio tab, and click on the tab below, called "Subnet associations."
+
+Click "Edit subnet associations"
+
+Choose the subnet you want - I chose my public one. 
+
+The subnet is now associated with this new NACL, and the other subnet is left behind in the other one. 
+
+Now that the Network ACL has the public subnet it in, any access via HTTP is no longer available (ie, Apache setup would have shown ability to see a little website via IP address in browser.
+
+### Set up Rules for the New Network ACL
+Click tab, "Inbound rules," then "Edit inbound rules"
+* Can create rules to connect on port 80, 443, and 22, for example, inbound.
+
+Edit Outbound rules
+* connect on port 80, 443, 1024-65535 (ephemoral ports for NAT Gateway)
+  * short lived transport protrocol port is an ephemeral port. They may be used on the server side of communication. Port only available during the communication, then times out. NAT gateway uses the emphemoral port of the type noted above. 
+
+# NACLs vs Security Groups
+
+Security Groups usually control the list of ports that are allowed to be used by your EC2 instances and the NACLs control which network or list of IP addresses can connect to your whole VPC.
+
+*if you're using network ACLs, they will always be evaluated before security groups.* So if you **deny** a specific port on your ACL, it will never reach your security group. So, **NACls will always act first before security groups.** 
+
+... So, you can use a network ACL to block specific IP Addresses.
+* You can't block specific IP addresses using security groups.
+
+[Sweet comparison chart on AWS](https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Security.html#VPC_Security_Comparison).
+
+# VPC Flow Logs
+
+A feature that lets you capture information about IP traffic going to/from network interfaces in a VPC. 
+
+Flow log data is stored, reviewed and retrieved using **CloudWatch Logs**. 
+
+* Alternatively you can send logs to an S3 Bucket. 
+
+Can do logs at the VPC level, Subnet level or Network Interface level. 
+
+You essentially go to VPC, go to the tab actions, and click "Flow Log." You also need to go over to CloudWatch and set up a new log group ("Create log group" button). This is necessary before choosing Destination log group when creating a new flow log. You'll also have to "set up permissions" (a link available when setting up a new flow log), which makes you set up a new IAM role (easy though, since it sets everything up for you). 
+
+When you go to CloudWatch, click on "Logs" on the left hand side, and you'll see lots of data.
+
+Note:
+* You cannot enable flow logs for VPCs that are peered with your VPC unless the peer VPC is in your account. As in, you can't do this across accounts.
+* You can tag flow logs
+* Once you create a flow log, you cannot change its configuration. As in, you can't associate a different IAM role with the flow log. 
+* Not all IP traffic is monitored. 
+  * traffic generated by instances that contact the Amazon DNS server is not monitored, however if you use your own DNS server, all traffic to that DNS server is logged.
+  * traffic to/from 169.254.169.254 for instance metadata not monitored
+  * DHCP traffic not monitored
+  * traffic to the reserved IP address for the default VPC router also not monitored.
+
+# Bastion Host
+
+Used to securely administer EC2 instances.
+
+**A Bastion Host allows you to SSH or RDP into an EC2 instance located in a private subnet.** 
+
+A special purpose computer set up to resist attacks. It's usually on the outside of a firewall or in a public subnet. Usually involves access from untrusted networks or computers. It is used to securely administer EC2 instances (using SSH or RDP).
+* So, if we want to SSH into our instances in our private subnet, we do that via a bastion host. 
+
+To create a bastion host, you can create a new EC2 instance which should only have a security group from a particular IP address for maximum security. Since the cost is also considered in the question, you should choose a small instance for your host. By default, t2.micro instance is used by AWS but you can change these settings during deployment.
+
+> A bastion host is a special purpose computer on a network specifically designed and configured to withstand attacks. If you have a bastion host in AWS, it is basically just an EC2 instance. It should be in a public subnet with either a public or Elastic IP address with sufficient RDP or SSH access defined in the security group. Users log on to the bastion host via SSH or RDP and then use that session to manage other hosts in the private subnets.
+
+
+## NAT Gateway / NAT Instance
+
+A NAT Gateway or NAT Instance is used to provide internet traffic to EC2 instances in a private subnet. 
+
+* Note that you can't use a NAT Gateway as a Bastion host; you have to go ahead and configure a bastion host. 
+
+## Public Subnet
+
+If we have a public subnet, the bastion host can go inside the public subnet. This means you can SSH or RDP through the **Internet Gateway**, through our **Route Tables**, through the **Network ACLs**, through **Security Groups**, onto the **Bastion server**. The Bastion server would then forward the connection through SSH or through RDP to our private instances. So, we just "harden" the Bastion host (since this is what will be hacked). That way we don't need to harden our private instances. 
+
+## Scenario
+
+You have added a bastion host with Microsoft Remote Desktop Protocol (RDP) access to the application instance security groups (instances are in both public and private subnets), but the company wants to further limit administrative access to all of the instances in the VPC.
+
+The correct answer is to deploy a Windows Bastion host with an Elastic IP address in the public subnet and allow RDP access to bastion only from the corporate IP addresses.
+
+# VPC Endpoint
+
+Allows traffic between your VPC and the other service to *not leave* the Amazon network. It's a *private connection* between your VPC to supported AWS services and VPC endpoint services (powered by PrivateLink). No internet gateway, NAT device, VPN connection or AWS Direct Connect connection required! A public IP address is not required either! 
+
+Endpoints are *virtual devices*. 
+
+Benefits:
+
+* Redundant
+* Highly available
+* No availability risks
+* No bandwidth constraints
+
+Two Types of VPC Endpoints:
+
+* Interface 
+  * Endpoints support many services
+* Gateway
+  * Endpoints support only S3 and DynamoDB
+
+### How to Build One
+
+See A Cloud Guru's AWS Certified Solutions Architect, Chapter 7.12 for a demo, which starts about 1/2 way through the chapter.
+
+# Route Tables
+
+A route table specifies how packets are forwarded between the subnets within your VPC, the internet, and your VPN connection.
+
+Your VPC has an implicit router, and you use route tables to control where network traffic is directed. Each subnet in your VPC must be associated with a route table, which controls the routing for the subnet (subnet route table). You can explicitly associate a subnet with a particular route table. Otherwise, the subnet is implicitly associated with the main route table.
+
+A subnet can only be associated with one route table at a time, but you can associate multiple subnets with the same subnet route table. You can optionally associate a route table with an internet gateway or a virtual private gateway (gateway route table). This enables you to specify routing rules for inbound traffic that enters your VPC through the gateway
+
+Be sure that the subnet route table also has a route entry to the internet gateway. If this entry doesn't exist, the instance is in a private subnet and is inaccessible from the internet.
+
+## Problem Solving
+
+In cases where your EC2 instance cannot be accessed from the Internet (or vice versa), you usually have to check two things:
+
+- Does it have an EIP or public IP address?
+
+- Is the route table properly configured?
+
+# Create a VPC on the AWS Console 
+
+A VPC with Public & Private Subnets
 
 This custom VPC is built step by step, using the AWS Console. 
 
@@ -459,354 +862,9 @@ ping private-ip-address-of-private-instance
 ```
 
 
-# NAT Instances and Nat Gateways
-
-## Nat Gateway
-
-NAT = network address translation
-
-> **Problem**: EC2 instances for the application tier running in private subnets need to download software patches from the internet. However, the instances cannot be directly accessible from the internet. 
-
-> **Solution**: 
-> * Configure a NAT gateway in a public subnet. 
-> * Define a custom route table with a route to the NAT gateway for internet traffic and associate it with the
-private subnets for the application tier. 
-
-When you're in a private subnet, how do you install updates? Install updates? Download software? Download software patches? 
-
-Must use NAT Instances or Nat Gateways, since there is no route set up to the Internet from the private subnet. These things make it possible to **communicate with our Internet Gateway, without making our private subnet public.**
-
-In other words, when our instances in our private subnets need to access the internet, they do so via either a NAT Instance or a NAT gateway. 
-
-Nat Gateways are used 99% of the time. Gateways are *highly available, spread across multiple AZ's*. 
-
-Jump down to more about [Nat Gateways](#NAT-Gateways)...
-
-## Nat Instances
-
-Nat Instances are *individual EC2 instances* that do this. Instances are on their way out... but they're still on the exam.
-
-Problems with NAT Instance architecture:
-* It is a single virtual machine
-  * Can create high availability using Autoscaling groups, multiple subnets in different AZs, and a script to automate failover... but ouch, lots of work. 
-* It's a small virtual machine, so it can easily get overwhelmed - it's a massive bottleneck.
-  * Solution: increase the instance size to deal with bottle-necking.
-* It's got a single point of failure. 
-
-## How to Create a NAT *Instance*
-
-[See Amazon docs about NAT Instances](https://docs.aws.amazon.com/vpc/latest/userguide/VPC_NAT_Instance.html). Essentially, the instance will act like a bridge to our private subnet, through our public subnet, to our internet gateway. 
-
-Things to Note:
-* When you create a NAT instance, you have to disable source/destination check on the instance.
-* NAT instances must be a in a public subnet.
-* There must be a route out of the private subnet *to* the NAT instance 
-* A NAT instance is always *behind* a security gruop.
-
-### Set up the NAT instance
-In EC2, launch an instance.
-
-On the left of the list of AMIs, under "Quick Start," choose "Communicty AMIs." In the search bar, type in "nat" and hit return/enter. This gives us our nat instances. 
-
-This is the one I chose, which is an Amazon Community AMI:
-```
-amzn-ami-vpc-nat-hvm-2018.03.0.20181116-x86_64-ebs - ami-0b840e8a1ce4cdf15
-Amazon Linux AMI 2018.03.0.20181116 x86_64 VPC HVM ebs
-```
-
-It's set as a t2.micro, which is great. 
-
-In the configure instance details page:
-* Change the vpc to your custom vpc.
-* Change the subnet to the public subnet (want to launch into the public one), which will give us a public ip address, regarding the "Auto-assign Public IP" - it will say "Enable"
-* Leave everything else the way it is. 
-
-Click the button that says "Add Storage," where you do nothing, just click the button to "Add tags."
-
-Add a few descriptive tags, definitely at least a name. 
-
-Click "Configure security group."
-
-Choose the "Select an existing security group" radio button so we can put this instance inside the security group that also holds the *public* instance we created earlier.
-
-Click "Review and launch."
-
-A window might pop up that asks where to boot from, re SSD. Choose the radio button that says, "Make General Purpose (SSD) the boot volume for this instance." If you don't get this window, don't panic - it's probably b/c of the AMI you're using, and just move on. 
-
-Review the instance, and click "Launch"
-
-A window will pop up asking about key pairs - choose the key pair you've used above. ... and click "Launch instances"
-
-### Make it a "Gateway" of sorts by Disabling Source/Destination checks
-
-Click on the NAT instance radio button. Go to the Actions tab, and choose "Networking > Enable Source/Destination Check." Go ahead and disable it. 
-
-### Make the Database Server "talk" to the NAT Instance
-To do this, we need to create a route out to the internet. The route needs to be created in the default route table, which is the main route table. 
-
-Go to VPC (within network and content delivery), and go to "Route Tables," on the left, within the Virtual Private Cloud section. 
-
-Click the radio button of the route table that is associated with your VPC, and says "Yes," in the "Main" column. This is the main route table associated with your VPC. 
-
-In the tabs below, click "Routes." 
-
-Click "Edit routes," and then "Add route." 
-
-If we want to go out to the internet, we can add something like, "0.0.0.0/0," as our Destination. We then add our NAT instance as the Target, by clicking "Instance" on the pulldown menu and then choosing the NAT instance we created above.
-* You should only allow 0.0.0.0/0 on port 80 or 443 to to connect to your public facing Web Servers, or preferably only to an ELB, says A Cloud Guru.
-
-Click "Save routes."
-
-Now we have a route within our main route table, which says, go over this elastic network interface (eni-).
-
-### Terminate the Instance, since, seriously, so many issues with this architecture!
-
-Click the radio button for the nat instance. Click the Actions pulldown menu above. Choose "Instance State > Terminate"
-
-Remember to remove the route associated with this instance, too. Go to VPC > Route Tables.
-
-Click on your main route table, click the tab below that says "Routes." You'll see one that says, blackhole! This is because the instance no longer exists. 
-
-Go to "Edit routes," and click on the "x" to the right of the route, then click "Save routes."
-
-## NAT Gateways
-
-NAT =  network address translation
-
-> Purpose in Life: enable instances in a private subnet to connect to the internet or other AWS services, but prevent the internet from initiating a connection with those instances.
-
-(Other option to connect without public IP addresses: For VPCs with a hardware VPN connection or Direct Connect connection, instances can route their Internet traffic down the virtual private gateway to your existing datacenter. From there, it can access the Internet via your existing egress points and network security/monitoring devices.)
-
-* No need to patch the OS 
-* Not associated with any security groups! (Doesn't need to be behind one)
-* Automatically assigned a public ip address
-* No need to disable source/destination checks
-
-### Scaleable and highly available
-
-* It scales automatically
-
-### Location
-
-To create a NAT gateway, you must specify the public subnet in which the NAT gateway should reside.
-
-### Availability Zones
-
-You can only have one NAT gateway in an AZ.
-  
-To create AZ-independant architecture, you must create a NAT gateway in *each* availability zone, and configure your routing to ensure that resources use the NAT gateway in the same AZ that they're in (otherwise when a gateway goes down, things stop working)
-
-Each NAT gateway is created in a specific Availability Zone and implemented with redundancy in that zone. You have a quota on the number of NAT gateways you can create in an Availability Zone.
-
-
-### Update the Route Table
-
-After you've created a NAT gateway, you must update the route table associated with one or more of your private subnets to point internet-bound traffic to the NAT gateway. This enables instances in your private subnets to communicate with the internet.
-
-### Elastic IP Address
-
-You must also specify an Elastic IP address to associate with the NAT gateway when you create it. The Elastic IP address cannot be changed after you associate it with the NAT Gateway.
-
-An Elastic IP address is a **property of network interfaces**. An Elastic IP address is a reserved public IP address that you can assign to any EC2 instance in a particular region, until you choose to release it. 
-
-When you associate an Elastic IP address with an EC2 instance, it replaces the default public IP address.
-
-Associate an Elastic IP address with any instance or network interface for any VPC in your account. With an Elastic IP address, you can mask the failure of an instance by rapidly remapping the address to another instance in your VPC. 
-
-Note that the advantage of associating the Elastic IP address with the network interface instead of directly with the instance is that **you can move all the attributes of the network interface from one instance to another in a single step**.
-
-Elastic IP Address Billing: 
-
-* To ensure efficient use of Elastic IP addresses, we impose a small hourly charge when they aren't associated with a running instance, or when they are associated with a stopped instance or an unattached network interface. While your instance is running, you aren't charged for one Elastic IP address associated with the instance, but you are charged for any additional Elastic IP addresses associated with the instance.
-
-### Nat Gateway Example
-Your instance is in the private subnet, it has a route in the Route Table to the NAT Gateway in the public instance. When your instance runs a yum update, it goes to the Nat Gateway, then traverses out.
-
-### Nat Gateway Billing
-
-NAT gateway hourly usage and data processing rates apply. Amazon EC2 charges for data transfer also apply
-
-## Make a Nat Gateway
-
-Go to VPC > Vitual Private Cloud > NAT Gateways.
-
-Click the button, "Create NAT Gateway."
-
-You'll want to choose the *public* subnet you created way back when. 
-
-Click the button that says "Allocate Elastic IP Address," which will create an IP address and attach it to the new Gateway. 
-
-Create the Gateway.
-
-### Edit route tables
-
-A window will pop up saying you'll need to edit your route tables. Click on the "Edit route tables" button.
-
-You'll find yourself at the list of Route Tables.
-
-Click the radio button for your *main* route table inside your VPC. Click the tab called "Routes" and then the button "Edit routes."
-
-We need to give the main route table a route out into the internet. Click "Add route," put the destination perhaps as "0.0.0.0/0," change the "Target" to "NAT_gateway," and then choose the one you created. 
-
-Click the "save" and "close" button.
-
-
-# Network Access Control Lists 
-
-Network Access Control List = Network ACL = NACL
-
-> Use a network ACL to block specific IP Addresses.
-
-"A network ACL is an optional layer of security that acts as a firewall for controlling traffic in and out of a subnet," says AWS.
-
-VPC > Security (to the left) > Network ACLs
-
-## Default NACL
-
-When we create a custom VPC, a network ACL is created by default. **By default, it allows all outbound and inbound traffic**. 
-
-Every time we add a subnet to our VPC, it will be associated with our default Network ACL. In fact, it *must* be associated with a network ACL - if you don't explicitly associate a subnet with a network ACL, the subnet will be automatically associated with the default network ACL. 
-
-We can associate a subnet with a new NACL, but *a subnet itself can only be associated with one network ACL at a given time*. Network ACLs can have multiple subnets associated with them, however. 
-
-* When you associate a network ACL with a subnet, the previous association is removed.
-
-The Default NACL has Inbound Rules. Each rule is incremented by 100. 
-
-## Custom NACLs
-
-You can create custom network ACLs. By default each custom network ACL *denies* all inbound and outbound traffic until you add rules. 
-
-## Order of Rules
-
-Network ACL Rules are evaluated by rule number, from lowest to highest, and executed immediately when a matching allow/deny rule is found.
-
-The rules are evaluated in order - 100 (HTTP), 200 (HTTPS), 300 (SSH) for inbound rules. 
-
-## Stateless
-
-*Network ACLs are stateless*. So responses to allowed inbound traffic are subject to the rules for outbound traffic (and vice versa). 
-
-You can add deny and allow rules. When you open a port on inbound, it doesn't mean a port opens on outbound. 
-
-## Create a Network ACL 
-Click the Create button up top. 
-
-Create a descriptive name.
-
-Select the VPC it should go inside. 
-
-*Once a new Network ACL is created, note that all inbound and outbound rules are automatically set to deny everything*.
-
-### Change Subnet Associations
-Click on the new NACL's radio tab, and click on the tab below, called "Subnet associations."
-
-Click "Edit subnet associations"
-
-Choose the subnet you want - I chose my public one. 
-
-The subnet is now associated with this new NACL, and the other subnet is left behind in the other one. 
-
-Now that the Network ACL has the public subnet it in, any access via HTTP is no longer available (ie, Apache setup would have shown ability to see a little website via IP address in browser.
-
-### Set up Rules for the New Network ACL
-Click tab, "Inbound rules," then "Edit inbound rules"
-* Can create rules to connect on port 80, 443, and 22, for example, inbound.
-
-Edit Outbound rules
-* connect on port 80, 443, 1024-65535 (ephemoral ports for NAT Gateway)
-  * short lived transport protrocol port is an ephemeral port. They may be used on the server side of communication. Port only available during the communication, then times out. NAT gateway uses the emphemoral port of the type noted above. 
-
-# NACLs vs Security Groups
-
-Security Groups usually control the list of ports that are allowed to be used by your EC2 instances and the NACLs control which network or list of IP addresses can connect to your whole VPC.
-
-*if you're using network ACLs, they will always be evaluated before security groups.* So if you **deny** a specific port on your ACL, it will never reach your security group. So, **NACls will always act first before security groups.** 
-
-... So, you can use a network ACL to block specific IP Addresses.
-* You can't block specific IP addresses using security groups.
-
-[Sweet comparison chart on AWS](https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Security.html#VPC_Security_Comparison).
-
-# VPC Flow Logs
-
-A feature that lets you capture information about IP traffic going to/from network interfaces in a VPC. 
-
-Flow log data is stored, reviewed and retrieved using **CloudWatch Logs**. 
-
-* Alternatively you can send logs to an S3 Bucket. 
-
-Can do logs at the VPC level, Subnet level or Network Interface level. 
-
-You essentially go to VPC, go to the tab actions, and click "Flow Log." You also need to go over to CloudWatch and set up a new log group ("Create log group" button). This is necessary before choosing Destination log group when creating a new flow log. You'll also have to "set up permissions" (a link available when setting up a new flow log), which makes you set up a new IAM role (easy though, since it sets everything up for you). 
-
-When you go to CloudWatch, click on "Logs" on the left hand side, and you'll see lots of data.
-
-Note:
-* You cannot enable flow logs for VPCs that are peered with your VPC unless the peer VPC is in your account. As in, you can't do this across accounts.
-* You can tag flow logs
-* Once you create a flow log, you cannot change its configuration. As in, you can't associate a different IAM role with the flow log. 
-* Not all IP traffic is monitored. 
-  * traffic generated by instances that contact the Amazon DNS server is not monitored, however if you use your own DNS server, all traffic to that DNS server is logged.
-  * traffic to/from 169.254.169.254 for instance metadata not monitored
-  * DHCP traffic not monitored
-  * traffic to the reserved IP address for the default VPC router also not monitored.
-
-# Bastion Host
-
-Used to securely administer EC2 instances.
-
-**A Bastion Host allows you to SSH or RDP into an EC2 instance located in a private subnet.** 
-
-A special purpose computer set up to resist attacks. It's usually on the outside of a firewall or in a public subnet. Usually involves access from untrusted networks or computers. It is used to securely administer EC2 instances (using SSH or RDP).
-* So, if we want to SSH into our instances in our private subnet, we do that via a bastion host. 
-
-
-## NAT Gateway / NAT Instance
-
-A NAT Gateway or NAT Instance is used to provide internet traffic to EC2 instances in a private subnet. 
-
-* Note that you can't use a NAT Gateway as a Bastion host; you have to go ahead and configure a bastion host. 
-
-## Public Subnet
-If we have a public subnet, the bastion host can go inside the public subnet. This means you can SSH or RDP through the Internet Gateway, through our Route Tables, through the Network ACLs, through Security Groups, onto the Bastion server. The Bastion server would then forward the connection through SSH or through RDP to our private instances. So, we just "harden" the Bastion host (since this is what will be hacked). That way we don't need to harden our private instances. 
-
-> A bastion host is a special purpose computer on a network specifically designed and configured to withstand attacks. If you have a bastion host in AWS, it is basically just an EC2 instance. It should be in a public subnet with either a public or Elastic IP address with sufficient RDP or SSH access defined in the security group. Users log on to the bastion host via SSH or RDP and then use that session to manage other hosts in the private subnets.
-
-## Scenario
-
-You have added a bastion host with Microsoft Remote Desktop Protocol (RDP) access to the application instance security groups (instances are in both public and private subnets), but the company wants to further limit administrative access to all of the instances in the VPC.
-
-The correct answer is to deploy a Windows Bastion host with an Elastic IP address in the public subnet and allow RDP access to bastion only from the corporate IP addresses.
-
-# VPC Endpoint
-
-Allows traffic between your VPC and the other service to *not leave* the Amazon network. It's a *private connection* between your VPC to supported AWS services and VPC endpoint services (powered by PrivateLink). No internet gateway, NAT device, VPN connection or AWS Direct Connect connection required! A public IP address is not required either! 
-
-Endpoints are *virtual devices*. 
-
-Benefits:
-* Redundant
-* Highly available
-* No availability risks
-* No bandwidth constraints
-
-Two Types of VPC Endpoints:
-
-* Interface 
-  * Endpoints support many services
-* Gateway
-  * Endpoints support only S3 and DynamoDB
-
-### How to Build One
-
-See A Cloud Guru's AWS Certified Solutions Architect, Chapter 7.12 for a demo, which starts about 1/2 way through the chapter.
-
------------------
 # Learning Moments
 Hardest part to building a VPC, when doing this for the first time, is making sure that one is working within or with the correct subnet, given the goals for that subnet. So, labeling each subnet descriptively is really important. Actually, label *everything* descriptively. I didn't at first, and that got me in a bit of confused trouble at times. 
 
------------------
 
 # Resources
 [Practical VPC Design on Medium](https://medium.com/aws-activate-startup-blog/practical-vpc-design-8412e1a18dcc)
