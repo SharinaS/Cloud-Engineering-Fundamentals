@@ -8,7 +8,7 @@
   * [EBS Types](#EBS-Types)
 * [Encryption](#Encrypted-Root-Device-Volumes-&-Snapshots)
 * [Placement Groups](#Types-of-Placement-Groups)
-* [Pricing](#Pricing-Models)
+* [Pricing and Instance Types](#Pricing-Models)
 * [Security Group](#Security-Group)
 
 # What EC2 is
@@ -119,15 +119,31 @@ Good for apps with *steady state or predictable usage*, or for apps that require
 * Scheduled 
   * allows you to have reserved instances within a particular time window. Great for situations like schools that have specific working hours. 
 
+### Reserved Instance Marketplace
+
+The Reserved Instance Marketplace is a platform that supports the sale of third-party and AWS customers' unused Standard Reserved Instances, which vary in terms of lengths and pricing options. 
+
+For example, you may want to sell Reserved Instances after moving instances to a new AWS region, changing to a new instance type, ending projects before the term expiration, when your business needs change, or if you have unneeded capacity.
+
+### Expiration
+
+when a Reserved Instance expires, any instances that were covered by the Reserved Instance are billed at the on-demand price which costs significantly higher.
+
 ## Spot
 
-Up to 90% off the On-Demand price!
+Amazon EC2 Spot instances are spare compute capacity in the AWS cloud available to you at steep discounts compared to On-Demand prices. EC2 Spot enables you to optimize your costs on the AWS cloud and **scale your application's throughput up to 10X** for the same budget. 
 
-* bid a price you want to pay; when the price hits the value you bid for, you get your instance. 
-* Amazon drops the price for an EC2 instance when they have excess capacity so people will use the capacity. So, the price moves around. 
-* Essentially Amazon is selling off its excess capacity at a certain rate --> supply and demand pricing.
-* Great for apps that are only feasible at very low compute prices and that have flexible start/stop times, and for users with urgent computing needs for large amounts of additional capacity.  
-* If it's terminated by AWS, you won't pay for the rest of the hour (unlike other instances, where you pay for the full hour if you terminate prior to the hour being up)
+By simply selecting Spot when launching EC2 instances, you can **save up-to 90%** on On-Demand prices. 
+
+The only difference between On-Demand instances and Spot Instances is that Spot instances can be interrupted by EC2 with **two minutes of notification** when the EC2 needs the capacity back. You can specify whether Amazon EC2 should hibernate, stop, or terminate Spot Instances when they are interrupted. You can choose the interruption behavior that meets your needs.
+
+There is no "bid price" anymore for Spot EC2 instances since March 2018. You simply have to set your maximum price instead.
+
+Amazon drops the price for an EC2 instance when they have excess capacity so people will use the capacity. So, the price moves around. 
+
+Great for apps that are only feasible at very low compute prices and that have **flexible start/stop times**, and for users with urgent computing needs for large amounts of additional capacity.  
+
+If it's terminated by AWS, you won't pay for the rest of the hour (unlike other instances, where you pay for the full hour if you terminate prior to the hour being up)
 
 ## Dedicated
 
@@ -197,7 +213,9 @@ The name you use for a placement group must be unique within your AWS account.
 
 ## Cluster
 
-Instances are tightly grouped within a single AZ.
+Packs instances close together inside an Availability Zone. This strategy enables workloads to achieve the **low-latency** network performance necessary for tightly-coupled node-to-node communication that is typical of HPC applications.
+
+Cluster placement groups are recommended for applications that benefit from low network latency, high network throughput, or both. They are also recommended when the majority of the network traffic is between the instances in the group. To provide the lowest latency and the highest packet-per-second network performance for your placement group, choose an instance type that supports enhanced networking.
 
 The only type that can't span multiple AZs.
 
@@ -219,28 +237,30 @@ Each partition has its own set of racks to supply its network and power source.
 
 * Isolation is designed to prevent the impact of hardware failure within your application.
 
-Great for large distributed and replicated workloads
+Spreads your instances across logical partitions such that groups of instances in one partition do not share the underlying hardware with groups of instances in different partitions. 
 
-* Hadoop
-* Cassandra
-* Kafka
+This strategy is typically used by large distributed and replicated workloads, such as Hadoop, Cassandra, and Kafka.
+
+Partition placement groups can be used to deploy **large distributed and replicated** workloads, such as HDFS, HBase, and Cassandra, across distinct racks. 
+
+When you launch instances into a partition placement group, Amazon EC2 tries to **distribute the instances evenly** across the number of partitions that you specify. You can also launch instances into a specific partition to have more control over where the instances are placed.
 
 ## Spread
 
 A small group of instances is placed across distinct underlying hardware.
 
-Opposite from cluster.
+Spread placement groups are recommended for applications that have a small number of **critical instances** that should be kept separate from each other. Launching instances in a spread placement group **reduces the risk of simultaneous failures** that might occur when instances share the same racks. 
 
-Used to reduce correlated failures.
-
-For apps with a small number of crtical instances that should be kept separate from each other. 
+Spread placement groups provide access to distinct racks, and are therefore suitable for **mixing instance types** or **launching instances over time**. A spread placement group can span multiple Availability Zones in the same Region. 
 
 You can have spread splacement groups inside different AZs, within one region.
 
 Think of individual instances. Each one is completely isolated from another instance. If one rack fails, with an instance per rack, the other instances won't be affected. Designed to protect instances from hardware failure. 
 
-----------------
-----------------
+### Max number instances
+
+You can have a maximum of seven running instances per Availability Zone per group.
+
 
 # Provision an EC2 Instance 
 
@@ -563,6 +583,12 @@ So, when you terminate an EC2 instance, by default the root device volume will b
 ### Additional Volumes
 
 Additional volumes, attached to that EC2 instance, however, will *continue to persist.* You will have to manually click the radio buttons of each of the volumes, and click "Actions > Delete Volumes."
+
+### Change of Mind
+
+When you no longer need an Amazon EBS volume, you can delete it. After deletion, its data is gone and the volume can't be attached to any instance. 
+
+However, before deletion, you can store a snapshot of the volume, which you can use to re-create the volume later.
 
 ## Copy and Move
 

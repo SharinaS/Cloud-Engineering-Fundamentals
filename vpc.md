@@ -13,7 +13,9 @@
 
 [NACLs vs Security Groups](#NACLs-vs-Security-Groups)
 
-[Network Access Control Lists](#Network-Access-Control-Lists)
+[Network Access Control Lists](#Network-Access-Control-Lists) (NACLs)
+
+* [Order of Rules](#Order-of-Rules)
 
 [Peering](#VPC-Peering)
 
@@ -22,6 +24,8 @@
 [Security Groups](#Security-Groups)
 
 [What is a VPC](#What-is-a-VPC)
+
+[What is Created with a VPC](#What-is-Created-with-a-VPC)
 
 [VPC Endpoint](#VPC-Endpoint)
 
@@ -101,29 +105,9 @@ Alternative to peering: Use a Transit Gateway.
 
 A VPC peering connection is a networking connection between two VPCs that enables you to route traffic between them privately. Instances in either VPC can communicate with each other as if they are within the same network. You can create a VPC peering connection between your own VPCs, with a VPC in another AWS account, or with a VPC in a different AWS Region.
 
-AWS uses the existing infrastructure of a VPC to create a VPC peering connection; it is neither a gateway nor a VPN connection and does not rely on a separate piece of physical hardware. There is no single point of failure for communication or a bandwidth bottleneck.
+AWS uses the existing infrastructure of a VPC to create a VPC peering connection; it is neither a gateway nor a VPN connection and does not rely on a separate piece of physical hardware. 
 
-## Limitations to VPC Peering
-
- A VPC peering connection does not support edge to edge routing. This means that if either VPC in a peering relationship has one of the following connections, you cannot extend the peering relationship to that connection:
-
-* A VPN connection or an AWS Direct Connect connection to a corporate network
-* An Internet connection through an Internet gateway
-* An Internet connection in a private subnet through a NAT device
-* A gateway VPC endpoint to an AWS service; for example, an endpoint to Amazon S3.
-* (IPv6) A ClassicLink connection. You can enable IPv4 communication between a linked EC2-Classic instance and instances in a VPC on the other side of a VPC peering connection. However, IPv6 is not supported in EC2-Classic, so you cannot extend this connection for IPv6 communication.
-
-For example, if VPC A and VPC B are peered, and VPC A has any of these connections, then instances in VPC B cannot use the connection to access resources on the other side of the connection. Similarly, resources on the other side of a connection cannot use the connection to access VPC B.
-
-## Increase Fault Tolerance
-
-A media company has two VPCs: VPC-1 and VPC-2 with peering connection between each other. VPC-1 only contains private subnets while VPC-2 only contains public subnets. The company uses a single AWS Direct Connect connection and a virtual interface to connect their on-premises network with VPC-1.
-
-Which of the following options increase the fault tolerance of the connection to VPC-1?
-
---> Establish a hardware VPN over the Internet between VPC-1 and the on-premises network.
-
---> Establish another AWS Direct Connect connection and private virtural interface in the same AWS region as VPC-1.
+There is no single point of failure for communication or a bandwidth bottleneck.
 
 ## Invalid Configurations
 
@@ -137,7 +121,7 @@ You cannot route packets directly from VPC B to VPC C *through* VPC A.
 
 Edge to edge routing via a gateway or private connection is an invalid VPC peering configuration.
 
-If either VPC in a peering relationship has one of the following connections, you cannot extend the peering relationship to that connection:
+Thus, if either VPC in a peering relationship has one of the following connections, you cannot extend the peering relationship to that connection:
 
 * A VPN connection or an AWS Direct Connect connection to a corporate network
 * An internet connection through an internet gateway
@@ -145,10 +129,21 @@ If either VPC in a peering relationship has one of the following connections, yo
 * A gateway VPC endpoint to an AWS service; for example, an endpoint to Amazon S3.
 * (IPv6) A ClassicLink connection. You can enable IPv4 communication between a linked EC2-Classic instance and instances in a VPC on the other side of a VPC peering connection. However, IPv6 is not supported in EC2-Classic, so you cannot extend this connection for IPv6 communication.
 
+As in, if VPC A and VPC B are peered, and VPC A has any of these connections, then instances in VPC B cannot use the connection to access resources on the other side of the connection. Similarly, resources on the other side of a connection cannot use the connection to access VPC B.
 
 ### No Overlap of CIDR Blocks
 
 If the VPCs have multiple IPv4 CIDR blocks, you cannot create a VPC peering connection if any of the CIDR blocks overlap (regardless of whether you intend to use the VPC peering connection for communication between the non-overlapping CIDR blocks only).
+
+## Increase Fault Tolerance
+
+A media company has two VPCs: VPC-1 and VPC-2 with peering connection between each other. VPC-1 only contains private subnets while VPC-2 only contains public subnets. The company uses a single AWS Direct Connect connection and a virtual interface to connect their on-premises network with VPC-1.
+
+Which of the following options increase the fault tolerance of the connection to VPC-1?
+
+--> Establish a hardware VPN over the Internet between VPC-1 and the on-premises network.
+
+--> Establish another AWS Direct Connect connection and private virtural interface in the same AWS region as VPC-1.
 
 ## Scenario with 3 VPCs
 
@@ -412,6 +407,20 @@ You can create custom network ACLs. By default each custom network ACL *denies* 
 Network ACL Rules are evaluated by rule number, from lowest to highest, and executed immediately when a matching allow/deny rule is found.
 
 The rules are evaluated in order - 100 (HTTP), 200 (HTTPS), 300 (SSH) for inbound rules. 
+
+Rules are evaluated starting with the lowest numbered rule. As soon as a rule matches traffic, it's applied immediately regardless of any higher-numbered rule that may contradict it.
+
+We have 3 rules here:
+
+1. Rule 100 permits all traffic from any source.
+
+2. Rule 101 denies all traffic coming from 110.238.109.37
+
+3. The Default Rule (*) denies all traffic from any source.
+
+The Rule 100 will first be evaluated. If there is a match, then it will allow the request. Otherwise, it will then go to Rule 101 to repeat the same process until it goes to the default rule. 
+
+If there is a request from, say, 110.238.109.37, it will go through Rule 100 first. Rule 100 says it will permit all traffic from any source, so it will allow this request and will not further evaluate Rule 101 (which denies 110.238.109.37) nor the default rule.
 
 ## Stateless
 

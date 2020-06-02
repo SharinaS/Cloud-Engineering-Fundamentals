@@ -1,15 +1,29 @@
-# About
-* CloudFormation automates the task of creating groups that power an application.
+# CloudFormation
+
+## Index
+
+* [About](#About)
+* [Check Prerequisities for Stack Creation](#Check-Prerequisities-for-Stack-Creation)
+* [CloudFormation Example](#CloudFormation-Example)
+* [QuickStart](#QuickStart)
+* [Stack Overview](#Stack-Overview)
+
+## About
+
+CloudFormation automates the task of creating groups that power an application.
+
   * CF is a way to provide scripting for the cloud environment.
-* Manages the lifecycle of the infrastucture
+
+Manages the lifecycle of the infrastucture
   * *Creates* AWS infrascture, based on a template
   * *Updates* the AWS infrascture as needed
   * *Deletes* the AWS infrascture reliably
-* Uses a JSON or YAML-format file that describes all the AWS resources you need to deploy in order to run the application and the stack. 
+
+Uses a JSON or YAML-format file that describes all the AWS resources you need to deploy in order to run the application and the stack. 
   * Template is the YAML file, which is then uploaded via S3 to AWS, which kicks off CloudFormation.
 * Includes a stack, which is the set of AWS resources that are created and managed as a single unit.
-* 
 
+## QuickStart
 **Quick start** is something on AWS that includes templates already built by AWS Solutions Architects, which allows you to create complex environments very quickly. 
 
 ## The YAML or JSON file includes:
@@ -20,7 +34,7 @@
 4. The list of AWS resources and their configuration values
 5. A template file format version number
 
-# Simple CloudFormation Example
+## CloudFormation Example
 *Provision a  EC2 t2.micro instance with an AMI of Amazon Linux*
 
 ### Generals about the Template
@@ -59,7 +73,8 @@ Template is like a constructor function. It can make many stacks. Every time I r
 * Note - Stack is a bad name, because a CloudFormation stack is not a stack. A stack is the results of whatever happened in the Template.
 * Template is the blueprint that describes the infrastructure.
 
-### Stack Overview:
+## Stack Overview
+
 A stack will know:
 * What template was used and parameter values
 * Some metadata (name, creation date, etc)
@@ -80,7 +95,7 @@ Use the Console to Create the Stack. In CloudFormation, click on the button that
 
  A change set is thus a summary of proposed changes. If it's accepted, it will create an sns topic within the stack.  
 
-# Basic Template Terminology - Resources
+## Basic Template Terminology - Resources
 ```
 AWSTemplateFormationVersion:
 Description:
@@ -145,10 +160,10 @@ Resources:
         Cidrlp: 0.0.0.0/0
 ```
 
-# Intrinsic Functions
+## Intrinsic Functions
 Built in functions, of which there are over 10 in CloudFormation. 
 
-## Join
+### Join
 Appends a set of values into a single value
 
 Syntax:
@@ -187,19 +202,24 @@ Resources:
         Value: !Join [ " ", [EC2, Instance, with, fn, Join ] ]
 ```
 
-# Multiple Resources
+## Multiple Resources
 The order of creation is very important. CloudFormation handles this for us. 
 
--------
+## Check Prerequisities for Stack Creation
 
-# Hints
-When you see !Ref, go look up variable.
+Ensure that the required components are properly running before the stack creation proceeds.
 
-# CLI Commands - CheatSheet
-### Access information about a stack in CloudFormation:
-```
-aws cloudformation describe-stacks --stack-name sharina-s3bucket
-```
+You can associate the `CreationPolicy` attribute with a resource to prevent its status from reaching create complete until AWS CloudFormation receives a specified number of success signals or the timeout period is exceeded. 
+
+To signal a resource, you can use the **cfn-signal helper script** or **SignalResource API**. AWS CloudFormation publishes valid signals to the stack events so that you track the number of signals sent.
+
+The creation policy is invoked only when AWS CloudFormation creates the associated resource. 
+
+Currently, the only AWS CloudFormation resources that support creation policies are `AWS::AutoScaling::AutoScalingGroup`, `AWS::EC2::Instance`, and `AWS::CloudFormation::WaitCondition`.
+
+Use the `CreationPolicy` attribute when you want to wait on resource configuration actions before stack creation proceeds. 
+
+For example, if you install and configure software applications on an EC2 instance, you might want those applications to be running before proceeding. In such cases, you can add a `CreationPolicy` attribute to the instance, and then send a success signal to the instance after the applications are installed and configured.
 
 # Resources
 [AWS CloudFormation FAQs](https://aws.amazon.com/cloudformation/faqs/)

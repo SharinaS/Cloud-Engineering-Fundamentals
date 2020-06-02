@@ -20,16 +20,24 @@ SWF is a way of coordinating both your applications as well with human beings / 
 
 Amazon SWF is a web service that makes it easy to coordinate work across distributed application components.
 
-### Use Cases
-
-Task coordination use cases:
+## Use Cases
 
 * media processing
 * web application backends
 * busines process workflows
-* analysis piopeslines
+* analytics pipelines
 
-### Tasks Invocations
+...  designed as a coordination of tasks
+
+### Use with EC2
+
+For: 
+
+* Managing a multi-step and multi-decision checkout process of an e-commerce mobile app.
+
+* Orchestrating the execution of distributed business processes
+
+## Tasks Invocations
 
 Tasks are invocations of various processing steps in an application, which are preformed by:
 
