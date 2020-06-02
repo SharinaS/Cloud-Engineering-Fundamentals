@@ -1,6 +1,10 @@
-# LoadBalancer
+# ELB
+
+ELB = Elastic Load Balancer
 
 ## Index 
+
+[Analyze ELB Log Files](#Analytics-and-Log-Files)
 
 [3 Types of Elastic Load Balancers](#3-Types-of-Elastic-Load-Balancers)
 
@@ -207,14 +211,30 @@ The nodes for your load balancer distribute requests from clients to registered 
 Path-based routing means creating a listener that has rules to forward requests (direct traffic) based on the URL path.
 
 Perks:
+
 * This means that if you have microservices, you can route traffic to multiple backend services.
 * You can route general requests to one target group, and requests to render images to another target group.
 
 ### Scenario
+
 traffic from users --> route53 --> a single AZ's application load balancer
 
 You want to have the home url sent to one AZ, and the url with, say, /images/ will be sent to a separate AZ. You have the load balancer take care of the Path Patterns that will organize the traffic destinations, re: AZs. 
 
+# Analytics and Log Files
+
+AWS services can be used together to collect logs and then easily perform log analysis on an ELB.
+
+Access logging in the ELB is stored in Amazon S3 which means that the following are valid options:
+
+- Amazon S3 for storing the ELB log files and an EC2 instance for analyzing the log files using a custom-built application.
+
+- Amazon S3 for storing ELB log files and Amazon EMR for analyzing the log files.
+
+However, log analysis can be automatically provided by Amazon EMR, which is more economical than building a custom-built log analysis application and hosting it in EC2.
+
+## Access Logging
+Access logging is an optional feature of Elastic Load Balancing that is disabled by default. After you enable access logging for your load balancer, Elastic Load Balancing captures the logs and stores them in the Amazon S3 bucket that you specify as compressed files. You can disable access logging at any time.
 
 # Build a Simple One in the AWS Console
 

@@ -71,6 +71,10 @@ Solution: An Internet-routable IP address (static) of the **customer gateway**'s
 
 For managing remote access, AWS Client VPN connects your users to AWS or on-premises resources using a free VPN software client.
 
+A VPN allows you to connect your AWS cloud resources to your on-premises data center using secure and private sessions with IP Security (IPSec) or Transport Layer Security (TLS) tunnels... since one of the main advantages of having a VPN connection is that you will be able to connect your Amazon VPC to other remote networks securely.
+
+In other words, AWS Site-to-Site VPN establishes secure and private sessions with IP Security (IPSec) and Transport Layer Security (TLS) tunnels.
+
 Elastically scales up or down based on user demand.
 
 ### Enable Connectivity to Other Networks
@@ -78,5 +82,9 @@ Elastically scales up or down based on user demand.
 You can enable connectivity to other networks like peered Amazon VPCs, on-premises networks via virtual gateway or AWS services, such as S3, via endpoints, networks via AWS PrivateLink or other resources via internet gateway. 
 
 To enable connectivity, add a route to the specific network in the Client VPN route table, and add authorization rule enabling access to the specific network.
+
+### Compare with Direct Connect
+
+Direct Connect enables you to establish a private and dedicated network connection between your network and your VPC.
 
 [See more on AWS](https://github.com/SharinaS/Cloud-Engineering-Fundamentals/blob/master/direct_connect.md)

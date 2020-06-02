@@ -1,13 +1,14 @@
 # ECS
 
--------- 
+## Index
+ 
 [Docker and Batch Jobs](#Docker-and-Batch-Jobs)
 
 [Fargate](#Fargate)
 
 [Launch Types](#Launch-Types)
 
----------
+## About ECS
 
 ECS = Elastic Container Service
 
@@ -23,9 +24,26 @@ Amazon Elastic Container Service (Amazon ECS) is a highly scalable, fast, contai
 
 AWS Fargate is serverless compute for containers.
 
-* Fargate is a serverless compute engine for containers that work with both Amazon Elastic Container Service (ECS) and Amazon Elastic Kubernetes Service (EKS)
+Fargate makes it easy for you to focus on building your applications. Fargate removes the need to provision and manage servers, lets you specify and pay for resources per application, and improves security through application isolation by design.
+
+Fargate allocates the right amount of compute, eliminating the need to choose instances and scale cluster capacity. 
+
+### Billing
+
+You only pay for the resources required to run your containers, so there is no over-provisioning and paying for additional servers.
+
+### Workload Isolation
+
+Fargate runs each task or pod in its own kernel providing the tasks and pods their own isolated compute environment. This enables your application to have workload isolation and improved security by design. This is why customers such as Vanguard, Accenture, Foursquare, and Ancestry have chosen to run their mission critical applications on Fargate.
+
+### Serverless Compute
+
+Fargate is a **serverless compute engine** for containers that work with both Amazon Elastic Container Service (ECS) and Amazon Elastic Kubernetes Service (EKS)
 
 ## Launch Types
+
+* Fargate
+* EC2
 
 ### Fargate Launch Type
 
@@ -37,13 +55,9 @@ For more control you can host your tasks on a **cluster** of Amazon Elastic Comp
 
 ## Elastic Beanstalk vs ECS
 
-AWS Elastic Beanstalk can also be used to rapidly develop, test, and deploy Docker containers in conjunction with other components of your application infrastructure; however, using Amazon ECS directly provides more fine-grained control and access to a wider set of use cases.
+AWS Elastic Beanstalk can also be used to rapidly develop, test, and deploy Docker containers in conjunction with other components of your application infrastructure. 
 
-## Regional
-
-Amazon ECS is a regional service that simplifies running application containers in a highly available manner across multiple Availability Zones within a Region. 
-
-You can create Amazon ECS clusters within a new or existing VPC. After a cluster is up and running, you can define task definitions and services that specify which Docker container images to run across your clusters.
+However, using Amazon ECS directly provides more fine-grained control and access to a wider set of use cases.
 
 ## What are Containers
 
@@ -62,6 +76,14 @@ Elastic Load Balancing
 Elastic Container Registry (ECR)
 
 CloudFormation
+
+## Regional
+
+Amazon ECS is a regional service that simplifies running application containers in a highly available manner across **multiple Availability Zones** within a Region. 
+
+## VPC
+
+You can create Amazon ECS clusters within a new or existing VPC. After a cluster is up and running, you can define task definitions and services that specify which Docker container images to run across your clusters.
 
 ## ECR
 

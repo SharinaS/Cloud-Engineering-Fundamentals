@@ -3,8 +3,10 @@
 ## Index
 
 * [About](#About)
+* [Connecting a Lambda to a VPC](#Connecting-a-Lambda-to-a-VPC)
 * [Deployment Configurations](#Deployment-Configurations)
 * [IAM](#IAM)
+* [Metrics](#Metrics)
 * [Pricing](#Pricing)
 * [Scaling](#Scaling)
 * [Triggers](#Lambda-Triggers)
@@ -166,6 +168,10 @@ See the AWS docs about this topic [here](https://aws.amazon.com/blogs/architectu
 
 If you're using the AWS Lambda compute platform, you must choose one of the following deployment configuration types to specify how traffic is shifted from the original AWS Lambda function version to the new AWS Lambda function version.
 
+* Canary
+* Linear
+* All-at-once
+
 AWS CodeDeploy can be used as the deployment service.
 
 ### Canary
@@ -179,4 +185,34 @@ Traffic is shifted in **equal increments** with an **equal number of minutes** b
 ### All-at-once
 
 All traffic is shifted from the original Lambda function to the updated Lambda function version at once.
+
+## Connecting a Lambda to a VPC
+
+You can configure a function to connect to a virtual private cloud (VPC) in your account. Use Amazon Virtual Private Cloud (Amazon VPC) to create a private network for resources such as databases, cache instances, or internal services. 
+
+Connect your function to the VPC to access private resources during execution.
+
+AWS Lambda runs your function code securely within a VPC by default. 
+
+However, to enable your Lambda function to access resources inside your private VPC, you must provide additional VPC-specific configuration information that includes VPC **subnet IDs and security group IDs**. 
+
+AWS Lambda uses this information to set up elastic network interfaces (ENIs) that enable your function to connect securely to other resources within your private VPC.
+
+Lambda functions cannot connect directly to a VPC with dedicated instance tenancy (Your instance runs on single-tenant hardware). To connect to resources in a dedicated VPC, peer it to a second VPC with default tenancy.
+
+Your Lambda function automatically scales based on the number of events it processes. If your Lambda function accesses a VPC, you must make sure that your VPC has sufficient ENI capacity to support the scale requirements of your Lambda function. It is also recommended that you specify at least one subnet in each Availability Zone in your Lambda function configuration.
+
+By specifying subnets in each of the Availability Zones, your Lambda function can run in another Availability Zone if one goes down or runs out of IP addresses. If your VPC does not have sufficient ENIs or subnet IPs, your Lambda function will not scale as requests increase, and you will see an increase in invocation errors with EC2 error types like `EC2ThrottledException`. For asynchronous invocation, if you see an increase in errors without corresponding CloudWatch Logs, invoke the Lambda function synchronously in the console to get the error responses.
+
+### Reasons for EC2ThrottledException
+
+* You only specified one subnet in your Lambda function configuration. That single subnet runs out of available IP addresses and there is no other subnet or Availability Zone which can handle the peak load.
+
+* Your VPC does not have sufficient subnet ENIs or subnet IPs.
+
+## Metrics
+
+AWS Lambda automatically monitors functions on your behalf, reporting metrics through Amazon CloudWatch. These metrics include total **invocation** requests, **latency**, and **error rates**. The *throttles*, **Dead Letter** Queues errors and **Iterator** age for stream-based invocations are also monitored.
+
+You can monitor metrics for Lambda and view logs by using the Lambda console, the CloudWatch console, the AWS CLI, or the CloudWatch API.
 

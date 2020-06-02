@@ -25,7 +25,7 @@ Note that in AWS, we are constantly using different domain names - S3 has a diff
 
 A way to bypass Same-Origin Policy - One way the server at the other end (not the client code in the browser) can relax the same-origin policy.
 
-CORS allows restricted resources on Domain A's web page to be requested from Bomain B - outside Domain A.
+CORS allows restricted resources on Domain A's web page to be requested from Domain B - outside Domain A.
 
 * ie, fonts on the webpage
 

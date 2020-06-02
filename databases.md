@@ -8,6 +8,7 @@
 
 [Non Relational Databases](#Non-Relational-Databases) - NoSQL
 
+* [Compare to RDS](#Compare-to-RDS)
 * [DynamoDB](#DynamoDB)
 * [DynamoDB Accelerator](#Make-It-Even-Faster)
 * [Improve Performance](#Improve-Performance)
@@ -15,28 +16,21 @@
 
 [Redshift DB](#Redshift)
 
+* [Advanced Compression](#Advanced-Compression)
+* [Redshift Use Cases](#Redshift-Use-Cases)
+
 [Relational Databases](#Relational-Databases) - RDS
 
 * [Aurora DB](#Aurora)
-
   * [Migrate to Aurora](#Migrate-to-Aurora)
-
 * [Backups for RDS](#Backups-for-RDS)
-
 * [Encryption at Rest](#Encryption-at-Rest)
-
 * [Enhanced Monitoring](#Enhanced-Monitoring)
-
 * [Failover](#Failover)
-
 * [Multi AZ](#(1)-Multi-AZ)
-
 * [Read Replicas](#(2)-Read-Replicas)
-
 * [Set up RDS Database](#Set-up-RDS-Database)
-
 * [Two Features of RDS](#Two-Features-of-RDS)
-
 
 [OLTP vs OLAP](#OLTP-vs-OLAP)
 
@@ -75,6 +69,8 @@ Relational databases have been around since the '70s.
 Amazon Relational Database Service (Amazon RDS) makes it easy to set up, operate, and scale a relational database in the cloud. It provides cost-efficient and resizable Compute (and\or Storage) capacity while automating time-consuming administration tasks such as hardware provisioning, operating system maintenance, database setup, patching and backups. It frees you to focus on your applications so you can give them the fast performance, high availability, security and compatibility they need.
 
 Choose RDS because of its resizable compute capacity and its lower administrative burden.
+
+RDS is managed... but not fully-managed, like DynamoDB is.
 
 ## Nature of the Queries
 
@@ -163,11 +159,15 @@ Multi-AZ available for all the RDS databases except for Aurora (Aurora by its ow
 * PostgreSQL
 * MariaDB
 
-Failover:
+Multi-AZ deployments for the MySQL, MariaDB, Oracle, and PostgreSQL engines utilize **synchronous** physical replication to keep data on the standby up-to-date with the primary. Multi-AZ deployments for the SQL Server engine use synchronous logical replication to achieve the same result, employing SQL Server-native Mirroring technology.
+
+### Failover
 
 * Failover is automatic with multi-AZ. [See failover section](#Failover).
 * If the primary DB fails, the DNS address will automatically point to the secondary DB.
 * *You can force a failover from one AZ to another by using "Reboot" of the RDS instance.*
+
+Compare this to a Single-AZ deployment: in case of a Single-AZ database failure, a user-initiated point-in-time-restore operation will be required. This operation can take several hours to complete, and any data updates that occurred after the latest restorable time (typically within the last five minutes) will not be available.
 
 ## (2) Read Replicas
 
@@ -278,6 +278,8 @@ The primary DB instance is synchronously replicated across Availability Zones to
 
 A Standby Replica is not a scaling solution for read-only scenarios; you cannot use a standby replica to serve read traffic. To service read-only traffic, you should use a [Read Replica - see above](#(2)-Read-Replicas).
 
+> Regardless of the database engine, you cannot use a standby database for read and write operations.
+
 ### Failover is Automatic
 
 Failover involves shifting work to the standby replica.
@@ -299,6 +301,8 @@ Amazon RDS automatically performs a failover in the event of any of the followin
 Automatic failover only occurs if the primary database is the one that is affected.
 
 Amazon RDS detects and automatically recovers from the most common failure scenarios for Multi-AZ deployments so that you can resume database operations as quickly as possible without administrative intervention.
+
+[Go to my Disaster Recovery page](https://github.com/SharinaS/Cloud-Engineering-Fundamentals/blob/master/disaster_recovery.md).
 
 # Backups for RDS
 
@@ -427,7 +431,9 @@ AWS' NoSQL Database is DynamoDB
 
 NoSQL DB service.
 
-> DynamoDB is serverless with no servers to provision, patch, or manage and no software to install, maintain, or operate. DynamoDB automatically scales tables up and down to adjust for capacity and maintain performance. Availability and fault tolerance are built in, eliminating the need to architect your applications for these capabilities. -- *Certified Cloud Practitioner Practice Exam Course*
+DynamoDB is serverless with no servers to provision, patch, or manage and no software to install, maintain, or operate. DynamoDB automatically scales tables up and down to adjust for capacity and maintain performance. Availability and fault tolerance are built in, eliminating the need to architect your applications for these capabilities. 
+
+It is a fully managed non-relational database service, scaling and all.
 
 ### Overview
 
@@ -475,6 +481,10 @@ If the shard iterator expires immediately before you can use it, this might indi
 ### Compare to RDS
 
 RDS is more suitable for a relational model that normalizes data into tables that are composed of rows and columns. An RDS database enforces referential integrity in relationships between tables, unlike a DynamoDB table.
+
+RDS is just a "managed" service and not "fully managed". This means that you still have to handle the backups and other administrative tasks such as when the automated OS patching will take place.
+
+DynamoDB is a database service in which you no longer need to worry about database management tasks such as hardware or software provisioning, setup and configuration... aka a fully managed database. This means that AWS fully manages all of the database management tasks and the underlying host server. In RDS, you still have to manually scale up your resources and create Read Replicas to improve scalability while in DynamoDB, this is automatically done.
 
 ### Storage Amount
 
@@ -586,12 +596,11 @@ A way to do business intelligence, or data warehousing in the cloud.
 
 Redshift is a **cloud data warehouse**.
 
+Amazon Redshift is a fast, scalable data warehouse that makes it simple and cost-effective to analyze all your data across your data warehouse and data lake. Redshift delivers ten times faster performance than other data warehouses by using machine learning, massively parallel query execution, and columnar storage on high-performance disk.
+
 * You create a data warehouse with a set of nodes, which are referred to as a *cluster*.
 
-
 Used for online analytics processing - [OLAP](#OLTP-vs-OLAP)
-
-## Overview
 
 * fast
 * powerful
@@ -599,7 +608,7 @@ Used for online analytics processing - [OLAP](#OLTP-vs-OLAP)
 * petabyte-scale
 * data warehouse service - *the* one to use in the AWS world.
 
-## Use Cases
+## Redshift Use Cases
 
 ### Queries on tons of data to get reports
 
