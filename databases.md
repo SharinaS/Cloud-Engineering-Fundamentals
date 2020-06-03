@@ -25,7 +25,8 @@
   * [Migrate to Aurora](#Migrate-to-Aurora)
 * [Backups for RDS](#Backups-for-RDS)
 * [Encryption at Rest](#Encryption-at-Rest)
-* [Enhanced Monitoring](#Enhanced-Monitoring)
+* [Metrics](#Metrics)
+  * [Enhanced Monitoring](#Enhanced-Monitoring)
 * [Failover](#Failover)
 * [Multi AZ](#(1)-Multi-AZ)
 * [Read Replicas](#(2)-Read-Replicas)
@@ -173,7 +174,7 @@ Compare this to a Single-AZ deployment: in case of a Single-AZ database failure,
 
 ***--> Main purpose is scalability <--***
 
-> For performance... for security.... for increased scalability and to maintain database availability in the case of an AZ failure... NOT for disaster recovery. 
+>  Read Replicas provide enhanced performance and durability for database (DB) instances.
 
 You must have *automatic backups* turned *on* in order to deploy a read replica.
 
@@ -187,7 +188,9 @@ Amazon RDS then uses the asynchronous replication method for the DB engine to **
 
 ### Reduce the load and increase elasticity
 
-You can reduce the load on your source DB instance by routing read queries from your applications to the read replica. Using read replicas, you can elastically scale out beyond the capacity constraints of a single DB instance for read-heavy database workloads.
+You can reduce the load on your source DB instance by routing read queries from your applications to the read replica. 
+
+Using read replicas, you can elastically scale out beyond the capacity constraints of a single DB instance for read-heavy database workloads.
 
 Use read replicas for very read-heavy DB workloads.
 
@@ -364,9 +367,17 @@ Encryption is done with the **AWS Key Management Service (KMS)**.
 
 > RDS instance is encrypted --> (data stored at rest in the underlying storage is encrypted) +  (automated backups, read replicas & snapshots are encrypted).
 
-# Enhanced Monitoring
+# Metrics
 
-Amazon RDS provides metrics in real time for the operating system (OS) that your DB instance runs on. 
+## Regular Items from RDS Metrics
+
+Provided by Amazon RDS Metrics in CloudWatch without any extra configuration:
+
+CPU Utilization, Database Connections, and Freeable Memory
+
+## Enhanced Monitoring
+
+> Amazon RDS provides metrics in real time for the **operating system** (OS) that your DB instance runs on. 
 
 You can view the metrics for your DB instance using the console, or consume the Enhanced Monitoring JSON output from CloudWatch Logs in a monitoring system of your choice. 
 
@@ -374,11 +385,25 @@ By default, Enhanced Monitoring metrics are stored in the CloudWatch Logs for 30
 
 * To modify the amount of time the metrics are stored in the CloudWatch Logs, change the retention for the RDSOSMetrics log group in the CloudWatch console.
 
+### Metrics Provided by Enhanced Monitoring
+
+#### RDS child processes 
+
+Shows a summary of the RDS processes that support the DB instance, for example aurora for Amazon Aurora DB clusters and mysqld for MySQL DB instances. Process threads appear nested beneath the parent process. Process threads show CPU utilization only as other metrics are the same for all threads for the process. The console displays a maximum of 100 processes and threads. The results are a combination of the top CPU consuming and memory consuming processes and threads. If there are more than 50 processes and more than 50 threads, the console displays the top 50 consumers in each category. This display helps you identify which processes are having the greatest impact on performance.
+
+#### RDS processes 
+
+Shows a summary of the resources used by the RDS management agent, diagnostics monitoring processes, and other AWS processes that are required to support RDS DB instances.
+
+#### OS processes
+
+Shows a summary of the kernel and system processes, which generally have minimal impact on performance.
+
 ## CPU Utilization Metrics
 
 There are differences between CloudWatch and Enhanced Monitoring Metrics re CPU utilization:
 
-| CloudWatch | Enhanced Monitoring |
+| From CloudWatch | From RDS Enhanced Monitoring |
 |-----|-----|
 | gathers metrics from the hypervisor for a DB instance | gathers metrics from an agent on the instance |
 | the hypervisor layer performs a small amount of work| useful when you want to see how different processes or threads on a DB instance use the CPU|
@@ -466,7 +491,7 @@ To speed up access to relevant data, you can pair Amazon S3 with a search engine
 
 #### Managing web sessions
 
-the DynamoDB Time-to-Live (TTL) mechanism enables you to manage web sessions of your application easily. It lets you set a specific timestamp to delete expired items from your tables. Once the timestamp expires, the corresponding item is marked as expired and is subsequently deleted from the table. By using this functionality, you do not have to track expired data and delete it manually. TTL can help you reduce storage usage and reduce the cost of storing data that is no longer relevant.
+The DynamoDB Time-to-Live (TTL) mechanism enables you to manage web sessions of your application easily. It lets you set a specific timestamp to delete expired items from your tables. Once the timestamp expires, the corresponding item is marked as expired and is subsequently deleted from the table. By using this functionality, you do not have to track expired data and delete it manually. TTL can help you reduce storage usage and reduce the cost of storing data that is no longer relevant.
 
 #### Use with Kinesis to store data
 
@@ -533,9 +558,31 @@ To avoid request throttling, design your DynamoDB table with the right partition
 
 **Warning**: Don't mix up partition key with partition group, regarding EC2 instances and placement types!
 
+### DynamoDB Streams
+
+DynamoDB Streams captures a time-ordered sequence of item-level modifications in any DynamoDB table and stores this information in a log for up to 24 hours. Applications can access this log and view the data items as they appeared before and after they were modified, in near-real time.
+
+Amazon DynamoDB is integrated with AWS Lambda so that you can create triggers—pieces of code that automatically respond to events in DynamoDB Streams. With triggers, you can build applications that react to data modifications in DynamoDB tables.
+
+Don't get confused with [Kinesis Streams](https://github.com/SharinaS/Cloud-Engineering-Fundamentals/blob/master/kinesis.md#Kinesis-Streams)!
+
 ### Weakness
 
-If you need to scan large amounts of data (ie a lot of keys all in one query), the performance will not be optimal (Think Redshift, intsead). DynamoDB is a NoSQL database which is based on key-value pairs used for **fast processing of small data** that dynamically grows and changes.
+If you need to scan large amounts of data (ie a lot of keys all in one query), the performance will not be optimal (Think Redshift, instead). DynamoDB is a NoSQL database which is based on key-value pairs used for **fast processing of small data** that dynamically grows and changes.
+
+### Auto Scaling
+
+DynamoDB auto scaling uses the AWS Application Auto Scaling service to dynamically adjust provisioned throughput capacity on your behalf, in response to actual traffic patterns. This enables a table or a global secondary index to increase its provisioned read and write capacity to handle sudden increases in traffic, without throttling. When the workload decreases, Application Auto Scaling decreases the throughput so that you don't pay for unused provisioned capacity.
+
+#### Scenario
+
+A popular augmented reality (AR) mobile game is heavily using a RESTful API which is hosted in AWS. The API uses Amazon API Gateway and a DynamoDB table with a preconfigured read and write capacity. Based on your systems monitoring, the DynamoDB table begins to throttle requests during high peak loads which causes the slow performance of the game. 
+
+--> Use DynamoDB Auto Scaling
+
+### ALB
+
+An Application Load Balancer is not suitable to be used with DynamoDB 
 
 # Data Warehousing
 
@@ -602,11 +649,9 @@ Amazon Redshift is a fast, scalable data warehouse that makes it simple and cost
 
 Used for online analytics processing - [OLAP](#OLTP-vs-OLAP)
 
-* fast
-* powerful
-* fully managed
-* petabyte-scale
-* data warehouse service - *the* one to use in the AWS world.
+
+a Fully-managed, petabyte-scaled data warehouse service.
+
 
 ## Redshift Use Cases
 
@@ -689,11 +734,21 @@ Reshift takes care of key managment. You can manage your keys through AWS key ma
 
 ## Availability
 
-Only available in one availability zone, so you can't turn on multi-AZ. 
+Only available in one availability zone, so you can't turn on multi-AZ.
+
+### Disaster Recovery
+
+Although Amazon Redshift is a fully-managed data warehouse, you will still need to configure cross-region snapshot copy to ensure that your data is properly replicated to another region.
 
 You can restore snapshots to a new AZ in the event of an outage.
 
 * Redshift can asynchronously replicate your snapshots to S3 in another region for disaster recovery. 
+
+#### Cross-Region Snapshot Copy
+
+You can configure Amazon Redshift to copy snapshots for a cluster to another region. To configure cross-region snapshot copy, you need to enable this copy feature for each cluster and configure where to copy snapshots and how long to keep copied automated snapshots in the destination region. 
+
+When cross-region copy is enabled for a cluster, all new manual and automatic snapshots are copied to the specified region.
 
 ## Enhanced VPC routing
 

@@ -20,6 +20,12 @@ SWF is a way of coordinating both your applications as well with human beings / 
 
 Amazon SWF is a web service that makes it easy to coordinate work across distributed application components.
 
+A fully-managed state tracker and task coordinator service. 
+
+### Not Serverless
+
+It does not provide serverless orchestration to multiple AWS resources.
+
 ## Use Cases
 
 * media processing

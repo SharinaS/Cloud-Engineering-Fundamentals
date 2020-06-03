@@ -1,8 +1,8 @@
 # Direct Connect
 
-A direct connection from your data center into AWS, using dedicated lines. It is an AWS service. 
+A direct connection from your data center into AWS, using **dedicated** lines. It is an AWS service. 
 
-Allows for private connectivity between AWS and a datacenter, office, etc. 
+Allows for **private connectivity** between AWS and a datacenter, office, etc. 
 
 Direct connect locations are spread all over the world. 
 
@@ -12,7 +12,7 @@ Within direct connect is a "AWS cage," which has routers. Customers routers then
 
 Useful for high throughput workloads (ie lots of network traffic). 
 
-Useful for when you need a stable and reliable and secure connection. For example, if you have situation where you're trying to use a VPN connection but it keeps dropping out b/c of the amount of throughput, you can use a direct connect to solve those issues.
+Useful for when you need a **stable and reliable and secure connection**. For example, if you have situation where you're trying to use a VPN connection but it keeps dropping out b/c of the amount of throughput, you can use a direct connect to solve those issues.
 
 VPN connectivity utilizes the public Internet, which can have unpredictable performance and despite being encrypted, can present security concerns
 
