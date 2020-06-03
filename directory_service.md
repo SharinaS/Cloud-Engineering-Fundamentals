@@ -1,6 +1,6 @@
 # Directory Service
 
-provides multiple ways to use Amazon **Cloud Directory** and Microsoft **Active Directory** (AD) with other AWS services.
+Provides multiple ways to use Amazon **Cloud Directory** and Microsoft **Active Directory** (AD) with other AWS services.
 
 * Microsoft Active Directory is a collection of services that help you manage users and devices on a network. Microsoft Active Directory is used by Windows applications to manage access and enable single sign-on (SSO).
 

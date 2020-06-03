@@ -4,21 +4,15 @@ ELB = Elastic Load Balancer
 
 ## Index 
 
-[Analyze ELB Log Files](#Analytics-and-Log-Files)
-
-[3 Types of Elastic Load Balancers](#3-Types-of-Elastic-Load-Balancers)
-
-[About Load Balancers](#About-Load-Balancers)
-
-[Cross Zone Load Balancing](#Cross-Zone-Load-Balancing)
-
-[Errors One May See](#Errors-One-May-See)
-
-[Path Patterns](#Path-Patterns)
-
-[Sticky Sessions](#Sticky-Sessions)
-
-[X-Forwarded-For Header](#X-Forwarded-For-Header)
+* [Analyze ELB Log Files](#Analytics-and-Log-Files)
+* [3 Types of Elastic Load Balancers](#3-Types-of-Elastic-Load-Balancers)
+* [About Load Balancers](#About-Load-Balancers)
+* [Connection Draining](#Connection-Draining)
+* [Cross Zone Load Balancing](#Cross-Zone-Load-Balancing)
+* [Errors One May See](#Errors-One-May-See)
+* [Path Patterns](#Path-Patterns)
+* [Sticky Sessions](#Sticky-Sessions)
+* [X-Forwarded-For Header](#X-Forwarded-For-Header)
 
 # About Load Balancers
 
@@ -40,6 +34,8 @@ Load balancers don't have an IP address; you are supplied a DNS name for the loa
 ## Benefits
 
 A load balancer distributes workloads across multiple compute resources, such as virtual servers. Using a load balancer **increases the availability and fault tolerance of your applications.**
+
+> Difference between Fault Tolerance and High Availability: the former refers to the minimum number of running instances. For example, you have a system that requires a minimum of 4 running instances and currently has 6 running instances deployed in two Availability Zones. There was a component failure in one of the Availability Zones which knocks out 3 instances. In this case, the system can still be regarded as Highly Available since there are still instances running that can accomodate the requests. However, it is not Fault Tolerant since the required minimum of four instances have not been met.
 
 You can **add and remove compute resources** from your load balancer as your needs change, without disrupting the overall flow of requests to your applications.
 
@@ -154,6 +150,11 @@ This means the the *application* is having problems, maybe at the Web Server lay
 
 Solution: Identify where the application is failing - Web Server layer or the Database Server layer. Scale it up or out, where possible. 
 
+# Connection Draining
+
+To ensure that a Classic Load Balancer stops sending requests to instances that are de-registering or unhealthy while keeping the existing connections open, use connection draining. This enables the load balancer to complete in-flight requests made to instances that are de-registering or unhealthy. Hence, configuring Connection Draining is the correct answer.
+
+When you enable connection draining, you can specify a maximum time for the load balancer to keep connections alive before reporting the instance as de-registered. The maximum timeout value can be set between 1 and 3,600 seconds (the default is 300 seconds). When the maximum time limit is reached, the load balancer forcibly closes connections to the de-registering instance.
 
 # X Forwarded For Header
 

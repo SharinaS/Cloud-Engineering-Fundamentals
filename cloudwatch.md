@@ -2,13 +2,12 @@
 
 ## Index (in the works)
 
-[CloudWatch & EC2](#EC2)
-
-[CloudWatch & Databases](#CloudWatch-&-Databases) 
-
-[Do Things with CloudWatch](#Do-Things-with-CloudWatch)
-
-[Metrics Available](#Available-Metrics)
+* [CloudWatch & EC2](#EC2)
+* [CloudWatch & Databases](#CloudWatch-&-Databases) 
+* [CloudWatch Logs Insights](#CloudWatch-Logs-Insights)
+* [Demo Console Example](#Do-Things-with-CloudWatch)
+* [Metrics Available](#Available-Metrics)
+  * [CloudWatch Agent](#CloudWatch-Agent)
 
 # About CloudWatch
 
@@ -53,7 +52,9 @@ CloudWatch can monitor at a **host level**. This includes metrics such as:
 
 ### Custom Metrics
 
-To monitor other items you need to prepare a custom metric using a Perl or other shell script, as there are no ready to use metrics for these:
+You can look at the existing CloudWatch logs for keywords related to an application error to create a custom metric. Then, create a CloudWatch alarm for that custom metric which invokes an action to restart the EC2 instance.
+
+To monitor custom items you need to prepare a custom metric using a Perl or other shell script, as there are no ready to use metrics for these:
 
 * memory usage
 * disk swap utilization
@@ -63,7 +64,31 @@ To monitor other items you need to prepare a custom metric using a Perl or other
 
 ### CloudWatch Agent
 
- there is a multi-platform *CloudWatch agent* which can be installed on both Linux and Windows-based instances. You can use a single agent to collect both system metrics and log files from Amazon EC2 instances and on-premises servers. 
+There is a multi-platform *CloudWatch agent* which can be **installed** on both Linux and Windows-based **instances**. 
+ 
+You can use a single agent to collect both **system metrics and log files** from Amazon EC2 instances and on-premises servers. 
+
+To collect logs from your Amazon EC2 instances and on-premises servers into CloudWatch Logs, AWS offers both a new unified CloudWatch agent, and an older CloudWatch Logs agent. It is recommended to use the unified CloudWatch agent which has the following advantages:
+
+- You can collect both logs and advanced metrics with the installation and configuration of just one agent.
+
+- The unified agent enables the collection of logs from servers running Windows Server.
+
+- If you are using the agent to collect CloudWatch metrics, the unified agent also enables the collection of additional system metrics, for in-guest visibility.
+
+- The unified agent provides better performance.
+
+### Alarms for Instance-Related Events
+
+You can create alarms that automatically stop, terminate, reboot, or recover your EC2 instances using Amazon CloudWatch alarm actions. You can use the stop or terminate actions to help you save money when you no longer need an instance to be running. You can use the reboot and recover actions to automatically reboot those instances or recover them onto new hardware if a system impairment occurs.
+
+### Scenario
+
+There is a new compliance rule in your company that audits every Windows and Linux EC2 instances each month to view any performance issues. They have more than a hundred EC2 instances running in production, and each must have a logging function that collects various system details regarding that instance. The SysOps team will periodically review these logs and analyze their contents using AWS Analytics tools, and the result will need to be retained in an S3 bucket.
+
+In this scenario, what is the most efficient way to collect and analyze logs from the instances with minimal effort?
+
+--> Install the unified CloudWatch Logs agent in each instance which will automatically collect and push data to CloudWatch Logs. Analyze the log data with CloudWatch Logs Insights.
 
 ## Dashboards
 
@@ -78,6 +103,14 @@ Lets you set alarms to notify you when particular thresholds (ie, billing, cpu u
 CloudWatch > Logs 
 
 Allows for performance logging. So, you can send all your logs to CloudWatch. Allows for aggregation, monitoring and storing of logs.
+
+### CloudWatch Logs Insights
+
+CloudWatch Logs Insights enables you to interactively search and analyze your log data in Amazon CloudWatch Logs. 
+
+You can perform queries to help you quickly and effectively respond to operational issues. If an issue occurs, you can use CloudWatch Logs Insights to identify potential causes and validate deployed fixes.
+
+CloudWatch Logs Insights includes a purpose-built query language with a few simple but powerful commands. CloudWatch Logs Insights provides sample queries, command descriptions, query autocompletion, and log field discovery to help you get started quickly. Sample queries are included for several types of AWS service logs.
 
 ## Events
 
@@ -103,17 +136,13 @@ While CloudWatch is about *performance*, CloudTrail is about *auditing*.
 
 * "What's the performance of the EC2 instance?" <-- think CloudWatch
 
-# CloudWatch & Databases
+## CloudWatch & Databases
 
-## RDS 
+### RDS 
 
 you can use CloudWatch to monitor the CPU Utilization of your database instance, but it does not provide the percentage of the CPU bandwidth and total memory consumed by each database process in your RDS instance.
 
-* Use RDS Enhanced Monitoring instead. See more in [the databases file](https://github.com/SharinaS/Cloud-Engineering-Fundamentals/blob/master/databases.md)
-
-
----------
----------
+* Use RDS Enhanced Monitoring instead. See more about metrics in [the databases file](https://github.com/SharinaS/Cloud-Engineering-Fundamentals/blob/master/databases.md)
 
 # Do Things with CloudWatch
 

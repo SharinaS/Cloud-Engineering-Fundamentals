@@ -1,5 +1,12 @@
 # Global Accelerator
 
+## Index
+
+* [Compare with CloudFront](#Compare-with-CloudFront)
+* [Use Cases](#Use-Cases)
+
+## About
+
 See also the [tutorialsdojo notes](https://tutorialsdojo.com/aws-global-accelerator/).
 
 A service in which you create accelerators to improve availability and performance of your app for local and global users. 
@@ -10,9 +17,8 @@ AWS Global Accelerator is a service that **improves the availability and perform
 
 AWS Global Accelerator uses the AWS global network to optimize the path from your users to your applications, improving the performance of your traffic by as much as 60%.
 
-User --> Edge location --> AWS Global Accelerator --> Endpoint group --> Endpoints
-
-You can control traffic using traffic dials, so it's very highly configurable (this is done within the endpoint group, like an EC2 instance).
+## Low Latency
+Many applications, such as gaming, media, mobile applications, and financial applications, need very low latency for a great user experience. To improve the user experience, AWS Global Accelerator directs user traffic to the nearest application endpoint to the client, thus reducing internet latency and jitter. It routes the traffic to the closest edge location via Anycast, then by routing it to the closest regional endpoint over the AWS global network. AWS Global Accelerator quickly reacts to changes in network performance to improve your users’ application performance.
 
 ## Multiple Regions
 
@@ -66,11 +72,23 @@ An Application Load Balancer endpoint can be an internet-facing or internal.
 
 For each endpoint, you can configure weights (weights are numbers that you use to indicate the proportion of traffic to route to each one) so you can do things like performance testing within a region. 
 
-## What to Do with a Global Accelerator
+## Use Cases
 
 ### Associate IP addresses with regional resources
 
-Associate the **static IP addresses** provided by AWS Global Accelerator to regional AWS resources or endpoints, such as Network Load Balancers, Application Load Balancers, EC2 Instances, and Elastic IP addresses. The IP addresses are anycast from AWS edge locations so they provide onboarding to the AWS global network close to your users.
+Associate the **static IP addresses** provided by AWS Global Accelerator to regional AWS resources or endpoints, such as Network Load Balancers, Application Load Balancers, EC2 Instances, and Elastic IP addresses. 
+
+The IP addresses are Anycast from AWS edge locations so they provide onboarding to the AWS global network close to your users.
+
+* Anycast is a network addressing and routing methodology in which a single destination address has multiple routing paths to two or more endpoint destinations. 
+
+#### Scenario
+
+An online trading platform with thousands of clients across the globe is hosted in AWS. To reduce latency, you have to direct user traffic to the nearest application endpoint to the client. **The traffic should be routed to the closest edge location via an Anycast static IP address.** AWS Shield should also be integrated into the solution for DDoS protection.
+
+Which of the following is the MOST suitable service that the Solutions Architect should use to satisfy the above requirements?
+
+--> AWS Global Accelerator
 
 ### Move endpoints
 
@@ -79,6 +97,8 @@ Easily move endpoints between Availability Zones or AWS Regions without needing 
 ### Dial traffic
 
 Dial traffic up or down for a specific AWS Region by configuring a traffic dial percentage for your endpoint groups. This is especially useful for testing performance and releasing updates.
+
+You can control traffic using traffic dials, so it's very highly configurable (this is done within the endpoint group, like an EC2 instance).
 
 ### Control traffic direction
 
@@ -92,7 +112,13 @@ See A Cloud Guru's AWS Certified Solutions Architect, Chapter 7.11 for a demo
 
 AWS Global Accelerator and Amazon CloudFront are separate services that use the AWS global network and its edge locations around the world. Both services integrate with AWS Shield for DDoS protection.
 
-CloudFront improves performance for both cacheable content (such as images and videos) and dynamic content (such as API acceleration and dynamic site delivery). 
+CloudFront improves performance for both cacheable content (such as **images and videos**) and dynamic content (such as **API acceleration and dynamic site** delivery). 
 
-Global Accelerator improves performance for a wide range of applications over TCP or UDP by proxying packets at the edge to applications running in one or more AWS Regions. Global Accelerator is a good fit for non-HTTP use cases, such as gaming (UDP), IoT (MQTT), or Voice over IP, as well as for HTTP use cases that specifically require static IP addresses or deterministic, fast regional failover. 
+CloudFront doesn't have the capability to route the traffic to the closest edge location via an Anycast static IP address.
+
+Global Accelerator improves performance for a wide range of applications over **TCP or UDP** by proxying packets at the edge to applications running in one or more AWS Regions. 
+
+Global Accelerator is a good fit for non-HTTP use cases, such as **gaming (UDP), IoT (MQTT), or Voice over IP**, as well as for HTTP use cases that specifically require **static IP addresses** or **deterministic, fast regional** failover. 
+
+Both services integrate with **AWS Shield** for DDoS protection.
 

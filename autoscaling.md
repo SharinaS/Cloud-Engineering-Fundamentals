@@ -2,13 +2,14 @@
 
 ## Index 
 
-[Cooldown Period](#Cooldown-Period)
+* [3 Components to Auto Scaling](#3-Components-to-Auto-Scaling)
+* [Cooldown Period](#Cooldown-Period)
+* [Launch Configuration](#(2)-Configuration-Templates)
+* [Scaling Options](#(3)-Scaling-Options)
+* [Order of Termination](#Order-of-Termination)
+* [Services that Scale Automatically](#Services-that-Scale-Automatically)
 
-[Order of Termination](#Order-of-Termination)
-
-[Services that Scale Automatically](#Services-that-Scale-Automatically)
-
-# Three Components to Auto Scaling
+# 3 Components to Auto Scaling
 
 ## (1) Groups
 
@@ -18,15 +19,38 @@ Webserver group, Application group, Database group, etc.
 
 ## (2) Configuration Templates
 
-Groups uses a launch template (launch configuration) for its EC2 instances.
+Whenever you create an Auto Scaling group, you must specify a launch configuration, a launch template, or an EC2 instance. When you create an Auto Scaling group using an EC2 instance, Amazon EC2 Auto Scaling automatically creates a launch configuration for you and associates it with the Auto Scaling group.
 
-Allows for specification of information
+Specify information for the instances in the launch template or launch configuration:
+
 * AMI Id
 * Instance type
 * KeyPair
 * Security groups
 * block device mapping
 * etc
+
+### Launch Configurations
+
+You can only specify one launch configuration for an Auto Scaling group at a time, and you can't modify a launch configuration after you've created it. 
+
+Therefore, if you want to change the launch configuration for an Auto Scaling group, you must create a launch configuration and then update your Auto Scaling group with the new launch configuration.
+
+If you plan to continue to use launch configurations with Amazon EC2 Auto Scaling, be aware that not all Auto Scaling group features are available. For example, you cannot create an Auto Scaling group that launches both Spot and On-Demand Instances or that specifies multiple instance types.
+
+### Launch Templates
+
+A launch template is similar to a launch configuration, in that it specifies instance configuration information. 
+
+However, defining a launch template instead of a launch configuration allows you to have **multiple versions of a template**. 
+
+With versioning, you can create a subset of the full set of parameters and then reuse it to create other templates or template versions. For example, you can create a default template that defines common configuration parameters and allow the other parameters to be specified as part of another version of the same template.
+
+Launch templates provide more advanced Amazon EC2 configuration options. For example, you must use launch templates to use Amazon EC2 Dedicated Hosts.
+
+### Replace Launch Configuration with a Launch Template
+
+After you replace the launch configuration for an Auto Scaling group, any new instances are launched using the new launch template, but existing instances are not affected. In this situation, you can terminate existing instances in the Auto Scaling group to force a new instance to launch that uses your launch template. Or, you can allow automatic scaling to gradually replace older instances with newer instances based on your termination policies.
 
 ## (3) Scaling Options
 
@@ -94,8 +118,6 @@ The default termination policy is designed to help ensure that your network arch
 3. If there are multiple instances to terminate based on the above criteria, determine which unprotected instances are closest to the next billing hour. (This helps you maximize the use of your EC2 instances and manage your Amazon EC2 usage costs.) If there is one such instance, terminate it.
 
 4. If there is more than one unprotected instance closest to the next billing hour, choose one of these instances at random.
-
--- *AWS AWS Certified Solutions Architect Associate Practice Tests*
 
 # Cooldown Period
 

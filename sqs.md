@@ -1,7 +1,8 @@
 [SQS](#SQS)
 
 * [About SQS](#About-SQS)
-* [Examples](#Examples)
+* [Duplication Scenarios](#Duplication-Scenarios)
+* [Use Cases](#Examples)
 * [Types of Queues](#Types-of-Queues)
 * [Visibility Timeout](#Visibility-Timeout)
 
@@ -81,8 +82,7 @@ You developed a web application and deployed it on a fleet of EC2 instances, whi
 
 ## Visibility Timeout
 
-> Invisibility time for the message that prevents **duplicate messages**.
-
+> Invisibility time for the message that reduces the liklihood of **duplicate messages**.
 
 The amount of time the message is invisible in the SQS queue **after a reader picks up** that message.
 
@@ -97,7 +97,7 @@ Visibility timeout maximum: 12 hours
 
 * If the job is not completed by 12 hours, the message will become visible in the queue again.
 
-### Example exam question
+### Scenario
 
 You're getting the same message delivered twice. Why?
 
@@ -127,6 +127,11 @@ Application must be able to cope with:
 * Multiple copies of the same message delivered twice.
 
 Great for applications that can deal with messages occasionally out of order and isn't effected by duplicates.
+
+If you can't at all handle having any duplicates, you can:
+
+- Replace Amazon SQS and instead, use Amazon Simple Workflow service.
+- Use an Amazon SQS FIFO Queue instead.
 
 ### FIFO
 
@@ -227,7 +232,7 @@ The reason for this is that you cannot set a priority to individual items in an 
 
 Amazon SQS offers reliable, highly-scalable hosted queues for storing messages while they travel between applications or microservices. Amazon SQS lets you move data between distributed application components and helps you decouple these components. 
 
-Amazon SWF is a web service that makes it easy to coordinate work across distributed application components.
+Amazon SWF is a web service that makes it easy to coordinate work across distributed application components. It ensures that a task is never duplicated and is assigned only once.
 
 ## SQS vs SWF
 
@@ -238,7 +243,7 @@ The Thing|SQS|SWF|
 |Duplication|Need to handle duplicated messages (default type)|A task is assigned only once and is never duplicated|
 |Tracking|Need to implement your own app-level tracking (esp w/multiple queues)|Keeps track of all tasks and events in an app|
 
-## Delete is Not Automatic
+## Duplication Scenarios
 
 After a message is added to an SQS queue, SQS does not automatically delete the messages.
 
@@ -247,3 +252,15 @@ After a message is added to an SQS queue, SQS does not automatically delete the 
 You have built a web application that checks for new items in an S3 bucket once every hour. If new items exist, a message is added to an SQS queue. You have a fleet of EC2 instances which retrieve messages from the SQS queue, process the file, and finally, send you and the user an email confirmation that the item has been successfully processed. Your officemate uploaded one test file to the S3 bucket and after a couple of hours, you noticed that you and your officemate have 50 emails from your application with the same message.
 
 --> In this scenario, the main culprit is that your application does not issue a delete command to the SQS queue after processing the message, which is why this message went back to the queue and was processed multiple times.
+
+### Scenario
+
+You have a web-based order processing system which is currently using a standard queue in Amazon SQS. The support team noticed that there are a lot of cases where an order was processed twice. This issue has caused a lot of trouble in your processing and made your customers very unhappy. Your IT Manager has asked you to ensure that this issue will not recur.
+
+The main issue in this scenario is that the order management system produces duplicate orders at times. Since the company is using SQS, there is a possibility that a message can have a duplicate in case an EC2 instance failed to delete the already processed message. 
+
+To prevent this issue from happening:
+
+- Replace Amazon SQS and instead, use Amazon Simple Workflow service.
+
+- Use an Amazon SQS FIFO Queue instead.

@@ -2,34 +2,22 @@
 
 ## Index
 
-[Bastion Host](#Bastion-Host)
-
-[Create a VPC on the AWS Console](#Create-a-VPC-on-the-AWS-Console)
-
-[NAT Instances and Nat Gateways](#NAT-Instances-and-Nat-Gateways)
-
-* [NAT Gateway](#NAT-Gateways)
-* [Elastic IP Address](#Elastic-IP-Address)
-
-[NACLs vs Security Groups](#NACLs-vs-Security-Groups)
-
-[Network Access Control Lists](#Network-Access-Control-Lists) (NACLs)
-
-* [Order of Rules](#Order-of-Rules)
-
-[Peering](#VPC-Peering)
-
-[Route Tables](#Route-Tables)
-
-[Security Groups](#Security-Groups)
-
-[What is a VPC](#What-is-a-VPC)
-
-[What is Created with a VPC](#What-is-Created-with-a-VPC)
-
-[VPC Endpoint](#VPC-Endpoint)
-
-[VPC Flow Logs](#VPC-Flow-Logs)
+* [Bastion Host](#Bastion-Host)
+* [Create a VPC on the AWS Console](#Create-a-VPC-on-the-AWS-Console)
+* [DNS Hostnames](#DNS-Hostnames)
+* [NAT Instances and Nat Gateways](#NAT-Instances-and-Nat-Gateways)
+  * [NAT Gateway](#NAT-Gateways)
+  * [Elastic IP Address](#Elastic-IP-Address)
+* [NACLs vs Security Groups](#NACLs-vs-Security-Groups)
+* [Network Access Control Lists](#Network-Access-Control-Lists) (NACLs)
+  * [Order of Rules](#Order-of-Rules)
+* [Peering](#VPC-Peering)
+* [Route Tables](#Route-Tables)
+* [Security Groups](#Security-Groups)
+* [What is a VPC](#What-is-a-VPC)
+* [What is Created with a VPC](#What-is-Created-with-a-VPC)
+* [VPC Endpoint](#VPC-Endpoint)
+* [VPC Flow Logs](#VPC-Flow-Logs)
 
 # What is a VPC
 
@@ -76,6 +64,28 @@ In a default VPC, all Amazon EC2 instances are assigned two IP addresses at laun
 Example: A public-facing subnet for your webservers, with backend systems like a DB placed in a private-facing subnet. 
 
 Example: A Hardware Virtual Private Network (VPN) connection between a corporate datacenter and your VPC. The AWS cloud becomes an extension of your corporate datacenter. 
+
+## DNS Hostnames
+
+When resolved from within the VPC, the DNS hostname will translate to the instance's private IP address. From outside the VPC, the DNS hostname will translate to the instance's public IP address.
+
+### Default VPC
+
+When you launch an EC2 instance into a default VPC, AWS provides it with public and private DNS hostnames that correspond to the public IPv4 and private IPv4 addresses for the instance.
+
+The VPC is the one that enables assigning of instance hostnames.
+
+### Custom VPC
+
+When you launch an instance into a non-default VPC, AWS provides the instance with a private DNS hostname only. 
+
+New instances will only be provided with public DNS hostname depending on these two DNS attributes: the DNS resolution and DNS hostnames, that you have specified for your VPC, and if your instance has a public IPv4 address.
+
+### Scenario
+
+You launched an EC2 instance in your newly created VPC. You have noticed that the generated instance does not have an associated DNS hostname.
+
+In this case, the new EC2 instance does not automatically get a DNS hostname because the DNS resolution and DNS hostnames attributes are disabled in the newly created VPC.
 
 ## Subnets
 

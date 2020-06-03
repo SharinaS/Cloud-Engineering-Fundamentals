@@ -499,7 +499,7 @@ See more in section [Copy and Move](#Copy-and-Move)
 
 ## EBS Types
 
-You can change EBS volume sizes on the fly, including size and storage type.
+You can change EBS volume sizes on the fly, including size and storage type. You can also increase EBS storage for up to 16TB or add new volumes for additional storage.
 
 * General
 * Provisioned
@@ -522,7 +522,8 @@ Note that some EBS are SSD and some are HDD.
 ### General Purpose (SSD)
 
 * API Name: gp2
-* For wide variety of work loads, up to 16,000 IPS/volume
+* For wide variety of work loads
+* up to 16,000 IPS/volume
 * can handle small, random I/O operations
 
 ### Provisioned IPS (SSD)
