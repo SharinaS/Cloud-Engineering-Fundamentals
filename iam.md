@@ -1,5 +1,13 @@
 # IAM
 
+## Index
+
+* [Policies](#Policies)
+* [Roles](#Roles)
+* [Use of Tags](#Tags)
+
+## About IAM
+
 IAM = Identity Access Management
 
 IAM includes:
@@ -11,9 +19,21 @@ IAM includes:
   * Used to grant resources permissions to other resources and are generally not for end-users
 * Policies
 
-IAM is universal
+## IAM is universal
 
 * No region needs to be chosen.
+
+### Scenario
+
+You are consulted by a multimedia company that needs to deploy web services to an AWS region which they have never used before. The company currently has an IAM role for their Amazon EC2 instance which permits the instance to access Amazon DynamoDB. They want their EC2 instances in the new region to have the exact same privileges.   
+
+What should you do to accomplish this?
+
+--> Assign the existing IAM role to instances in the new region
+
+#### Explanation
+
+In this scenario, the company has an existing IAM role hence you don’t need to create a new one. IAM roles are global service that are available to all regions hence, all you have to do is assign the existing IAM role to the instance in the new region.
 
 ## Root Account
 
@@ -21,7 +41,7 @@ The account created when you first set up your AWS account.
 
 It has complete Admin access.
 
-## New Users
+## Users
 
 New users have *no permissions* when they are first created. 
 
@@ -44,9 +64,9 @@ Always set this up on your root account.
 
 You can set up rotation policies.
 
-# Roles
+## Roles
 
-## About
+### About
 
 Roles are a way for one AWS service to use another AWS service.
 
@@ -58,13 +78,38 @@ Roles are universal - don't need to specify what region they're in.
 
 > IAM roles are designed so that your applications can securely make API requests from your instances, without requiring you to manage the security credentials that the applications use. Instead of creating and distributing your AWS credentials, you can delegate permission to make API requests using IAM roles.
 
-## Roles and AWS CLI
+### Roles and AWS CLI
 
 Roles are more secure than storing your access key and secret access key on individual EC2 instances (ie, SSH into an instance, and then do `aws configure`)
 
-Roles can be assigned to an EC2 instance after it's created, using both the console and the CLI. 
+Roles can be assigned to an EC2 instance after it's created, using both the console and the CLI.
+
+## Tags
+
+Tags enable you to categorize your AWS resources in different ways, for example, by purpose, owner, or environment. This is useful when you have many resources of the same type — you can quickly identify a specific resource based on the tags you've assigned to it.
+
+## Policies
+
+You manage access in AWS by creating policies and attaching them to IAM identities (users, groups of users, or roles) or AWS resources. A policy is an object in AWS that, when associated with an identity or resource, defines their permissions. AWS evaluates these policies when an IAM principal (user or role) makes a request. Permissions in the policies determine whether the request is allowed or denied. Most policies are stored in AWS as JSON documents. 
+
+### Scenario
+
+You have EC2 instances running on your VPC. You have both UAT and production EC2 instances running. You want to ensure that employees who are responsible for the UAT instances don’t have the access to work on the production instances to minimize security risks.
+
+Which of the following would be the best way to achieve this?
+
+--> Define the tags on the UAT and production servers and add a condition to the IAM policy which allows access to specific tags.
+
+#### Background
+
+For this scenario, the best way to achieve the required solution is to use a combination of Tags and IAM policies. You can define the tags on the UAT and production EC2 instances and add a condition to the IAM policy which allows access to specific tags.
+
+By default, IAM users don't have permission to create or modify Amazon EC2 resources, or perform tasks using the Amazon EC2 API. (This means that they also can't do so using the Amazon EC2 console or CLI.) 
+
+To allow IAM users to create or modify resources and perform tasks, you must **create IAM policies that grant IAM users permission** to use the specific resources and API actions they'll need, and then **attach those policies to the IAM users or groups** that require those permissions.
 
 # Simple Demo
+
 ## Create a Role
 In the Amazon Console, go to IAM > Access Management > Roles.
 

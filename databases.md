@@ -371,9 +371,11 @@ Encryption is done with the **AWS Key Management Service (KMS)**.
 
 ## Regular Items from RDS Metrics
 
-Provided by Amazon RDS Metrics in CloudWatch without any extra configuration:
+Provided by Amazon RDS Metrics in CloudWatch *without any extra configuration:*
 
-CPU Utilization, Database Connections, and Freeable Memory
+* CPU Utilization
+* Database Connections
+* Freeable Memory
 
 ## Enhanced Monitoring
 
@@ -386,6 +388,10 @@ By default, Enhanced Monitoring metrics are stored in the CloudWatch Logs for 30
 * To modify the amount of time the metrics are stored in the CloudWatch Logs, change the retention for the RDSOSMetrics log group in the CloudWatch console.
 
 ### Metrics Provided by Enhanced Monitoring
+
+* RDS child processes
+* RDS processes
+* OS processes
 
 #### RDS child processes 
 

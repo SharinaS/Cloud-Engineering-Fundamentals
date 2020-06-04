@@ -1,0 +1,11 @@
+# SQS vs Step Functions vs SWF
+
+||**SQS**|**Step Functions**|**SWF**|
+|------|------|------|------|
+|When to Use|When you need a reliable, highly scalable, hosted queue for sending, storing, and receiving messages between services.|When you need to coordinate service components in the development of highly scalable and auditable applications using visual workflows|If you require external signals to intervene in your processes, or you would like to launch child processes that return a result to a parent.|
+|Tracking|requires you to implement your own application-level tracking, especially if your application uses multiple queues.|keeps track of all tasks and events in an application|keeps track of all tasks and events in an application|
+|Visibility| requires implementing additional functionality|Step Functions Console and visibility APIs provide an application-centric view that lets you search for executions, drill down into an execution’s details, and administer executions.|SWF Functions Console and visibility APIs provide an application-centric view that lets you search for executions, drill down into an execution’s details, and administer executions.|
+|What you write||you write state machines in declarative JSON|you write a decider program to separate activity steps from decision steps. This provides you complete control over your orchestration logic, but increases the complexity of developing applications.|
+|API Actions|Message-oriented||Task-oriented|
+|Application Development|Requires you to implement some application-level functionality|Helps facilitate app development by passing data between tasks and adds flexibility in distributing tasks|Helps facilitate app development by passing data between tasks and adds flexibility in distributing tasks|
+|Workflows|Can build basic workflows to coordinate your distributed application|workflows are out-of-the-box|Provides the Flow Framework, letting you write distributed applications using programming constructs that structure asynchronous interactions.|

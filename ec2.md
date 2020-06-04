@@ -516,6 +516,7 @@ Note that some EBS are SSD and some are HDD.
 |great for transactional workloads | great for large, streaming workloads |
 | moderate/high cost | low cost|
 | Performance attribute: IOPS| Performance attribute: Throughput|
+|Can be used as a bootable volume|Cannot be used as a bootable volume|
 
 
 
@@ -523,16 +524,17 @@ Note that some EBS are SSD and some are HDD.
 
 * API Name: gp2
 * For wide variety of work loads
-* up to 16,000 IPS/volume
+* minimum of 100 IOPS - maximum of 10,000 IOPS
 * can handle small, random I/O operations
+* Cost effective
 
 ### Provisioned IPS (SSD)
 
 * API Name: io1
 * Highest performance SSD volume
-* Designed for mission critical 
-* Great for **databases**
+* Great for **databases** and critical business applications
 * Max IOPS is 64,000
+* Great for sustained IOPS performance
 
 ### Throughput Optimised Hard Disk Drive (HDD)
 
@@ -733,6 +735,7 @@ AMIs are categorized as *one* of the following:
 * Backed by instance store
   * root device for an instance launched from the AMI is an instance store volume created from a **template stored in S3**.
   * Sometimes called Ephemeral Storage
+  * Can be referred to as a Store-Backed AMI
 
 See below - [Persistant Storage vs Emphemoral Storage](#Persistant-Storage-vs-Emphemoral-Storage)
 
@@ -740,19 +743,15 @@ See below - [Persistant Storage vs Emphemoral Storage](#Persistant-Storage-vs-Em
 
 The data in an instance store persists only during the lifetime of its associated instance. If an instance reboots (intentionally or unintentionally), data in the instance store persists. However, data in the instance store is lost under any of the following circumstances:
 
-- The underlying disk drive fails
-
-- The instance stops
-
-- The instance terminates
-
-
+* The underlying disk drive fails
+* The instance stops
+* The instance terminates
 
 Therefore, do not rely on instance store for valuable, long-term data. Instead, use more durable data storage such as **Amazon S3, Amazon EBS, or Amazon EFS**. When you stop or terminate an instance, every block of storage in the instance store is reset. Hence, your data cannot be accessed through the instance store of another instance.
 
-If you create an AMI from an instance, the data on its instance store volumes aren't preserved and aren't present on the instance store volumes of the instances that you launch from the AMI. You can specify instance store volumes for an instance only when you launch it. You can't detach an instance store volume from one instance and attach it to a different instance.
+If you create an AMI from an instance, the data on its instance store volumes aren't preserved and aren't present on the instance store volumes of the instances that you launch from the AMI. You can specify instance store volumes for an instance only when you launch it. 
 
--- *Udemy AWS Certified Solutions Architect Associate Practice Test*
+You can't detach an instance store volume from one instance and attach it to a different instance.
 
 ## Example of Launching EBS Backed vs Instance Store Backed
 
