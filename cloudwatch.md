@@ -2,12 +2,16 @@
 
 ## Index (in the works)
 
+* [Alarms for Instance-Related Events](#Alarms-for-Instance-Related-Events)
+* [CloudWatch Agent](#CloudWatch-Agent)
+  * [Use CloudWatch Agent](#Use-CloudWatch-Agent)
+* [CloudWatch & Auto Scaling Group](#CloudWatch-&-Auto-Scaling-Group)
 * [CloudWatch & EC2](#EC2)
 * [CloudWatch & Databases](#CloudWatch-&-Databases) 
 * [CloudWatch Logs Insights](#CloudWatch-Logs-Insights)
+* [CloudWatch Monitoring Scripts](#CloudWatch-Monitoring-Scripts)
 * [Demo Console Example](#Do-Things-with-CloudWatch)
 * [Metrics Available](#Available-Metrics)
-  * [CloudWatch Agent](#CloudWatch-Agent)
 
 # About CloudWatch
 
@@ -40,7 +44,7 @@ Using Amazon CloudWatch alarm actions, you can create alarms that automatically 
 
 ### Available Metrics
 
-CloudWatch can monitor at a **host level**. This includes metrics such as:
+CloudWatch can monitor at a **host level**. This includes the default metrics for EC2:
 
 * CPU utilization
 * Network utilization
@@ -89,6 +93,54 @@ There is a new compliance rule in your company that audits every Windows and Lin
 In this scenario, what is the most efficient way to collect and analyze logs from the instances with minimal effort?
 
 --> Install the unified CloudWatch Logs agent in each instance which will automatically collect and push data to CloudWatch Logs. Analyze the log data with CloudWatch Logs Insights.
+
+## CloudWatch & Auto Scaling Group
+
+### Scenario
+
+An auto-scaling group of Linux EC2 instances is created with basic monitoring enabled in CloudWatch. You noticed that your application is slow so you asked one of your engineers to check all of your EC2 instances. After checking your instances, you noticed that the auto scaling group is not launching more instances as it should be, even though the servers already have high memory usage.
+
+Which of the following are possible solutions that an Architect can implement to solve this issue? (Select TWO.)
+
+ - Install CloudWatch monitoring scripts in the instances. Send custom metrics to CloudWatch which will trigger your Auto Scaling group to scale up.
+
+- Install the CloudWatch agent to the EC2 instances which will trigger your Auto Scaling group to scale up. [See in this doc about the agent...](#CloudWatch-Agent)
+
+#### CloudWatch Monitoring Scripts
+
+The Amazon CloudWatch Monitoring Scripts for Amazon Elastic Compute Cloud (Amazon EC2) Linux-based instances demonstrate how to produce and consume Amazon CloudWatch custom metrics. These sample Perl scripts comprise a fully functional example that reports memory, swap, and disk space utilization metrics for a Linux instance.
+
+The premise of the above scenario is that the EC2 servers have high memory usage, but since this specific metric is not tracked by the Auto Scaling group by default, the scaling up activity is not being triggered. Remember that by default, CloudWatch doesn't monitor memory usage but only the CPU utilization, Network utilization, Disk performance and Disk Reads/Writes.
+
+This is the reason why you have to install CloudWatch Monitoring Scripts in your EC2 instances to collect and monitor the custom metric (memory usage), which will be used by your Auto Scaling Group as a trigger for scaling activities.
+
+CloudWatch does not monitor EC2 memory usage as well as disk space utilization. You would have to collect the metrics using a script or by using a CloudWatch agent then send the data to CloudWatch.
+
+### Scenario 
+
+A company has an application hosted in an Auto Scaling group of Amazon EC2 instances across multiple Availability Zones behind an Application Load Balancer. There are several occasions where some instances are automatically terminated after failing the HTTPS health checks in the ALB and then purges all the ephemeral logs stored in the instance. A Solutions Architect must implement a solution that collects all of the application and server logs effectively. She should be able to perform a root cause analysis based on the logs, even if the Auto Scaling group immediately terminated the instance.
+
+What is the EASIEST way for the Architect to automate the log collection from the Amazon EC2 instances?
+
+-->  Add a lifecycle hook to your Auto Scaling group to move instances in the Terminating state to the Terminating:Wait state to delay the termination of unhealthy Amazon EC2 instances. Configure a CloudWatch Events rule for the EC2 Instance-terminate Lifecycle Action Auto Scaling Event with an associated Lambda function. Trigger the CloudWatch agent to push the application logs and then resume the instance termination once all the logs are sent to CloudWatch Logs.
+
+#### Use CloudWatch Agent
+
+Using CloudWatch agent is the most suitable tool to use to collect the logs. The unified CloudWatch agent enables you to do the following:
+
+- Collect more system-level metrics from Amazon EC2 instances across operating systems. The metrics can include in-guest metrics, in addition to the metrics for EC2 instances. The additional metrics that can be collected are listed in Metrics Collected by the CloudWatch Agent.
+
+- Collect system-level metrics from on-premises servers. These can include servers in a hybrid environment as well as servers not managed by AWS.
+
+- Retrieve custom metrics from your applications or services using the StatsD and collectd protocols. StatsD is supported on both Linux servers and servers running Windows Server. collectd is supported only on Linux servers.
+
+- Collect logs from Amazon EC2 instances and on-premises servers, running either Linux or Windows Server.
+
+You can store and view the metrics that you collect with the CloudWatch agent in CloudWatch just as you can with any other CloudWatch metrics. The default namespace for metrics collected by the CloudWatch agent is CWAgent, although you can specify a different namespace when you configure the agent.
+
+#### Don't Use Step Functions
+
+Using AWS Step Functions is inappropriate in collecting the logs from your EC2 instances. You should use a CloudWatch agent instead.
 
 ## Dashboards
 

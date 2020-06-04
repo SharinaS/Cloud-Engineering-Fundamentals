@@ -56,6 +56,13 @@ A way of combining the digital environment with human beings.
 
 In SWF, you've gotten a human element to factor into the design process. If there's any sort of manual process, you will be using SWF.
 
+
+## Work Flow Executions
+
+By default, each workflow execution can run for a maximum of 1 year in Amazon SWF. This means that it is possible that in your workflow, there are some tasks which require manual action that renders it idle. As a result, some orders get stuck for, say, 4 weeks.
+
+Amazon SWF does not take any special action if a workflow execution is idle for an extended period of time. Idle executions are subject to the timeouts that you configure. For example, if you have set the maximum duration for an execution to be 1 day, then an idle execution will be timed out if it exceeds the 1 day limit. Idle executions are also subject to the Amazon SWF limit on how long an execution can run (1 year).
+
 ## SWF Actors
 
 ### Workflow Starters

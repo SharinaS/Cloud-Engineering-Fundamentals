@@ -2,9 +2,12 @@
 
 ## Index
 
-[Cognito](#Cognito)
-
-[Web Identity Federation](#Web-Identity-Federation)
+* [Cognito](#Cognito)
+* [Identity Pools](#Identity-Pools)
+* [Manage Identity Providers](#Manage-Identity-Providers)
+* [MFA](#MFA)
+* [User Pools](#User-Pools)
+* [Web Identity Federation](#Web-Identity-Federation)
 
 # Web Identity Federation
 
@@ -58,6 +61,12 @@ User pools provide:
 
 After successfully authenticating a user, Amazon Cognito issues **JSON web tokens (JWT)** that you can use to secure and authorize access to your own APIs, or exchange for AWS credentials.
 
+### MFA
+
+You can add multi-factor authentication (MFA) to a user pool to protect the identity of your users. MFA adds a second authentication method that doesn't rely solely on user name and password. You can choose to use SMS text messages, or time-based one-time (TOTP) passwords as second factors in signing in your users. 
+
+You can also use adaptive authentication with its risk-based model to predict when you might need another authentication factor. It's part of the user pool advanced security features, which also include protections against compromised credentials.
+
 ## Identity Pools
 
 Lets you retrive an Amazon Cognito identity from an identity pool.
@@ -92,4 +101,5 @@ Uses *SNS* to send a notification to all devices associated with a given user id
 
 ## Manage Identity Providers
 
-You can manage identity providers using IAM Dashboard instead of creating IAM users in your AWS account. With an identity provider (IdP), you can manage your user identities outside of AWS and give these external user identities permission to use AWS resources in your account.
+You can manage identity providers using IAM Dashboard instead of creating IAM users in your AWS account. With an identity provider (IdP), you can manage your user identities outside of AWS and give these external user identities permission to use AWS resources in your account. [See my file on this topic](https://github.com/SharinaS/Cloud-Engineering-Fundamentals/blob/master/authentication.md)
+

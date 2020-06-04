@@ -40,7 +40,7 @@ Organization allows for consolidated billing, which is beneficial in that the mo
 
 # Resource Access Manager
 
-AWS Resource Access Manager (RAM) is a service that enables you to easily and securely share AWS resources with any AWS account or within your AWS Organization. 
+AWS Resource Access Manager (RAM) is a service that enables you to easily and securely **share AWS resources** with any AWS account or within your AWS Organization. 
 
 You can share 
 
@@ -49,7 +49,7 @@ You can share
 * AWS License Manager configurations
 * Amazon Route 53 Resolver rules resources
 
-Many organizations use multiple accounts to create administrative or billing isolation, and limit the impact of errors. RAM eliminates the need to create duplicate resources in multiple accounts, reducing the operational overhead of managing those resources in every single account you own. 
+Many organizations use multiple accounts to create administrative or billing isolation, and limit the impact of errors. RAM **eliminates the need to create duplicate resources** in multiple accounts, reducing the operational overhead of managing those resources in every single account you own. 
 
 You can create resources centrally in a multi-account environment, and use RAM to share those resources across accounts in three simple steps: 
 
@@ -65,4 +65,4 @@ RAM leverages existing policies and permissions set in AWS Identity and Access M
 * improve security and visibility
 * optimize costs
 
--- [AWS](https://aws.amazon.com/ram/)
+[See more on AWS](https://aws.amazon.com/ram/).
